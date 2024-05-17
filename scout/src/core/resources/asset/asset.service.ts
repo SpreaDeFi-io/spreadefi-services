@@ -6,6 +6,24 @@ import { CreateAssetDto } from 'src/core/resources/asset/dto/create-asset.dto';
 export class AssetService {
   constructor(private readonly assetRepository: AssetRepository) {}
 
+  async getAssets() {
+    const data = await this.assetRepository.getAssets();
+
+    return data;
+  }
+
+  async getAssetBySymbol(symbol: string) {
+    const data = await this.assetRepository.getAssetBySymbol(symbol);
+
+    return data;
+  }
+
+  async getAssetById(id: string) {
+    const data = await this.assetRepository.getAssetById(id);
+
+    return data;
+  }
+
   async createAsset(createAssetDto: CreateAssetDto) {
     const assetId = this.generateAssetId(createAssetDto);
 
