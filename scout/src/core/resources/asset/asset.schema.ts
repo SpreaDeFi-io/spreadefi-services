@@ -10,6 +10,13 @@ export class Asset {
   @Prop({
     type: String,
     required: true,
+    unique: true,
+  })
+  assetId: string;
+
+  @Prop({
+    type: String,
+    required: true,
     index: true,
   })
   protocolName: string;

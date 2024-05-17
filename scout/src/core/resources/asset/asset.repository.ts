@@ -8,8 +8,8 @@ import { CreateAssetDto } from 'src/core/resources/asset/dto/create-asset.dto';
 export class AssetRepository {
   constructor(@InjectModel(Asset.name) private assetModel: Model<Asset>) {}
 
-  createAsset(createAssetDto: CreateAssetDto) {
-    const newAsset = new this.assetModel(createAssetDto);
+  createAsset(asset: CreateAssetDto & { assetId: string }) {
+    const newAsset = new this.assetModel(asset);
 
     return newAsset.save();
   }

@@ -7,8 +7,26 @@ export class AssetService {
   constructor(private readonly assetRepository: AssetRepository) {}
 
   async createAsset(createAssetDto: CreateAssetDto) {
-    const data = await this.assetRepository.createAsset(createAssetDto);
+    const assetId = this.generateAssetId(createAssetDto);
+
+    const asset = {
+      assetId,
+      ...createAssetDto,
+    };
+
+    const data = await this.assetRepository.createAsset(asset);
 
     return data;
+  }
+
+  private generateAssetId(createAssetDto: CreateAssetDto) {
+    const assetId =
+      createAssetDto.protocolName +
+      '-' +
+      createAssetDto.assetSymbol +
+      '-' +
+      createAssetDto.chainId;
+
+    return assetId;
   }
 }
