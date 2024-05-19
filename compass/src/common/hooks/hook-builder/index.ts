@@ -1,13 +1,13 @@
 import { ChainType, Hook, SquidCallType } from '@0xsquid/squid-types';
-import { HookArgs } from 'src/common/types/hook';
+import { HookBuilderArgs } from 'src/common/types';
 
-export const hookBuilder = (hookArgs: HookArgs): Hook => {
+export const hookBuilder = (hookBuilderArgs: HookBuilderArgs): Hook => {
   const hook: Hook = {
     chainType: ChainType.EVM,
-    fundToken: hookArgs.fundToken,
-    fundAmount: hookArgs.fundAmount,
-    description: hookArgs.description,
-    calls: hookArgs.calls.map((call) => {
+    fundToken: hookBuilderArgs.fundToken,
+    fundAmount: hookBuilderArgs.fundAmount,
+    description: hookBuilderArgs.description,
+    calls: hookBuilderArgs.calls.map((call) => {
       return {
         chainType: ChainType.EVM,
         callType: SquidCallType.DEFAULT,

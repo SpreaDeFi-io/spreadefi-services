@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 
-export class CreateQuoteDto {
+export class CreateSquidQuoteDto {
   @IsString()
   @IsNotEmpty()
   fromChain: string;

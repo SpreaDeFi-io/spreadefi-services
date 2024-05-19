@@ -2,7 +2,7 @@ import { Squid } from '@0xsquid/sdk';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SQUID_BASE_URL } from 'src/common/constants';
-import { SquidQuoteParams } from 'src/common/types/quote';
+import { RouteRequest } from '@0xsquid/squid-types';
 
 @Injectable()
 export class SquidService {
@@ -15,21 +15,31 @@ export class SquidService {
     });
   }
 
-  async createQuote(squidQuoteParams: SquidQuoteParams) {
+  async createQuote(squidQuoteArgs: Partial<RouteRequest>) {
     await this.squid.init();
 
-    const { route } = await this.squid.getRoute({
-      fromChain: squidQuoteParams.fromChain,
-      fromAmount: squidQuoteParams.fromAmount,
-      fromToken: squidQuoteParams.fromToken,
-      toChain: squidQuoteParams.toChain,
-      toToken: squidQuoteParams.toToken,
-      fromAddress: squidQuoteParams.fromAddress,
-      toAddress: squidQuoteParams.toAddress,
+    const config: RouteRequest = {
+      fromChain: squidQuoteArgs.fromChain,
+      fromAmount: squidQuoteArgs.fromAmount,
+      fromToken: squidQuoteArgs.fromToken,
+      toChain: squidQuoteArgs.toChain,
+      toToken: squidQuoteArgs.toToken,
+      fromAddress: squidQuoteArgs.fromAddress,
+      toAddress: squidQuoteArgs.toAddress,
       slippageConfig: {
-        autoMode: 1,
+        autoMode: 1, //!should be changed dynamically
       },
-    });
+    };
+
+    if (squidQuoteArgs.preHook) {
+      config.preHook = squidQuoteArgs.preHook;
+    }
+
+    if (squidQuoteArgs.postHook) {
+      config.postHook = squidQuoteArgs.postHook;
+    }
+
+    const { route } = await this.squid.getRoute(config);
 
     return route;
   }

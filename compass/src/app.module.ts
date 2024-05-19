@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { QuoteModule } from './core/resources/quote/quote.module';
+import { TransactionModule } from './core/resources/quote/transaction.module';
 
 @Module({
   imports: [
@@ -10,7 +10,7 @@ import { QuoteModule } from './core/resources/quote/quote.module';
       isGlobal: true,
       envFilePath: ['.env'],
     }),
-    QuoteModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
