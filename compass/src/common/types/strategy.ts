@@ -12,6 +12,8 @@ export enum Action {
   WITHDRAW = 'Withdraw',
   BORROW = 'Borrow',
   REPAY = 'Repay',
+  APPROVE = 'Approve',
+  SQUID = 'Squid',
 }
 export type StrategyArgs = Partial<RouteRequest> & {
   fundToken?: string;

@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { AAVE_POOL_ABI, ERC20_ABI } from 'src/common/constants';
-import { AaveConfig } from 'src/common/constants/config/aave';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { encodeFunctionData } from 'src/common/ethers';
-import { aaveSupplyHandler } from 'src/common/hooks/aave';
+import { aaveRepayHandler, aaveSupplyHandler } from 'src/common/hooks/aave';
+import { SquidService } from 'src/libs/squid/squid.service';
+import { AaveConfig } from 'src/common/constants/config/aave';
+import { AAVE_POOL_ABI, ERC20_ABI } from 'src/common/constants';
 import { Action, HookArgs, StrategyArgs } from 'src/common/types';
 import { PrepareTransactionDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
-import { SquidService } from 'src/libs/squid/squid.service';
 
 @Injectable()
 export class AaveService {
@@ -15,19 +15,23 @@ export class AaveService {
     action,
     txData,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
+    let transactions: any[];
     switch (action) {
       case Action.SUPPLY:
-        await this.supply(txData);
-        break;
+        transactions = await this.supply(txData);
+        return transactions;
       case Action.BORROW:
-        'do something';
-        break;
+        transactions = await this.borrow(txData);
+        return transactions;
       case Action.REPAY:
-        'do something';
+        // transactions = await this.repay(txData);
+        // return transactions;
         break;
       case Action.WITHDRAW:
-        'do something';
-        break;
+        transactions = await this.withdraw(txData);
+        return transactions;
+      default:
+        throw new BadRequestException('Undefined action');
     }
   }
 
@@ -52,12 +56,12 @@ export class AaveService {
       transactions.push(
         {
           to: txData.fromToken,
-          type: 'Approve',
+          type: Action.APPROVE,
           tx: tx1,
         },
         {
           to: AaveConfig[txData.fromChain].poolAddress,
-          type: 'Supply',
+          type: Action.SUPPLY,
           tx: tx2,
         },
       );
@@ -82,7 +86,82 @@ export class AaveService {
           },
         ],
       };
+      //* prepare the post hook
       const hook = aaveSupplyHandler(hookArgs);
+
+      //* prepare squid Transaction data
+      const tx1 = await this.squidService.createQuote({
+        ...txData,
+        postHook: hook,
+      });
+
+      transactions.push({
+        to: '',
+        type: Action.SQUID,
+        tx: tx1,
+      });
+
+      return transactions;
+    }
+  }
+
+  async borrow(txData: StrategyArgs) {
+    const transactions = [];
+
+    //* call borrow function
+    const tx1 = encodeFunctionData(AAVE_POOL_ABI, 'borrow', [
+      txData.fromToken,
+      txData.fromAmount,
+      1,
+      0,
+      txData.fromAddress,
+    ]);
+
+    transactions.push({
+      to: AaveConfig[txData.fromChain].poolAddress,
+      type: Action.BORROW,
+      tx: tx1,
+    });
+
+    if (txData.fromChain !== txData.toChain) {
+      const tx2 = await this.squidService.createQuote(txData);
+
+      transactions.push({
+        to: '',
+        type: Action.SQUID,
+        tx: tx2,
+      });
+    }
+
+    return transactions;
+  }
+
+  async repay(txData: StrategyArgs) {
+    const transactions = [];
+
+    if (txData.fromChain !== txData.toChain) {
+      const hookArgs: HookArgs = {
+        fundToken: txData.fromToken,
+        fundAmount: txData.fromAmount,
+        contracts: [
+          {
+            target: txData.toToken,
+            params: [AaveConfig[txData.toChain].poolAddress, txData.fromAmount], //!fromAmount here is wrong, it'll be toAmount, but we don't have toAmount. So, just use payload
+          },
+          {
+            target: AaveConfig[txData.toChain].poolAddress,
+            params: [
+              txData.toToken,
+              txData.fromAmount,
+              1,
+              0,
+              txData.fromAddress,
+            ], //!fromAmount here is wrong as well
+          },
+        ],
+      };
+
+      const hook = aaveRepayHandler(hookArgs);
 
       const tx1 = await this.squidService.createQuote({
         ...txData,
@@ -91,15 +170,79 @@ export class AaveService {
 
       transactions.push({
         to: '',
-        type: 'Squid',
+        type: Action.SQUID,
         tx: tx1,
+      });
+
+      return transactions;
+    } else {
+      const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
+        AaveConfig[txData.fromChain].poolAddress,
+        txData.fromAmount,
+      ]);
+
+      transactions.push({
+        to: txData.fromToken,
+        type: Action.APPROVE,
+        tx: tx1,
+      });
+
+      const tx2 = encodeFunctionData(AAVE_POOL_ABI, 'repay', [
+        txData.fromToken,
+        txData.fromAmount,
+        1,
+        0,
+        txData.fromAddress,
+      ]);
+
+      transactions.push({
+        to: AaveConfig[txData.fromChain].poolAddress,
+        type: Action.REPAY,
+        tx: tx2,
       });
 
       return transactions;
     }
   }
 
-  async borrow() {}
+  async withdraw(txData: StrategyArgs) {
+    const transactions = [];
 
-  async withdraw() {}
+    //** Take approval of the aToken
+    const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
+      AaveConfig[txData.fromChain].poolAddress,
+      txData.fromAmount,
+    ]);
+
+    transactions.push({
+      to: txData.fundToken,
+      type: Action.APPROVE,
+      tx: tx1,
+    });
+
+    //** Call the Withdraw method
+    const tx2 = encodeFunctionData(AAVE_POOL_ABI, 'withdraw', [
+      txData.fromToken,
+      txData.fromAmount,
+      txData.fromAddress,
+    ]);
+
+    transactions.push({
+      to: AaveConfig[txData.fromChain].poolAddress,
+      type: Action.WITHDRAW,
+      tx: tx2,
+    });
+
+    if (txData.fromChain !== txData.toChain) {
+      const tx3 = await this.squidService.createQuote(txData);
+
+      transactions.push({
+        to: '',
+        type: Action.SQUID,
+        tx: tx3,
+      });
+    }
+
+    return transactions;
+  }
 }
