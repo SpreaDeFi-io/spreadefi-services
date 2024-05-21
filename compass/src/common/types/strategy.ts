@@ -1,5 +1,4 @@
-// import { SquidQuoteArgs } from './quote';
-import { RouteRequest } from '@0xsquid/squid-types';
+// import { RouteRequest } from '@0xsquid/squid-types';
 
 export enum StrategyName {
   AAVE = 'Aave',
@@ -15,7 +14,7 @@ export enum Action {
   APPROVE = 'Approve',
   SQUID = 'Squid',
 }
-export type StrategyArgs = Partial<RouteRequest> & {
-  fundToken?: string;
-  fundAmount?: string;
-};
+// export type StrategyArgs = Partial<RouteRequest> & {
+//   fundToken?: string;
+//   fundAmount?: string;
+// };

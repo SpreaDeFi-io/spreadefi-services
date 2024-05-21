@@ -11,7 +11,7 @@ import { CreateSquidQuoteDto } from './create-squid-quote.dto';
 import { Type } from 'class-transformer';
 import { StrategyName, Action } from 'src/common/types';
 
-export class StrategyDto extends CreateSquidQuoteDto {
+export class TransactionDetailsDto extends CreateSquidQuoteDto {
   @IsString()
   @Length(42, 42)
   @IsOptional()
@@ -35,7 +35,7 @@ export class PrepareTransactionDto {
 
   @IsObject()
   @ValidateNested()
-  @Type(() => StrategyDto)
+  @Type(() => TransactionDetailsDto)
   @IsNotEmpty()
-  txData: StrategyDto;
+  txDetails: TransactionDetailsDto;
 }

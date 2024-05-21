@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateSquidQuoteDto } from 'src/core/resources/quote/dto/create-squid-quote.dto';
-import { AaveService } from 'src/libs/strategies/aave/aave.service';
-import { SquidService } from 'src/libs/squid/squid.service';
-import { PrepareTransactionDto } from './dto/prepare-transaction.dto';
 import { StrategyName } from 'src/common/types';
+import { SquidService } from 'src/libs/squid/squid.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { AaveService } from 'src/libs/strategies/aave/aave.service';
+import { PrepareTransactionDto } from './dto/prepare-transaction.dto';
 import { SeamlessService } from 'src/libs/strategies/seamless/seamless.service';
+import { CreateSquidQuoteDto } from 'src/core/resources/quote/dto/create-squid-quote.dto';
 
 @Injectable()
 export class TransactionService {
@@ -23,22 +23,27 @@ export class TransactionService {
   async prepareTransaction({
     strategyName,
     action,
-    txData,
+    txDetails,
   }: PrepareTransactionDto) {
     let transactions;
+
     switch (strategyName) {
+      //* If strategy name is aave, then prepare transactions for aave
       case StrategyName.AAVE:
         transactions = await this.aaveService.prepareAaveTransaction({
           action,
-          txData,
+          txDetails,
         });
         return transactions;
+
+      //* If strategy name is seamless, then prepare transactions for seamless
       case StrategyName.SEAMLESS:
         transactions = await this.seamlessService.prepareSeamlessTransaction({
           action,
-          txData,
+          txDetails,
         });
         return transactions;
+
       default:
         throw new BadRequestException('Protocol or action not supported');
     }
