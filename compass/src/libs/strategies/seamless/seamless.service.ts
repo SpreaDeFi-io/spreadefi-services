@@ -1,20 +1,24 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { encodeFunctionData } from 'src/common/ethers';
-import { aaveRepayHandler, aaveSupplyHandler } from 'src/common/hooks/aave';
-import { SquidService } from 'src/libs/squid/squid.service';
-import { aaveConfig } from 'src/common/constants/config/aave';
-import { AAVE_POOL_ABI, ERC20_ABI } from 'src/common/constants';
-import { Action, HookArgs, StrategyArgs } from 'src/common/types';
+import { BadRequestException } from '@nestjs/common';
 import { PrepareTransactionDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
+import { Action, HookArgs, StrategyArgs } from 'src/common/types';
+import { encodeFunctionData } from 'src/common/ethers';
+import { ERC20_ABI, SEAMLESS_POOL_ABI } from 'src/common/constants';
+import { seamlessConfig } from 'src/common/constants/config/seamless';
+import { SquidService } from 'src/libs/squid/squid.service';
+import {
+  seamlessRepayHandler,
+  seamlessSupplyHandler,
+} from 'src/common/hooks/seamless';
 
-@Injectable()
-export class AaveService {
+export class SeamlessService {
   constructor(private readonly squidService: SquidService) {}
 
-  async prepareAaveTransaction({
+  async prepareSeamlessTransaction({
     action,
     txData,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
+    //!handle seamless functions differently as seamless is only available on base, so sometimes the dest chain and source chain should be base only
+
     let transactions: any[];
     switch (action) {
       case Action.SUPPLY:
@@ -38,15 +42,16 @@ export class AaveService {
   async supply(txData: StrategyArgs) {
     const transactions = [];
 
-    if (txData.fromChain === txData.toChain) {
+    //* seamless is only present on base
+    if (txData.fromChain === txData.toChain && txData.fromChain === '8453') {
       //** Approve the tokens first
       const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-        aaveConfig[txData.fromChain].poolAddress,
+        seamlessConfig[txData.fromChain].poolAddress,
         txData.fromAmount,
       ]);
 
       //** call the supply method
-      const tx2 = encodeFunctionData(AAVE_POOL_ABI, 'supply', [
+      const tx2 = encodeFunctionData(SEAMLESS_POOL_ABI, 'supply', [
         txData.fromToken,
         txData.fromAmount,
         txData.fromAddress,
@@ -60,7 +65,7 @@ export class AaveService {
           tx: tx1,
         },
         {
-          to: aaveConfig[txData.fromChain].poolAddress,
+          to: seamlessConfig[txData.fromChain].poolAddress,
           type: Action.SUPPLY,
           tx: tx2,
         },
@@ -69,7 +74,7 @@ export class AaveService {
       return transactions;
     } else {
       //* get the quote from squid
-      //! How should we manage slippage goes here, I think it can be managed by actually overwriting the payload in aave supply handler
+      //! How should we manage slippage goes here, I think it can be managed by actually overwriting the payload in seamless supply handler
       //! we need to add payload in this case here
       //! add checks as well that this token should be available to deposit first before making the transaction
       const hookArgs: HookArgs = {
@@ -78,16 +83,19 @@ export class AaveService {
         contracts: [
           {
             target: txData.toToken,
-            params: [aaveConfig[txData.toChain].poolAddress, txData.fromAmount], //!fromAmount here is wrong, it'll be toAmount, but we don't have toAmount. So, just use payload
+            params: [
+              seamlessConfig[txData.toChain].poolAddress,
+              txData.fromAmount,
+            ], //!fromAmount here is wrong, it'll be toAmount, but we don't have toAmount. So, just use payload
           },
           {
-            target: aaveConfig[txData.toChain].poolAddress,
+            target: seamlessConfig[txData.toChain].poolAddress,
             params: [txData.toToken, txData.fromAmount, txData.fromAddress, 0], //!fromAmount here is wrong as well
           },
         ],
       };
       //* prepare the post hook
-      const hook = aaveSupplyHandler(hookArgs);
+      const hook = seamlessSupplyHandler(hookArgs);
 
       //* prepare squid Transaction data
       const tx1 = await this.squidService.createQuote({
@@ -109,7 +117,7 @@ export class AaveService {
     const transactions = [];
 
     //* call borrow function
-    const tx1 = encodeFunctionData(AAVE_POOL_ABI, 'borrow', [
+    const tx1 = encodeFunctionData(SEAMLESS_POOL_ABI, 'borrow', [
       txData.fromToken,
       txData.fromAmount,
       1,
@@ -118,7 +126,7 @@ export class AaveService {
     ]);
 
     transactions.push({
-      to: aaveConfig[txData.fromChain].poolAddress,
+      to: seamlessConfig[txData.fromChain].poolAddress,
       type: Action.BORROW,
       tx: tx1,
     });
@@ -146,10 +154,13 @@ export class AaveService {
         contracts: [
           {
             target: txData.toToken,
-            params: [aaveConfig[txData.toChain].poolAddress, txData.fromAmount], //!fromAmount here is wrong, it'll be toAmount, but we don't have toAmount. So, just use payload
+            params: [
+              seamlessConfig[txData.toChain].poolAddress,
+              txData.fromAmount,
+            ], //!fromAmount here is wrong, it'll be toAmount, but we don't have toAmount. So, just use payload
           },
           {
-            target: aaveConfig[txData.toChain].poolAddress,
+            target: seamlessConfig[txData.toChain].poolAddress,
             params: [
               txData.toToken,
               txData.fromAmount,
@@ -161,7 +172,7 @@ export class AaveService {
         ],
       };
 
-      const hook = aaveRepayHandler(hookArgs);
+      const hook = seamlessRepayHandler(hookArgs);
 
       const tx1 = await this.squidService.createQuote({
         ...txData,
@@ -177,7 +188,7 @@ export class AaveService {
       return transactions;
     } else {
       const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-        aaveConfig[txData.fromChain].poolAddress,
+        seamlessConfig[txData.fromChain].poolAddress,
         txData.fromAmount,
       ]);
 
@@ -187,7 +198,7 @@ export class AaveService {
         tx: tx1,
       });
 
-      const tx2 = encodeFunctionData(AAVE_POOL_ABI, 'repay', [
+      const tx2 = encodeFunctionData(SEAMLESS_POOL_ABI, 'repay', [
         txData.fromToken,
         txData.fromAmount,
         1,
@@ -196,7 +207,7 @@ export class AaveService {
       ]);
 
       transactions.push({
-        to: aaveConfig[txData.fromChain].poolAddress,
+        to: seamlessConfig[txData.fromChain].poolAddress,
         type: Action.REPAY,
         tx: tx2,
       });
@@ -210,7 +221,7 @@ export class AaveService {
 
     //** Take approval of the aToken
     const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-      aaveConfig[txData.fromChain].poolAddress,
+      seamlessConfig[txData.fromChain].poolAddress,
       txData.fromAmount,
     ]);
 
@@ -221,14 +232,14 @@ export class AaveService {
     });
 
     //** Call the Withdraw method
-    const tx2 = encodeFunctionData(AAVE_POOL_ABI, 'withdraw', [
+    const tx2 = encodeFunctionData(SEAMLESS_POOL_ABI, 'withdraw', [
       txData.fromToken,
       txData.fromAmount,
       txData.fromAddress,
     ]);
 
     transactions.push({
-      to: aaveConfig[txData.fromChain].poolAddress,
+      to: seamlessConfig[txData.fromChain].poolAddress,
       type: Action.WITHDRAW,
       tx: tx2,
     });

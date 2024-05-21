@@ -85,7 +85,7 @@ export const aaveRepayHandler = (hookArgs: HookArgs) => {
   const hook = hookBuilder({
     fundToken: hookArgs.fundToken,
     fundAmount: hookArgs.fundAmount,
-    description: 'Repay backe to aave protocol using squid',
+    description: 'Repay back to aave protocol using squid',
     calls,
   });
 

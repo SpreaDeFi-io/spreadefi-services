@@ -15,6 +15,11 @@ export const hookBuilder = (hookBuilderArgs: HookBuilderArgs): Hook => {
         callData: call.callData,
         estimatedGas: call.estimatedGas ?? '300000',
         value: '0',
+        payload: {
+          //! this payload is just for testing, so squid calls don't fail
+          tokenAddress: call.target,
+          inputPos: 1,
+        },
       };
     }),
   };

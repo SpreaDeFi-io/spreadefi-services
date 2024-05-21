@@ -1,4 +1,4 @@
-export const AaveConfig = {
+export const aaveConfig = {
   '42161': {
     poolAddress: '0x794a61358D6845594F94dc1DB02A252b5b4814aD',
   },
