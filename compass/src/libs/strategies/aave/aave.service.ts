@@ -2,7 +2,7 @@ import { Action, ExecutableTransaction } from 'src/common/types';
 import { encodeFunctionData } from 'src/common/ethers';
 import { SquidService } from 'src/libs/squid/squid.service';
 import { aaveConfig } from 'src/common/constants/config/aave';
-import { AAVE_POOL_ABI, ERC20_ABI } from 'src/common/constants';
+import { AAVE_POOL_ABI, ERC20_ABI } from 'src/common/constants/abi';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { aaveRepayHandler, aaveSupplyHandler } from 'src/common/hooks/aave';
 import {
@@ -101,7 +101,7 @@ export class AaveService {
     const tx1 = encodeFunctionData(AAVE_POOL_ABI, 'borrow', [
       txDetails.fromToken,
       txDetails.fromAmount,
-      1,
+      2,
       0,
       txDetails.fromAddress,
     ]);

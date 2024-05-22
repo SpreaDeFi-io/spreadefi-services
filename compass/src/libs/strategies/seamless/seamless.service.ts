@@ -2,7 +2,7 @@ import { Action, ExecutableTransaction } from 'src/common/types';
 import { BadRequestException } from '@nestjs/common';
 import { encodeFunctionData } from 'src/common/ethers';
 import { SquidService } from 'src/libs/squid/squid.service';
-import { ERC20_ABI, SEAMLESS_POOL_ABI } from 'src/common/constants';
+import { ERC20_ABI, SEAMLESS_POOL_ABI } from 'src/common/constants/abi';
 import { seamlessConfig } from 'src/common/constants/config/seamless';
 import {
   seamlessRepayHandler,
@@ -110,7 +110,7 @@ export class SeamlessService {
     const tx1 = encodeFunctionData(SEAMLESS_POOL_ABI, 'borrow', [
       txDetails.fromToken,
       txDetails.fromAmount,
-      1,
+      2,
       0,
       txDetails.fromAddress,
     ]);

@@ -1,5 +1,5 @@
 import { SquidCallType } from '@0xsquid/squid-types';
-import { ERC20_ABI, ZEROLEND_POOL_ABI } from 'src/common/constants';
+import { ERC20_ABI, ZEROLEND_POOL_ABI } from 'src/common/constants/abi';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
 import { encodeFunctionData } from 'src/common/ethers';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
