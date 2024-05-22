@@ -31,7 +31,6 @@ export class AaveService {
       case Action.REPAY:
         transactions = await this.repay(txDetails);
         return transactions;
-        break;
 
       case Action.WITHDRAW:
         transactions = await this.withdraw(txDetails);
