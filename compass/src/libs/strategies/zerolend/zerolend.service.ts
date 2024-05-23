@@ -15,8 +15,6 @@ import {
 import { SquidService } from 'src/libs/squid/squid.service';
 
 export class ZerolendService {
-  //!handle zerolend functions differently as zerolend is only available on linea, so sometimes the dest chain and source chain should be linea only
-
   constructor(private readonly squidService: SquidService) {}
 
   async prepareZerolendTransaction({
@@ -49,7 +47,11 @@ export class ZerolendService {
   async supply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    if (txDetails.fromChain === txDetails.toChain) {
+    //* Integrate zerolend for linea chain only
+    if (
+      txDetails.fromChain === txDetails.toChain &&
+      txDetails.fromChain === '59144'
+    ) {
       //** Approve the tokens first
       //** If token is ethereum we don't need approval
 

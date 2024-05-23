@@ -45,6 +45,7 @@ export class AaveService {
   async supply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
+    //* If user wants to supply on the same chain
     if (txDetails.fromChain === txDetails.toChain) {
       //** Approve the tokens first
       //** If token is ethereum we don't need approval

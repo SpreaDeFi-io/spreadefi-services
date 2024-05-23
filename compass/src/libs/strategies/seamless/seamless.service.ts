@@ -21,8 +21,6 @@ export class SeamlessService {
     action,
     txDetails,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
-    //!handle seamless functions differently as seamless is only available on base, so sometimes the dest chain and source chain should be base only
-
     let transactions: Array<ExecutableTransaction> = [];
     switch (action) {
       case Action.SUPPLY:
