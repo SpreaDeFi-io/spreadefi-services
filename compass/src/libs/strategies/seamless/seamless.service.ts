@@ -12,6 +12,7 @@ import {
   PrepareTransactionDto,
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
+import { ETHEREUM_ADDRESS } from 'src/common/constants';
 
 export class SeamlessService {
   constructor(private readonly squidService: SquidService) {}
@@ -51,39 +52,37 @@ export class SeamlessService {
       txDetails.fromChain === '8453'
     ) {
       //** Approve the tokens first
-      const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-        seamlessConfig[txDetails.fromChain].poolAddress,
-        txDetails.fromAmount,
-      ]);
+      //** If token is ethereum we don't need approval
+      if (txDetails.fromToken !== ETHEREUM_ADDRESS) {
+        const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
+          seamlessConfig[txDetails.fromChain].poolAddress,
+          txDetails.fromAmount,
+        ]);
+
+        transactions.push({
+          to: txDetails.fromToken,
+          type: Action.APPROVE,
+          tx: tx1,
+        });
+      }
 
       //** call the supply method
       const tx2 = encodeFunctionData(SEAMLESS_POOL_ABI, 'supply', [
-        txDetails.fromToken,
+        txDetails.fromToken, //! fromToken will be different if eth is supplied
         txDetails.fromAmount,
         txDetails.fromAddress,
         0,
       ]);
 
-      transactions.push(
-        {
-          to: txDetails.fromToken,
-          type: Action.APPROVE,
-          tx: tx1,
-        },
-        {
-          to: seamlessConfig[txDetails.fromChain].poolAddress,
-          type: Action.SUPPLY,
-          tx: tx2,
-        },
-      );
+      transactions.push({
+        to: seamlessConfig[txDetails.fromChain].poolAddress,
+        type: Action.SUPPLY,
+        tx: tx2,
+      });
 
       return transactions;
     } else {
       //* get the quote from squid
-      //! How should we manage slippage goes here, I think it can be managed by actually overwriting the payload in seamless supply handler
-      //! we need to add payload in this case here
-      //! add checks as well that this token should be available to deposit first before making the transaction
-
       //* prepare the post hook
       const hook = seamlessSupplyHandler(txDetails);
 
@@ -108,7 +107,7 @@ export class SeamlessService {
 
     //* call borrow function
     const tx1 = encodeFunctionData(SEAMLESS_POOL_ABI, 'borrow', [
-      txDetails.fromToken,
+      txDetails.fromToken, //! fromToken will be different if we are borrowing eth
       txDetails.fromAmount,
       2,
       0,
@@ -153,22 +152,22 @@ export class SeamlessService {
 
       return transactions;
     } else {
-      const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-        seamlessConfig[txDetails.fromChain].poolAddress,
-        txDetails.fromAmount,
-      ]);
+      if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+        const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
+          seamlessConfig[txDetails.fromChain].poolAddress,
+          txDetails.fromAmount,
+        ]);
 
-      transactions.push({
-        to: txDetails.fromToken,
-        type: Action.APPROVE,
-        tx: tx1,
-      });
-
+        transactions.push({
+          to: txDetails.fromToken,
+          type: Action.APPROVE,
+          tx: tx1,
+        });
+      }
       const tx2 = encodeFunctionData(SEAMLESS_POOL_ABI, 'repay', [
-        txDetails.fromToken,
+        txDetails.fromToken, //! fromToken will differ here if token is ETH
         txDetails.fromAmount,
-        1,
-        0,
+        2,
         txDetails.fromAddress,
       ]);
 
@@ -199,7 +198,7 @@ export class SeamlessService {
 
     //** Call the Withdraw method
     const tx2 = encodeFunctionData(SEAMLESS_POOL_ABI, 'withdraw', [
-      txDetails.fromToken,
+      txDetails.fromToken, //!fromToken will differ here in case of ETH
       txDetails.fromAmount,
       txDetails.fromAddress,
     ]);
