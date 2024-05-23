@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AssetModule } from './core/resources/asset/asset.module';
 import { ApyModule } from './core/resources/apy/apy.module';
+import { CronModule } from './core/resources/cron/cron.module';
 
 @Module({
   imports: [
@@ -18,11 +19,12 @@ import { ApyModule } from './core/resources/apy/apy.module';
       useFactory: (configService: ConfigService) => ({
         uri:
           configService.get<string>('MONGODB_URI') ??
-          'mongodb://localhost:27017/spreadefi',
+          'mongodb+srv://drypfi:nQK0e8lN6NVFuHDU@drypfi-cluster.mqcytqc.mongodb.net/spreadefi',
       }),
     }),
     AssetModule,
     ApyModule,
+    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService],
