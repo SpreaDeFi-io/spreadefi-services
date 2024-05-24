@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+import { ETHEREUM_ADDRESS } from 'src/common/constants';
 import { ERC20_ABI, ZEROLEND_POOL_ABI } from 'src/common/constants/abi';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
 import { encodeFunctionData } from 'src/common/ethers';
@@ -14,8 +15,6 @@ import {
 import { SquidService } from 'src/libs/squid/squid.service';
 
 export class ZerolendService {
-  //!handle zerolend functions differently as zerolend is only available on linea, so sometimes the dest chain and source chain should be linea only
-
   constructor(private readonly squidService: SquidService) {}
 
   async prepareZerolendTransaction({
@@ -48,33 +47,40 @@ export class ZerolendService {
   async supply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    if (txDetails.fromChain === txDetails.toChain) {
+    //* Integrate zerolend for linea chain only
+    if (
+      txDetails.fromChain === txDetails.toChain &&
+      txDetails.fromChain === '59144'
+    ) {
       //** Approve the tokens first
-      const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-        zerolendConfig[txDetails.fromChain].poolAddress,
-        txDetails.fromAmount,
-      ]);
+      //** If token is ethereum we don't need approval
+
+      if (txDetails.fromToken !== ETHEREUM_ADDRESS) {
+        const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
+          zerolendConfig[txDetails.fromChain].poolAddress,
+          txDetails.fromAmount,
+        ]);
+
+        transactions.push({
+          to: txDetails.fromToken,
+          type: Action.APPROVE,
+          tx: tx1,
+        });
+      }
 
       //** call the supply method
       const tx2 = encodeFunctionData(ZEROLEND_POOL_ABI, 'supply', [
-        txDetails.fromToken,
+        txDetails.fromToken, //! fromToken will be different if eth is supplied
         txDetails.fromAmount,
         txDetails.fromAddress,
         0,
       ]);
 
-      transactions.push(
-        {
-          to: txDetails.fromToken,
-          type: Action.APPROVE,
-          tx: tx1,
-        },
-        {
-          to: zerolendConfig[txDetails.fromChain].poolAddress,
-          type: Action.SUPPLY,
-          tx: tx2,
-        },
-      );
+      transactions.push({
+        to: zerolendConfig[txDetails.fromChain].poolAddress,
+        type: Action.SUPPLY,
+        tx: tx2,
+      });
 
       return transactions;
     } else {
@@ -103,7 +109,7 @@ export class ZerolendService {
 
     //* call borrow function
     const tx1 = encodeFunctionData(ZEROLEND_POOL_ABI, 'borrow', [
-      txDetails.fromToken,
+      txDetails.fromToken, //! fromToken will be different if we are borrowing eth
       txDetails.fromAmount,
       2,
       0,
@@ -148,19 +154,21 @@ export class ZerolendService {
 
       return transactions;
     } else {
-      const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-        zerolendConfig[txDetails.fromChain].poolAddress,
-        txDetails.fromAmount,
-      ]);
+      if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+        const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
+          zerolendConfig[txDetails.fromChain].poolAddress,
+          txDetails.fromAmount,
+        ]);
 
-      transactions.push({
-        to: txDetails.fromToken,
-        type: Action.APPROVE,
-        tx: tx1,
-      });
+        transactions.push({
+          to: txDetails.fromToken,
+          type: Action.APPROVE,
+          tx: tx1,
+        });
+      }
 
       const tx2 = encodeFunctionData(ZEROLEND_POOL_ABI, 'repay', [
-        txDetails.fromToken,
+        txDetails.fromToken, //! fromToken will differ here if token is ETH
         txDetails.fromAmount,
         1,
         0,
@@ -194,7 +202,7 @@ export class ZerolendService {
 
     //** Call the Withdraw method
     const tx2 = encodeFunctionData(ZEROLEND_POOL_ABI, 'withdraw', [
-      txDetails.fromToken,
+      txDetails.fromToken, //!fromToken will differ here in case of ETH
       txDetails.fromAmount,
       txDetails.fromAddress,
     ]);

@@ -9,6 +9,7 @@ import {
   PrepareTransactionDto,
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
+import { ETHEREUM_ADDRESS } from 'src/common/constants';
 
 @Injectable()
 export class AaveService {
@@ -44,33 +45,36 @@ export class AaveService {
   async supply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
+    //* If user wants to supply on the same chain
     if (txDetails.fromChain === txDetails.toChain) {
       //** Approve the tokens first
-      const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-        aaveConfig[txDetails.fromChain].poolAddress,
-        txDetails.fromAmount,
-      ]);
+      //** If token is ethereum we don't need approval
+      if (txDetails.fromToken !== ETHEREUM_ADDRESS) {
+        const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
+          aaveConfig[txDetails.fromChain].poolAddress,
+          txDetails.fromAmount,
+        ]);
+
+        transactions.push({
+          to: txDetails.fromToken,
+          type: Action.APPROVE,
+          tx: tx1,
+        });
+      }
 
       //** call the supply method
       const tx2 = encodeFunctionData(AAVE_POOL_ABI, 'supply', [
-        txDetails.fromToken,
+        txDetails.fromToken, //! fromToken will be different if eth is supplied
         txDetails.fromAmount,
         txDetails.fromAddress,
         0,
       ]);
 
-      transactions.push(
-        {
-          to: txDetails.fromToken,
-          type: Action.APPROVE,
-          tx: tx1,
-        },
-        {
-          to: aaveConfig[txDetails.fromChain].poolAddress,
-          type: Action.SUPPLY,
-          tx: tx2,
-        },
-      );
+      transactions.push({
+        to: aaveConfig[txDetails.fromChain].poolAddress,
+        type: Action.SUPPLY,
+        tx: tx2,
+      });
 
       return transactions;
     } else {
@@ -99,7 +103,7 @@ export class AaveService {
 
     //* call borrow function
     const tx1 = encodeFunctionData(AAVE_POOL_ABI, 'borrow', [
-      txDetails.fromToken,
+      txDetails.fromToken, //! fromToken will be different if we are borrowing eth
       txDetails.fromAmount,
       2,
       0,
@@ -144,22 +148,23 @@ export class AaveService {
 
       return transactions;
     } else {
-      const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-        aaveConfig[txDetails.fromChain].poolAddress,
-        txDetails.fromAmount,
-      ]);
+      if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+        const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
+          aaveConfig[txDetails.fromChain].poolAddress,
+          txDetails.fromAmount,
+        ]);
 
-      transactions.push({
-        to: txDetails.fromToken,
-        type: Action.APPROVE,
-        tx: tx1,
-      });
+        transactions.push({
+          to: txDetails.fromToken,
+          type: Action.APPROVE,
+          tx: tx1,
+        });
+      }
 
       const tx2 = encodeFunctionData(AAVE_POOL_ABI, 'repay', [
-        txDetails.fromToken,
+        txDetails.fromToken, //! fromToken will differ here if token is ETH
         txDetails.fromAmount,
-        1,
-        0,
+        2,
         txDetails.fromAddress,
       ]);
 
@@ -190,7 +195,7 @@ export class AaveService {
 
     //** Call the Withdraw method
     const tx2 = encodeFunctionData(AAVE_POOL_ABI, 'withdraw', [
-      txDetails.fromToken,
+      txDetails.fromToken, //!fromToken will differ here in case of ETH
       txDetails.fromAmount,
       txDetails.fromAddress,
     ]);
