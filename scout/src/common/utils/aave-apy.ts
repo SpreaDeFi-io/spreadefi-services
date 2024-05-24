@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
-import { AAVE_ABI, AAVE_POOL_ADDRESSES, RPC_URLS } from '../constants';
+import { RPC_URLS } from '../constants';
+import { AAVE_ABI, AAVE_POOL_ADDRESSES } from '../constants/aave';
 
 async function getAaveApy(assetAddress: string, chainId: string) {
   try {
@@ -12,6 +13,7 @@ async function getAaveApy(assetAddress: string, chainId: string) {
     return apy;
   } catch (error) {
     console.error('Error fetching APY:', error);
+    return null;
   }
 }
 

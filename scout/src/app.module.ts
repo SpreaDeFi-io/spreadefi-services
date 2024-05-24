@@ -19,7 +19,7 @@ import { CronModule } from './core/resources/cron/cron.module';
       useFactory: (configService: ConfigService) => ({
         uri:
           configService.get<string>('MONGODB_URI') ??
-          'mongodb+srv://drypfi:nQK0e8lN6NVFuHDU@drypfi-cluster.mqcytqc.mongodb.net/spreadefi',
+          'mongodb://localhost:27017/spreadefi',
       }),
     }),
     AssetModule,
