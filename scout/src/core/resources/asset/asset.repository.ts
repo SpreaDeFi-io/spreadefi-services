@@ -15,6 +15,8 @@ export class AssetRepository {
           _id: '$assetSymbol',
           chainIds: { $addToSet: '$chainId' },
           protocolNames: { $addToSet: '$protocolName' },
+          assetApys: { $addToSet: '$assetApy' },
+          boostedApys: { $addToSet: '$boostedApy' },
         },
       },
       {
@@ -23,6 +25,14 @@ export class AssetRepository {
           assetSymbol: '$_id',
           chainIds: 1,
           protocolNames: 1,
+          assetApys: 1,
+          boostedApys: 1,
+        },
+      },
+      {
+        $addFields: {
+          assetApys: { $sortArray: { input: '$assetApys', sortBy: 1 } },
+          boostedApys: { $sortArray: { input: '$boostedApys', sortBy: 1 } },
         },
       },
     ]);
