@@ -1,12 +1,17 @@
 import { ethers } from 'ethers';
 import { RPC_URLS } from '../constants';
-import { AAVE_ABI, AAVE_POOL_ADDRESSES } from '../constants/aave';
+import { AAVE_POOL_ABI } from '../constants/abi';
+import { aaveConfig } from '../constants/config/aave';
 
 async function getAaveApy(assetAddress: string, chainId: string) {
   try {
     const provider = new ethers.JsonRpcProvider(RPC_URLS[chainId]);
-    const aaveAddress = AAVE_POOL_ADDRESSES[chainId];
-    const aaveContract = new ethers.Contract(aaveAddress, AAVE_ABI, provider);
+    const aaveAddress = aaveConfig[chainId].poolAddress;
+    const aaveContract = new ethers.Contract(
+      aaveAddress,
+      AAVE_POOL_ABI,
+      provider,
+    );
     const reserveData = await aaveContract.getReserveData(assetAddress);
     const liquidityRateRay: bigint = reserveData[2];
     const apy = Number(liquidityRateRay) / 1e25;
