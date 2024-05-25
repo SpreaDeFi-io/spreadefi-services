@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AssetModule } from './core/resources/asset/asset.module';
 import { ApyModule } from './core/resources/apy/apy.module';
+import { CronModule } from './core/resources/cron/cron.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ApyModule } from './core/resources/apy/apy.module';
     }),
     AssetModule,
     ApyModule,
+    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService],
