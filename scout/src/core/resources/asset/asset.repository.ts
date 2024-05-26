@@ -12,7 +12,7 @@ export class AssetRepository {
     const data = await this.assetModel.aggregate([
       {
         $group: {
-          _id: '$assetSymbol',
+          _id: { assetSymbol: '$assetSymbol', protocolType: '$protocolType' },
           chainIds: { $addToSet: '$chainId' },
           protocolNames: { $addToSet: '$protocolName' },
           assetApys: { $addToSet: '$assetApy' },
@@ -22,7 +22,8 @@ export class AssetRepository {
       {
         $project: {
           _id: 0,
-          assetSymbol: '$_id',
+          assetSymbol: '$_id.assetSymbol',
+          protocolType: '$_id.protocolType',
           chainIds: 1,
           protocolNames: 1,
           assetApys: 1,

@@ -3,6 +3,11 @@ import { HydratedDocument } from 'mongoose';
 
 export type AssetDocument = HydratedDocument<Asset>;
 
+export enum ProtocolType {
+  LENDING = 'Lending',
+  YIELD = 'Yield',
+}
+
 @Schema({
   timestamps: true,
 })
@@ -20,6 +25,13 @@ export class Asset {
     index: true,
   })
   protocolName: string;
+
+  @Prop({
+    type: String,
+    enum: ProtocolType,
+    required: true,
+  })
+  protocolType: ProtocolType;
 
   @Prop({
     type: String,
