@@ -207,6 +207,7 @@ export class SeamlessService {
       tx: tx2,
     });
 
+    //! haven't added the support to withdraw/swap to other token yet
     if (txDetails.fromChain !== txDetails.toChain) {
       const tx3 = await this.squidService.createQuote(txDetails);
 

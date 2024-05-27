@@ -21,7 +21,7 @@ export class ZerolendService {
     action,
     txDetails,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
-    let transactions: any[];
+    let transactions: Array<ExecutableTransaction> = [];
     switch (action) {
       case Action.SUPPLY:
         transactions = await this.supply(txDetails);
@@ -213,6 +213,7 @@ export class ZerolendService {
       tx: tx2,
     });
 
+    //! haven't added the support to withdraw/swap to other token yet
     if (txDetails.fromChain !== txDetails.toChain) {
       const tx3 = await this.squidService.createQuote(txDetails);
 

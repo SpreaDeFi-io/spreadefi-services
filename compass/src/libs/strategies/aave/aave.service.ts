@@ -18,8 +18,10 @@ export class AaveService {
   async prepareAaveTransaction({
     action,
     txDetails,
-  }: Omit<PrepareTransactionDto, 'strategyName'>) {
-    let transactions: any[];
+  }: Omit<PrepareTransactionDto, 'strategyName'>): Promise<
+    Array<ExecutableTransaction>
+  > {
+    let transactions: Array<ExecutableTransaction> = [];
     switch (action) {
       case Action.SUPPLY:
         transactions = await this.supply(txDetails);
@@ -205,6 +207,8 @@ export class AaveService {
       type: Action.WITHDRAW,
       tx: tx2,
     });
+
+    //! haven't added the support to withdraw/swap to other token yet
 
     if (txDetails.fromChain !== txDetails.toChain) {
       const tx3 = await this.squidService.createQuote(txDetails);

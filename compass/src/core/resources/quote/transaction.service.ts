@@ -1,10 +1,12 @@
-import { StrategyName } from 'src/common/types';
+import { ExecutableTransaction, StrategyName } from 'src/common/types';
 import { SquidService } from 'src/libs/squid/squid.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { AaveService } from 'src/libs/strategies/aave/aave.service';
 import { PrepareTransactionDto } from './dto/prepare-transaction.dto';
 import { SeamlessService } from 'src/libs/strategies/seamless/seamless.service';
 import { CreateSquidQuoteDto } from 'src/core/resources/quote/dto/create-squid-quote.dto';
+import { ZerolendService } from 'src/libs/strategies/zerolend/zerolend.service';
+import { AaveSeamlessService } from 'src/libs/strategies/aave-seamless/aave-seamless.service';
 
 @Injectable()
 export class TransactionService {
@@ -12,6 +14,8 @@ export class TransactionService {
     private readonly squidService: SquidService,
     private readonly aaveService: AaveService,
     private readonly seamlessService: SeamlessService,
+    private readonly zerolendService: ZerolendService,
+    private readonly aaveSeamlessService: AaveSeamlessService,
   ) {}
 
   async createQuote(createQuoteDto: CreateSquidQuoteDto) {
@@ -25,7 +29,7 @@ export class TransactionService {
     action,
     txDetails,
   }: PrepareTransactionDto) {
-    let transactions;
+    let transactions: Array<ExecutableTransaction> = [];
 
     switch (strategyName) {
       //* If strategy name is aave, then prepare transactions for aave
@@ -42,6 +46,24 @@ export class TransactionService {
           action,
           txDetails,
         });
+        return transactions;
+
+      //* If strategy name is zerolend, then prepare transactions for zerolend
+      case StrategyName.ZEROLEND:
+        transactions = await this.zerolendService.prepareZerolendTransaction({
+          action,
+          txDetails,
+        });
+        return transactions;
+
+      //* If it is a combined strategy, related to aave and seamless
+      case StrategyName.AAVE_SEAMLESS:
+        transactions =
+          await this.aaveSeamlessService.prepareAaveSeamlessTransaction({
+            strategyName,
+            action,
+            txDetails,
+          });
         return transactions;
 
       default:
