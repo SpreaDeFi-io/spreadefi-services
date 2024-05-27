@@ -57,7 +57,7 @@ export class TransactionService {
         return transactions;
 
       //* If it is a combined strategy, related to aave and seamless
-      case StrategyName.AAVE_SEAMLESS:
+      case StrategyName.AAVE_SEAMLESS || StrategyName.SEAMLESS_AAVE:
         transactions =
           await this.aaveSeamlessService.prepareAaveSeamlessTransaction({
             strategyName,

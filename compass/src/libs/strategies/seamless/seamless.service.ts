@@ -1,5 +1,5 @@
 import { Action, ExecutableTransaction } from 'src/common/types';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { encodeFunctionData } from 'src/common/ethers';
 import { SquidService } from 'src/libs/squid/squid.service';
 import { ERC20_ABI, SEAMLESS_POOL_ABI } from 'src/common/constants/abi';
@@ -14,6 +14,7 @@ import {
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { ETHEREUM_ADDRESS } from 'src/common/constants';
 
+@Injectable()
 export class SeamlessService {
   constructor(private readonly squidService: SquidService) {}
 

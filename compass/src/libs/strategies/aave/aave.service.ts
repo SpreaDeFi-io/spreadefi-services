@@ -18,9 +18,7 @@ export class AaveService {
   async prepareAaveTransaction({
     action,
     txDetails,
-  }: Omit<PrepareTransactionDto, 'strategyName'>): Promise<
-    Array<ExecutableTransaction>
-  > {
+  }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
     switch (action) {
       case Action.SUPPLY:

@@ -1,48 +1,47 @@
-import { AaveService } from '../aave/aave.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { SeamlessService } from '../seamless/seamless.service';
+import { AaveService } from '../aave/aave.service';
+import { ZerolendService } from '../zerolend/zerolend.service';
 import { Action, ExecutableTransaction, StrategyName } from 'src/common/types';
 import {
   PrepareTransactionDto,
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 
-//! Repay case not handled yet
 @Injectable()
-export class AaveSeamlessService {
+export class AaveZerolendService {
   constructor(
     private readonly aaveService: AaveService,
-    private readonly seamlessService: SeamlessService,
+    private readonly zerolendService: ZerolendService,
   ) {}
 
-  async prepareAaveSeamlessTransaction({
+  async prepareAaveZerolendTransaction({
     strategyName,
     action,
     txDetails,
   }: PrepareTransactionDto) {
     let transactions: Array<ExecutableTransaction> = [];
 
-    if (strategyName === StrategyName.AAVE_SEAMLESS) {
+    if (strategyName === StrategyName.AAVE_ZEROLEND) {
       switch (action) {
         case Action.WITHDRAW_SUPPLY:
-          transactions = await this.aaveWithdrawSeamlessSupply(txDetails);
+          transactions = await this.aaveWithdrawZerolendSupply(txDetails);
           return transactions;
 
         case Action.BORROW_SUPPLY:
-          transactions = await this.aaveBorrowSeamlessSupply(txDetails);
+          transactions = await this.aaveBorrowZerolendSupply(txDetails);
           return transactions;
 
         default:
           throw new BadRequestException('Undefined action');
       }
-    } else if (strategyName === StrategyName.SEAMLESS_AAVE) {
+    } else if (strategyName === StrategyName.ZEROLEND_AAVE) {
       switch (action) {
         case Action.WITHDRAW_SUPPLY:
-          transactions = await this.seamlessWithdrawAaveSupply(txDetails);
+          transactions = await this.zerolendWithdrawAaveSupply(txDetails);
           return transactions;
 
         case Action.BORROW_SUPPLY:
-          transactions = await this.seamlessBorrowAaveSupply(txDetails);
+          transactions = await this.zerolendBorrowAaveSupply(txDetails);
           return transactions;
 
         default:
@@ -52,16 +51,14 @@ export class AaveSeamlessService {
   }
 
   /**
-   * This method withdraws the token from aave and supply to seamless protocol
+   * This method withdraws the token from aave and supply to zerolend protocol
    * while withdrawing the source chain and dest chain will remain same
    * but while supplying, chains may differ
    * @param {TransactionDetailsDto} txDetails
    */
-  async aaveWithdrawSeamlessSupply(txDetails: TransactionDetailsDto) {
+  async aaveWithdrawZerolendSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    //* CALL the withdraw function of aave first
-    //* withdraw will be on same chain so modify the params
     const txDetailsAave = {
       ...txDetails,
       toChain: txDetails.fromChain,
@@ -72,35 +69,33 @@ export class AaveSeamlessService {
 
     transactions.push(...aaveTransactions);
 
-    //* For seamless -> the process from here on will be similar just like supplying normally
-    const seamlessTransactions = await this.seamlessService.supply(txDetails);
+    //* For zerolend -> the process from here on will be similar just like supplying normally
+    const zerolendTransactions = await this.zerolendService.supply(txDetails);
 
-    transactions.push(...seamlessTransactions);
+    transactions.push(...zerolendTransactions);
 
     return transactions;
   }
 
   /**
-   * This method withdraws the token from seamless and supply to aave protocol
+   * This method withdraws the token from zerolend and supply to aave protocol
    * while withdrawing the source chain and dest chain will remain same
    * but while supplying, chains may differ
    * @param {TransactionDetailsDto} txDetails
    */
-  async seamlessWithdrawAaveSupply(txDetails: TransactionDetailsDto) {
+  async zerolendWithdrawAaveSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    //* CALL the withdraw function of seamless first
-    //* withdraw will be on same chain so modify the params
-    const txDetailsSeamless = {
+    const txDetailsZerolend = {
       ...txDetails,
       toChain: txDetails.fromChain,
       toToken: txDetails.fromToken,
     };
 
-    const seamlessTransactions =
-      await this.seamlessService.withdraw(txDetailsSeamless);
+    const zerolendTransactions =
+      await this.zerolendService.withdraw(txDetailsZerolend);
 
-    transactions.push(...seamlessTransactions);
+    transactions.push(...zerolendTransactions);
 
     //* For aave -> the process from here on will be similar just like supplying normally
     const aaveTransactions = await this.aaveService.supply(txDetails);
@@ -111,12 +106,12 @@ export class AaveSeamlessService {
   }
 
   /**
-   * This method borrows token from aave and supplies to seamless
+   * This method borrows token from aave and supplies to zerolend
    * while borrowing the source chain and dest chain will remain same
    * but while supplying, chains may differ
    * @param {TransactionDetailsDto} txDetails
    */
-  async aaveBorrowSeamlessSupply(txDetails: TransactionDetailsDto) {
+  async aaveBorrowZerolendSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
     const txDetailsAave = {
@@ -129,35 +124,34 @@ export class AaveSeamlessService {
 
     transactions.push(...aaveTransactions);
 
-    //* For seamless -> the process from here on will be similar just like supplying normally
-    const seamlessTransactions = await this.seamlessService.supply(txDetails);
+    //* For zerolend -> the process from here on will be similar just like supplying normally
+    const zerolendTransactions = await this.zerolendService.supply(txDetails);
 
-    transactions.push(...seamlessTransactions);
+    transactions.push(...zerolendTransactions);
 
     return transactions;
   }
 
   /**
-   * This method borrows token from seamless and supplies to aave
+   * This method borrows token from zerolend and supplies to aave
    * while borrowing the source chain and dest chain will remain same
    * but while supplying, chains may differ
    * @param {TransactionDetailsDto} txDetails
    */
-  async seamlessBorrowAaveSupply(txDetails: TransactionDetailsDto) {
+  async zerolendBorrowAaveSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    const txDetailsSeamless = {
+    const txDetailsZerolend = {
       ...txDetails,
       toChain: txDetails.fromChain,
       toToken: txDetails.fromToken,
     };
 
-    const seamlessTransactions =
-      await this.seamlessService.borrow(txDetailsSeamless);
+    const zerolendTransactions =
+      await this.zerolendService.borrow(txDetailsZerolend);
 
-    transactions.push(...seamlessTransactions);
+    transactions.push(...zerolendTransactions);
 
-    //* For aave -> the process from here on will be similar just like supplying normally
     const aaveTransactions = await this.aaveService.supply(txDetails);
 
     transactions.push(...aaveTransactions);

@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ETHEREUM_ADDRESS } from 'src/common/constants';
 import { ERC20_ABI, ZEROLEND_POOL_ABI } from 'src/common/constants/abi';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
@@ -14,6 +14,7 @@ import {
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { SquidService } from 'src/libs/squid/squid.service';
 
+@Injectable()
 export class ZerolendService {
   constructor(private readonly squidService: SquidService) {}
 
