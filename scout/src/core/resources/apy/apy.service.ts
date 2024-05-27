@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Asset } from '../asset/asset.schema';
 import { Model } from 'mongoose';
-import getAaveApy from 'src/common/utils/aave-apy';
-import getZerolendApy from 'src/common/utils/zerolend-apy';
-import getSeamlessApy from 'src/common/utils/seamless-apy';
+import { Injectable } from '@nestjs/common';
+import { Asset } from '../asset/asset.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import getAaveApy from 'src/common/utils/apy/aave';
+import getZerolendApy from 'src/common/utils/apy/zerolend';
+import getSeamlessApy from 'src/common/utils/apy/seamless';
 
 @Injectable()
 export class ApyService {
@@ -21,7 +21,9 @@ export class ApyService {
         return getSeamlessApy(asset.assetAddress, asset.chainId);
       }
     });
+
     const apyValues = await Promise.all(apyPromises);
+
     const bulkOperations = assets
       .map((asset, index) => {
         const assetApy = apyValues[index];
@@ -36,6 +38,7 @@ export class ApyService {
         return null;
       })
       .filter((op) => op !== null);
+
     if (bulkOperations.length > 0) {
       await this.assetModel.bulkWrite(bulkOperations);
       console.log('APY values updated successfully');
