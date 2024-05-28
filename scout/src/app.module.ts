@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AssetModule } from './core/resources/asset/asset.module';
 import { ApyModule } from './core/resources/apy/apy.module';
-import { CronModule } from './core/resources/cron/cron.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -22,9 +22,9 @@ import { CronModule } from './core/resources/cron/cron.module';
           'mongodb://localhost:27017/spreadefi',
       }),
     }),
+    ScheduleModule.forRoot(),
     AssetModule,
     ApyModule,
-    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService],

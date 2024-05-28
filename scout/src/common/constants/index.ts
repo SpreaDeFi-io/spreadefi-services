@@ -6,5 +6,3 @@ export const RPC_URLS = {
   '8453': process.env.BASE_RPC,
   '59144': process.env.LINEA_RPC,
 };
-
-export const CRON_JOB_2H = '0 */2 * * *';

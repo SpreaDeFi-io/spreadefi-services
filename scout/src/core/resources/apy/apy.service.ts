@@ -1,14 +1,19 @@
 import { Model } from 'mongoose';
+import { ApyLogger } from './apy.logger';
 import { Injectable } from '@nestjs/common';
 import { Asset } from '../asset/asset.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import getAaveApy from 'src/common/utils/apy/aave';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import getZerolendApy from 'src/common/utils/apy/zerolend';
 import getSeamlessApy from 'src/common/utils/apy/seamless';
 
 @Injectable()
 export class ApyService {
-  constructor(@InjectModel(Asset.name) private assetModel: Model<Asset>) {}
+  constructor(
+    @InjectModel(Asset.name) private assetModel: Model<Asset>,
+    private readonly apyLogger: ApyLogger,
+  ) {}
 
   async updateApy() {
     const assets = await this.assetModel.find();
@@ -24,6 +29,7 @@ export class ApyService {
 
     const apyValues = await Promise.all(apyPromises);
 
+    //* apy value may return null if rpc is down for some reason, filter the null values
     const bulkOperations = assets
       .map((asset, index) => {
         const assetApy = apyValues[index];
@@ -40,10 +46,24 @@ export class ApyService {
       .filter((op) => op !== null);
 
     if (bulkOperations.length > 0) {
-      await this.assetModel.bulkWrite(bulkOperations);
-      console.log('APY values updated successfully');
+      const data = await this.assetModel.bulkWrite(bulkOperations);
+      this.apyLogger.log('Successfully updated APY');
+
+      return data;
     } else {
-      console.log('No APY values to update');
+      this.apyLogger.log('No APY values to updated');
+
+      return null;
+    }
+  }
+
+  @Cron(CronExpression.EVERY_2_HOURS) // Adjust the cron expression as needed
+  async updateApyCron() {
+    try {
+      await this.updateApy();
+      this.apyLogger.log('[CRON] - APY updated successfully');
+    } catch (error) {
+      this.apyLogger.error(`[CRON] - APY updation failed: ${error}`);
     }
   }
 }
