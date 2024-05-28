@@ -64,13 +64,23 @@ export class Asset {
     type: Number,
     default: 0,
   })
-  assetApy: number;
+  assetSupplyApy: number;
 
   @Prop({
     type: Number,
     default: 0,
   })
-  assetBoostedApy?: number;
+  assetSupplyBoostedApy?: number;
+
+  @Prop({
+    type: Number,
+  })
+  assetBorrowApy?: number;
+
+  @Prop({
+    type: Number,
+  })
+  assetBorrowBoostedApy?: number;
 }
 
 export const AssetSchema = SchemaFactory.createForClass(Asset);
