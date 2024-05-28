@@ -8,6 +8,7 @@ import { CreateSquidQuoteDto } from 'src/core/resources/quote/dto/create-squid-q
 import { ZerolendService } from 'src/libs/strategies/zerolend/zerolend.service';
 import { AaveSeamlessService } from 'src/libs/strategies/aave-seamless/aave-seamless.service';
 import { AaveZerolendService } from 'src/libs/strategies/aave-zerolend/aave-zerolend.service';
+import { SeamlessZerolendService } from 'src/libs/strategies/seamless-zerolend/seamless-zerolend.service';
 
 @Injectable()
 export class TransactionService {
@@ -18,6 +19,7 @@ export class TransactionService {
     private readonly zerolendService: ZerolendService,
     private readonly aaveSeamlessService: AaveSeamlessService,
     private readonly aaveZerolendService: AaveZerolendService,
+    private readonly seamlessZerolendService: SeamlessZerolendService,
   ) {}
 
   async createQuote(createQuoteDto: CreateSquidQuoteDto) {
@@ -76,6 +78,17 @@ export class TransactionService {
             action,
             txDetails,
           });
+
+      //* If it is a combined strategy, related to seamless and zerolend
+      case StrategyName.SEAMLESS_ZEROLEND || StrategyName.ZEROLEND_SEAMLESS:
+        transactions =
+          await this.seamlessZerolendService.prepareSeamlessZerolendTransaction(
+            {
+              strategyName,
+              action,
+              txDetails,
+            },
+          );
 
       default:
         throw new BadRequestException('Protocol or action not supported');
