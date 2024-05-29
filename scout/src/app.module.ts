@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AssetModule } from './core/resources/asset/asset.module';
 import { ApyModule } from './core/resources/apy/apy.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BalanceModule } from './core/resources/user/balance/balance.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ScheduleModule.forRoot(),
     AssetModule,
     ApyModule,
+    BalanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
