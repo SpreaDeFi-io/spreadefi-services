@@ -66,7 +66,7 @@ export class ApyService {
     }
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS) // Adjust the cron expression as needed
+  @Cron(CronExpression.EVERY_2_HOURS) // Adjust the cron expression as needed
   async updateApyCron() {
     try {
       await this.updateApy();
