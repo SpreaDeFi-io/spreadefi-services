@@ -3,10 +3,17 @@ import { ApyLogger } from './apy.logger';
 import { Injectable } from '@nestjs/common';
 import { Asset } from '../asset/asset.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import getAaveApy from 'src/common/utils/apy/aave';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import getZerolendApy from 'src/common/utils/apy/zerolend';
-import getSeamlessApy from 'src/common/utils/apy/seamless';
+import { ethers } from 'ethers';
+import { RPC_URLS } from 'src/common/constants';
+import { aaveConfig } from 'src/common/constants/config/aave';
+import {
+  AAVE_POOL_ABI,
+  SEAMLESS_POOL_ABI,
+  ZEROLEND_POOL_ABI,
+} from 'src/common/constants/abi';
+import { seamlessConfig } from 'src/common/constants/config/seamless';
+import { zerolendConfig } from 'src/common/constants/config/zerolend';
 
 @Injectable()
 export class ApyService {
@@ -19,11 +26,11 @@ export class ApyService {
     const assets = await this.assetModel.find();
     const apyPromises = assets.map((asset) => {
       if (asset.protocolName == 'Aave') {
-        return getAaveApy(asset.assetAddress, asset.chainId);
+        return this.getAaveApy(asset.assetAddress, asset.chainId);
       } else if (asset.protocolName == 'Zerolend') {
-        return getZerolendApy(asset.assetAddress, asset.chainId);
+        return this.getZerolendApy(asset.assetAddress, asset.chainId);
       } else if (asset.protocolName == 'Seamless') {
-        return getSeamlessApy(asset.assetAddress, asset.chainId);
+        return this.getSeamlessApy(asset.assetAddress, asset.chainId);
       }
     });
 
@@ -64,6 +71,73 @@ export class ApyService {
       this.apyLogger.log('[CRON] - APY updated successfully');
     } catch (error) {
       this.apyLogger.error(`[CRON] - APY updation failed: ${error}`);
+    }
+  }
+
+  async getAaveApy(assetAddress: string, chainId: string) {
+    try {
+      const provider = new ethers.JsonRpcProvider(RPC_URLS[chainId]);
+      const aaveAddress = aaveConfig[chainId].poolAddress;
+      const aaveContract = new ethers.Contract(
+        aaveAddress,
+        AAVE_POOL_ABI,
+        provider,
+      );
+      const reserveData = await aaveContract.getReserveData(assetAddress);
+      const liquidityRateRay: bigint = reserveData[2];
+      const apy = Number(liquidityRateRay) / 1e25;
+      return apy;
+    } catch (error) {
+      this.apyLogger.error(
+        `getting Aave apy on chainId ${chainId} of asset ${assetAddress} ${error}`,
+      );
+      return null;
+    }
+  }
+
+  async getSeamlessApy(assetAddress: string, chainId: string) {
+    try {
+      const provider = new ethers.JsonRpcProvider(RPC_URLS[chainId]);
+      const contractAddress = seamlessConfig[chainId].poolAddress;
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        SEAMLESS_POOL_ABI,
+        provider,
+      );
+
+      const reserveData = await contract.getReserveData(assetAddress);
+
+      const liquidityRateRay: bigint = reserveData[2];
+      const apy = Number(liquidityRateRay) / 1e25;
+
+      return apy;
+    } catch (error) {
+      this.apyLogger.error(
+        `Error getting Seamless apy on chainId ${chainId} of asset ${assetAddress} : ${error}`,
+      );
+      return null;
+    }
+  }
+
+  async getZerolendApy(assetAddress: string, chainId: string) {
+    try {
+      const provider = new ethers.JsonRpcProvider(RPC_URLS[chainId]);
+      const contractAddress = zerolendConfig[chainId].poolAddress;
+      const contract = new ethers.Contract(
+        contractAddress,
+        ZEROLEND_POOL_ABI,
+        provider,
+      );
+      const reserveData = await contract.getReserveData(assetAddress);
+      const liquidityRateRay: bigint = reserveData[2];
+      const apy = Number(liquidityRateRay) / 1e25;
+      return apy;
+    } catch (error) {
+      this.apyLogger.error(
+        `Error getting Zerolend apy on chainId ${chainId} of asset ${assetAddress} : ${error}`,
+      );
+      return null;
     }
   }
 }
