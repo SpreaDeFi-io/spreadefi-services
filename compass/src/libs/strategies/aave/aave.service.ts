@@ -45,8 +45,11 @@ export class AaveService {
   async supply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    //* If user wants to supply on the same chain
-    if (txDetails.fromChain === txDetails.toChain) {
+    //* If user wants to supply on the same chain and same token, then we don't need to use squid
+    if (
+      txDetails.fromChain === txDetails.toChain &&
+      txDetails.fromToken === txDetails.toToken
+    ) {
       //** Approve the tokens first
       //** If token is ethereum we don't need approval
       if (txDetails.fromToken !== ETHEREUM_ADDRESS) {
@@ -116,7 +119,12 @@ export class AaveService {
       tx: tx1,
     });
 
-    if (txDetails.fromChain !== txDetails.toChain) {
+    //* if user wants different token, or token on different chain or different token on different chain
+    //* then call squid
+    if (
+      txDetails.fromChain !== txDetails.toChain ||
+      txDetails.fromToken !== txDetails.toToken
+    ) {
       const tx2 = await this.squidService.createQuote(txDetails);
 
       transactions.push({
@@ -132,7 +140,12 @@ export class AaveService {
   async repay(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    if (txDetails.fromChain !== txDetails.toChain) {
+    //* if user wants to repay on different chain or wants to pay from different token or wants to pay on different chain
+    //* from different token then use squid
+    if (
+      txDetails.fromChain !== txDetails.toChain ||
+      txDetails.fromToken !== txDetails.toToken
+    ) {
       const hook = aaveRepayHandler(txDetails);
 
       const tx1 = await this.squidService.createQuote({
@@ -206,9 +219,12 @@ export class AaveService {
       tx: tx2,
     });
 
-    //! haven't added the support to withdraw/swap to other token yet
-
-    if (txDetails.fromChain !== txDetails.toChain) {
+    //* if user wants different token or wants on different chain or wants different token on different chain
+    //* then use squid
+    if (
+      txDetails.fromChain !== txDetails.toChain &&
+      txDetails.fromToken !== txDetails.toToken
+    ) {
       const tx3 = await this.squidService.createQuote(txDetails);
 
       transactions.push({

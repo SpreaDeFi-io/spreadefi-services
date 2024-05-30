@@ -49,9 +49,11 @@ export class ZerolendService {
     const transactions: Array<ExecutableTransaction> = [];
 
     //* Integrate zerolend for linea chain only
+    //* if user wants to supply same token he has on the same chain then we don't need to use squid
     if (
       txDetails.fromChain === txDetails.toChain &&
-      txDetails.fromChain === '59144'
+      txDetails.fromChain === '59144' &&
+      txDetails.fromToken === txDetails.toToken
     ) {
       //** Approve the tokens first
       //** If token is ethereum we don't need approval
@@ -123,7 +125,12 @@ export class ZerolendService {
       tx: tx1,
     });
 
-    if (txDetails.fromChain !== txDetails.toChain) {
+    //* if user wants different token, or token on different chain or different token on different chain
+    //* then call squid
+    if (
+      txDetails.fromChain !== txDetails.toChain ||
+      txDetails.fromToken !== txDetails.toToken
+    ) {
       const tx2 = await this.squidService.createQuote(txDetails);
 
       transactions.push({
@@ -139,7 +146,12 @@ export class ZerolendService {
   async repay(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    if (txDetails.fromChain !== txDetails.toChain) {
+    //* if user wants to repay on different chain or wants to pay from different token or wants to pay on different chain
+    //* from different token then use squid
+    if (
+      txDetails.fromChain !== txDetails.toChain ||
+      txDetails.fromToken !== txDetails.toToken
+    ) {
       const hook = zerolendRepayHandler(txDetails);
 
       const tx1 = await this.squidService.createQuote({
@@ -214,8 +226,10 @@ export class ZerolendService {
       tx: tx2,
     });
 
-    //! haven't added the support to withdraw/swap to other token yet
-    if (txDetails.fromChain !== txDetails.toChain) {
+    if (
+      txDetails.fromChain !== txDetails.toChain &&
+      txDetails.fromToken !== txDetails.toToken
+    ) {
       const tx3 = await this.squidService.createQuote(txDetails);
 
       transactions.push({
