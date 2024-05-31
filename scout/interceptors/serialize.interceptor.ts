@@ -8,7 +8,14 @@ export class SerializeInterceptor implements NestInterceptor {
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
-    request.body.assetAddress = getAddress(request.body.assetAddress);
+
+    if (request.method === 'GET' && request.params.address) {
+      request.query.address = getAddress(request.params.address);
+    }
+
+    if (request.method === 'POST' && request.body.assetAddress) {
+      request.body.assetAddress = getAddress(request.body.assetAddress);
+    }
 
     return next.handle();
   }
