@@ -39,12 +39,14 @@ export class ApyService {
     //* apy value may return null if rpc is down for some reason, filter the null values
     const bulkOperations = assets
       .map((asset, index) => {
-        const assetApy = apyValues[index];
-        if (assetApy !== null) {
+        const { supplyApy, borrowApy } = apyValues[index];
+        if (supplyApy !== null && borrowApy !== null) {
           return {
             updateOne: {
               filter: { assetId: asset.assetId },
-              update: { $set: { assetApy } },
+              update: {
+                $set: { assetSupplyApy: supplyApy, assetBorrowApy: borrowApy },
+              },
             },
           };
         }
@@ -85,8 +87,12 @@ export class ApyService {
       );
       const reserveData = await aaveContract.getReserveData(assetAddress);
       const liquidityRateRay: bigint = reserveData[2];
-      const apy = Number(liquidityRateRay) / 1e25;
-      return apy;
+      const borrowRateRay: bigint = reserveData[4];
+
+      const supplyApy = Number(liquidityRateRay) / 1e25;
+      const borrowApy = Number(borrowRateRay) / 1e25;
+
+      return { supplyApy, borrowApy };
     } catch (error) {
       this.apyLogger.error(
         `getting Aave apy on chainId ${chainId} of asset ${assetAddress} ${error}`,
@@ -109,9 +115,12 @@ export class ApyService {
       const reserveData = await contract.getReserveData(assetAddress);
 
       const liquidityRateRay: bigint = reserveData[2];
-      const apy = Number(liquidityRateRay) / 1e25;
+      const borrowRateRay: bigint = reserveData[4];
 
-      return apy;
+      const supplyApy = Number(liquidityRateRay) / 1e25;
+      const borrowApy = Number(borrowRateRay) / 1e25;
+
+      return { supplyApy, borrowApy };
     } catch (error) {
       this.apyLogger.error(
         `Error getting Seamless apy on chainId ${chainId} of asset ${assetAddress} : ${error}`,
@@ -131,8 +140,12 @@ export class ApyService {
       );
       const reserveData = await contract.getReserveData(assetAddress);
       const liquidityRateRay: bigint = reserveData[2];
-      const apy = Number(liquidityRateRay) / 1e25;
-      return apy;
+      const borrowRateRay: bigint = reserveData[4];
+
+      const supplyApy = Number(liquidityRateRay) / 1e25;
+      const borrowApy = Number(borrowRateRay) / 1e25;
+
+      return { supplyApy, borrowApy };
     } catch (error) {
       this.apyLogger.error(
         `Error getting Zerolend apy on chainId ${chainId} of asset ${assetAddress} : ${error}`,
