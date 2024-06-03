@@ -4,8 +4,10 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AssetModule } from './core/resources/asset/asset.module';
-import { ApyModule } from './core/resources/apy/apy.module';
+import { ApyModule } from './core/resources/asset/apy/apy.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BalanceModule } from './core/resources/user/balance/balance.module';
+import { PortfolioModule } from './core/resources/user/portfolio/portfolio.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     ScheduleModule.forRoot(),
     AssetModule,
     ApyModule,
+    BalanceModule,
+    PortfolioModule,
   ],
   controllers: [AppController],
   providers: [AppService],

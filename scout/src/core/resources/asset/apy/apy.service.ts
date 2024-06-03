@@ -1,7 +1,7 @@
 import { Model } from 'mongoose';
 import { ApyLogger } from './apy.logger';
 import { Injectable } from '@nestjs/common';
-import { Asset } from '../asset/asset.schema';
+import { Asset } from '../../asset/asset.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ethers } from 'ethers';
