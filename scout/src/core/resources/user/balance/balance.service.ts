@@ -20,34 +20,49 @@ export class BalanceService {
     @InjectModel(Asset.name) private assetModel: Model<Asset>,
     private readonly balanceLogger: BalanceLogger,
   ) {}
-  async getAssetBalance(address: string, assetSymbol: string) {
-    const assets = await this.assetModel.find({ assetSymbol: assetSymbol });
+  async getAssetBalance(address: string) {
+    const assets = await this.assetModel.find();
 
     const balancePromises = assets.map((asset) => {
       if (asset.protocolName == 'Aave') {
-        return this.getAaveBalance(asset.assetAddress, asset.chainId, address);
+        return this.getAaveBalance(
+          asset.assetAddress,
+          asset.chainId,
+          address,
+        ).then((balance) => ({
+          asset: asset.assetAddress,
+          balance,
+        }));
       } else if (asset.protocolName == 'Zerolend') {
         return this.getZerolendBalance(
           asset.assetAddress,
           asset.chainId,
           address,
-        );
+        ).then((balance) => ({
+          asset: asset.assetAddress,
+          balance,
+        }));
       } else if (asset.protocolName == 'Seamless') {
         return this.getSeamlessBalance(
           asset.assetAddress,
           asset.chainId,
           address,
-        );
+        ).then((balance) => ({
+          asset: asset.assetAddress,
+          balance,
+        }));
       }
     });
 
     const balanceValues = await Promise.all(balancePromises);
+    const result = balanceValues.reduce((acc, { asset, balance }: any) => {
+      if (balance && BigInt(balance[0]) > 0) {
+        acc[asset] = this.convertBalanceToStrings(balance);
+      }
+      return acc;
+    }, {});
 
-    const totalBalance = this.calculateTotal(balanceValues, 0);
-
-    return {
-      totalBalance,
-    };
+    return result;
   }
 
   async getAaveBalance(
@@ -136,5 +151,21 @@ export class BalanceService {
     });
 
     return total.toString();
+  }
+
+  private convertBalanceToStrings(balance: any): any {
+    if (Array.isArray(balance)) {
+      return balance.map((item) =>
+        typeof item === 'bigint' ? item.toString() : item,
+      );
+    } else if (typeof balance === 'bigint') {
+      return balance.toString();
+    } else if (typeof balance === 'object' && balance !== null) {
+      return Object.entries(balance).reduce((acc, [key, value]) => {
+        acc[key] = typeof value === 'bigint' ? value.toString() : value;
+        return acc;
+      }, {});
+    }
+    return balance;
   }
 }

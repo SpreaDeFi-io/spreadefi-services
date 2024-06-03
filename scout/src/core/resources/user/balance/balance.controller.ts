@@ -15,12 +15,9 @@ export class BalanceController {
 
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(SerializeInterceptor)
-  @Get('/:address/:symbol')
-  async getTotalBalance(
-    @Param('address') address: string,
-    @Param('symbol') symbol: string,
-  ) {
-    const data = await this.balanceService.getAssetBalance(address, symbol);
+  @Get('/:address')
+  async getTotalBalance(@Param('address') address: string) {
+    const data = await this.balanceService.getAssetBalance(address);
 
     return {
       statusCode: HttpStatus.OK,
