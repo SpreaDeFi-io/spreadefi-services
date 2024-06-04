@@ -81,6 +81,11 @@ export class Asset {
     type: Number,
   })
   assetBorrowBoostedApy?: number;
+
+  @Prop({
+    type: [String],
+  })
+  points?: string[];
 }
 
 export const AssetSchema = SchemaFactory.createForClass(Asset);
