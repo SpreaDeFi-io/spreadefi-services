@@ -13,6 +13,7 @@ export class AssetRepository {
       {
         $group: {
           _id: { assetSymbol: '$assetSymbol', protocolType: '$protocolType' },
+          points: { $addToSet: '$points' },
           chainIds: { $addToSet: '$chainId' },
           protocolNames: { $addToSet: '$protocolName' },
           assetApys: { $addToSet: '$assetApy' },
@@ -28,6 +29,7 @@ export class AssetRepository {
           protocolNames: 1,
           assetApys: 1,
           boostedApys: 1,
+          points: 1,
         },
       },
       {
