@@ -20,64 +20,86 @@ export class BalanceService {
     @InjectModel(Asset.name) private assetModel: Model<Asset>,
     private readonly balanceLogger: BalanceLogger,
   ) {}
+
   async getAssetBalance(address: string) {
     const assets = await this.assetModel.find();
 
-    const balancePromises = assets.map((asset) => {
-      if (asset.protocolName == 'Aave') {
-        return this.getAaveBalance(
-          asset.assetAddress,
-          asset.chainId,
-          address,
-        ).then((balance) => ({
-          asset: asset.assetAddress,
-          balance,
-        }));
-      } else if (asset.protocolName == 'Zerolend') {
-        return this.getZerolendBalance(
-          asset.assetAddress,
-          asset.chainId,
-          address,
-        ).then((balance) => ({
-          asset: asset.assetAddress,
-          balance,
-        }));
-      } else if (asset.protocolName == 'Seamless') {
-        return this.getSeamlessBalance(
-          asset.assetAddress,
-          asset.chainId,
-          address,
-        ).then((balance) => ({
-          asset: asset.assetAddress,
-          balance,
-        }));
+    const balancePromises = assets.map(async (asset) => {
+      try {
+        let balance: any;
+        switch (asset.protocolName) {
+          case 'Aave':
+            balance = await this.getBalance(
+              asset.assetAddress,
+              asset.chainId,
+              address,
+              aaveConfig,
+              AAVE_DATA_PROVIDER_ABI,
+            );
+            break;
+          case 'Zerolend':
+            balance = await this.getBalance(
+              asset.assetAddress,
+              asset.chainId,
+              address,
+              zerolendConfig,
+              ZEROLEND_DATA_PROVIDER_ABI,
+            );
+            break;
+          case 'Seamless':
+            balance = await this.getBalance(
+              asset.assetAddress,
+              asset.chainId,
+              address,
+              seamlessConfig,
+              SEAMLESS_DATA_PROVIDER_ABI,
+            );
+            break;
+        }
+        return balance
+          ? {
+              asset: asset.assetAddress,
+              protocol: asset.protocolName,
+              chainId: asset.chainId,
+              currentATokenBalance: this.convertBalanceToStrings(balance[0]),
+              currentStableDebt: this.convertBalanceToStrings(balance[1]),
+              currentVariableDebt: this.convertBalanceToStrings(balance[2]),
+            }
+          : null;
+      } catch (error) {
+        this.balanceLogger.error(
+          `Error fetching balance for asset ${asset.assetAddress} on protocol ${asset.protocolName}: ${error.message}`,
+        );
+        return null;
       }
     });
 
-    const balanceValues = await Promise.all(balancePromises);
-    const result = balanceValues.reduce((acc, { asset, balance }: any) => {
-      if (balance && BigInt(balance[0]) > 0) {
-        acc[asset] = this.convertBalanceToStrings(balance);
-      }
-      return acc;
-    }, {});
+    const balanceValues = await Promise.allSettled(balancePromises);
+    const balanceFiltered = balanceValues
+      .filter(
+        (result) =>
+          result.status === 'fulfilled' &&
+          result.value &&
+          (result.value.currentATokenBalance > 0 ||
+            result.value.currentStableDebt > 0 ||
+            result.value.currentVariableDebt > 0),
+      )
+      .map((result: any) => result.value);
 
-    return result;
+    return balanceFiltered;
   }
 
-  async getAaveBalance(
+  async getBalance(
     assetAddress: string,
     chainId: string,
     userAddress: string,
+    config: any,
+    abi: any,
   ) {
     try {
       const provider = new ethers.JsonRpcProvider(RPC_URLS[chainId]);
-      const address = aaveConfig[chainId].poolDataProvider;
-      const contract = new ethers.Contract(
-        address,
-        AAVE_DATA_PROVIDER_ABI,
-        provider,
-      );
+      const address = config[chainId].poolDataProvider;
+      const contract = new ethers.Contract(address, abi, provider);
       const reserveData = await contract.getUserReserveData(
         assetAddress,
         userAddress,
@@ -85,72 +107,10 @@ export class BalanceService {
       return reserveData;
     } catch (error) {
       this.balanceLogger.error(
-        `while getting total user ${userAddress} Aave bal on chainId ${chainId} of asset ${assetAddress} ${error}`,
+        `Error fetching balance for user ${userAddress} on chain ${chainId} for asset ${assetAddress}: ${error.message}`,
       );
-      return null;
+      throw new Error(error);
     }
-  }
-
-  async getZerolendBalance(
-    assetAddress: string,
-    chainId: string,
-    userAddress: string,
-  ) {
-    try {
-      const provider = new ethers.JsonRpcProvider(RPC_URLS[chainId]);
-      const address = zerolendConfig[chainId].poolDataProvider;
-      const contract = new ethers.Contract(
-        address,
-        ZEROLEND_DATA_PROVIDER_ABI,
-        provider,
-      );
-      const reserveData = await contract.getUserReserveData(
-        assetAddress,
-        userAddress,
-      );
-      return reserveData;
-    } catch (error) {
-      this.balanceLogger.error(
-        `while getting total user ${userAddress} Aave bal on chainId ${chainId} of asset ${assetAddress} ${error}`,
-      );
-      return null;
-    }
-  }
-
-  async getSeamlessBalance(
-    assetAddress: string,
-    chainId: string,
-    userAddress: string,
-  ) {
-    try {
-      const provider = new ethers.JsonRpcProvider(RPC_URLS[chainId]);
-      const address = seamlessConfig[chainId].poolDataProvider;
-      const contract = new ethers.Contract(
-        address,
-        SEAMLESS_DATA_PROVIDER_ABI,
-        provider,
-      );
-      const reserveData = await contract.getUserReserveData(
-        assetAddress,
-        userAddress,
-      );
-      return reserveData;
-    } catch (error) {
-      this.balanceLogger.error(
-        `while getting total user ${userAddress} Aave bal on chainId ${chainId} of asset ${assetAddress} ${error}`,
-      );
-      return null;
-    }
-  }
-
-  private calculateTotal(balances: any[], index: number) {
-    let total = BigInt(0);
-
-    balances.forEach((balance) => {
-      total += BigInt(balance[index]);
-    });
-
-    return total.toString();
   }
 
   private convertBalanceToStrings(balance: any): any {

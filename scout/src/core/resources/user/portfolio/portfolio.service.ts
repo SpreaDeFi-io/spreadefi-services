@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { BalanceService } from '../balance/balance.service';
 import { ethers } from 'ethers';
-import { RPC_URLS } from 'src/common/constants';
+import { CHAINS, RPC_URLS } from 'src/common/constants';
 import {
   AAVE_POOL_ABI,
   SEAMLESS_POOL_ABI,
@@ -11,11 +10,12 @@ import { aaveConfig } from 'src/common/constants/config/aave';
 import { seamlessConfig } from 'src/common/constants/config/seamless';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
 import { PortfolioLogger } from './portfolio.logger';
+import { CovalentService } from 'src/libs/covalent/covalent.service';
 
 @Injectable()
 export class PortfolioService {
   constructor(
-    private readonly balanceService: BalanceService,
+    private readonly covalentService: CovalentService,
     private readonly portfolioLogger: PortfolioLogger,
   ) {}
 
@@ -37,9 +37,26 @@ export class PortfolioService {
       1,
     );
 
+    let totalUSD = 0;
+
+    await Promise.all(
+      Object.values(CHAINS).map(async (chainId: any) => {
+        const chainBalances =
+          await this.covalentService.getWalletBalanceForChain(address, chainId);
+
+        // Calculate total USD for the current chain
+        const chainTotalUSD = chainBalances.reduce((total, balance) => {
+          return total + (balance.quote || 0);
+        }, 0);
+
+        totalUSD += chainTotalUSD;
+      }),
+    );
+
     return {
       totalCollateralBase: totalCollateralBase,
       totalDebtBase: totalDebtBase,
+      totalBalanceUSD: totalUSD,
     };
   }
 
@@ -125,5 +142,21 @@ export class PortfolioService {
     });
 
     return total.toString();
+  }
+
+  private convertBigIntToString(data: any): any {
+    if (typeof data === 'bigint') {
+      return data.toString();
+    } else if (Array.isArray(data)) {
+      return data.map((item) =>
+        typeof item === 'bigint' ? item.toString() : item,
+      );
+    } else if (typeof data === 'object' && data !== null) {
+      return Object.entries(data).reduce((acc, [key, value]) => {
+        acc[key] = typeof value === 'bigint' ? value.toString() : value;
+        return acc;
+      }, {});
+    }
+    return data;
   }
 }
