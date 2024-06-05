@@ -10,7 +10,7 @@ export class SerializeInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
 
     if (request.method === 'GET' && request.params.address) {
-      request.query.address = getAddress(request.params.address);
+      request.params.address = getAddress(request.params.address);
     }
 
     if (request.method === 'POST' && request.body.assetAddress) {

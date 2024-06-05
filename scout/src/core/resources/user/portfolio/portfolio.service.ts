@@ -19,12 +19,17 @@ export class PortfolioService {
     private readonly portfolioLogger: PortfolioLogger,
   ) {}
 
-  async getTotalBalance(address: string) {
+  /**
+   * Fetches the total balance present in the wallet, total collateral, and debt across all protocols for a user's wallet.
+   * @param walletAddress - The wallet address of the user.
+   * @returns An object containing totalCollateralBase, totalDebtBase, and totalBalanceUSD.
+   */
+  async getTotalBalance(walletAddress: string) {
     const [aaveBalances, zerolendBalances, seamlessBalances] =
       await Promise.all([
-        this.getAaveTotalValue(address),
-        this.getZerolendTotalValue(address),
-        this.getSeamlessTotalValue(address),
+        this.getAaveTotalValue(walletAddress),
+        this.getZerolendTotalValue(walletAddress),
+        this.getSeamlessTotalValue(walletAddress),
       ]);
 
     //add more params here based on frontend requirement
@@ -37,54 +42,73 @@ export class PortfolioService {
       1,
     );
 
-    let totalUSD = 0;
+    let totalBalanceUSD = 0;
 
     await Promise.all(
       Object.values(CHAINS).map(async (chainId: any) => {
-        const chainBalances =
-          await this.covalentService.getWalletBalanceForChain(address, chainId);
+        const chainBalanceData =
+          await this.covalentService.getWalletBalanceForChain(
+            walletAddress,
+            chainId,
+          );
 
         // Calculate total USD for the current chain
-        const chainTotalUSD = chainBalances.reduce((total, balance) => {
-          return total + (balance.quote || 0);
-        }, 0);
+        const chainTotalBalanceUSD = chainBalanceData.reduce(
+          (total, balance) => {
+            return total + (balance.quote || 0);
+          },
+          0,
+        );
 
-        totalUSD += chainTotalUSD;
+        totalBalanceUSD += chainTotalBalanceUSD;
       }),
     );
 
     return {
       totalCollateralBase: totalCollateralBase,
       totalDebtBase: totalDebtBase,
-      totalBalanceUSD: totalUSD,
+      totalBalanceUSD: totalBalanceUSD,
     };
   }
 
-  async getAaveTotalValue(address: string) {
+  /**
+   * Fetches the total value of Aave protocol assets for a specific user.
+   * @param walletAddress - The wallet address of the user.
+   * @returns An array containing account data from Aave.
+   */
+  async getAaveTotalValue(walletAddress: string) {
     try {
-      const balancePromises = Object.keys(aaveConfig).map(async (networkId) => {
-        const provider = new ethers.JsonRpcProvider(RPC_URLS[networkId]);
-        const aaveAddress = aaveConfig[networkId].poolAddress;
-        const aaveContract = new ethers.Contract(
-          aaveAddress,
-          AAVE_POOL_ABI,
-          provider,
-        );
-        const accData = await aaveContract.getUserAccountData(address);
-        return accData;
-      });
+      const balanceDataPromises = Object.keys(aaveConfig).map(
+        async (networkId) => {
+          const provider = new ethers.JsonRpcProvider(RPC_URLS[networkId]);
+          const aaveAddress = aaveConfig[networkId].poolAddress;
+          const aaveContract = new ethers.Contract(
+            aaveAddress,
+            AAVE_POOL_ABI,
+            provider,
+          );
+          const accountData =
+            await aaveContract.getUserAccountData(walletAddress);
+          return accountData;
+        },
+      );
 
-      const balances = await Promise.all(balancePromises);
-      return balances;
+      const balanceData = await Promise.all(balanceDataPromises);
+      return balanceData;
     } catch (error) {
       this.portfolioLogger.error(`while getting Aave total values ${error}`);
       return null;
     }
   }
 
-  async getZerolendTotalValue(address: string) {
+  /**
+   * Fetches the total value of Zerolend protocol assets for a specific user.
+   * @param walletAddress - The wallet address of the user.
+   * @returns An array containing account data from Zerolend.
+   */
+  async getZerolendTotalValue(walletAddress: string) {
     try {
-      const balancePromises = Object.keys(zerolendConfig).map(
+      const balanceDataPromises = Object.keys(zerolendConfig).map(
         async (networkId) => {
           const provider = new ethers.JsonRpcProvider(RPC_URLS[networkId]);
           const contractAddress = zerolendConfig[networkId].poolAddress;
@@ -93,13 +117,13 @@ export class PortfolioService {
             ZEROLEND_POOL_ABI,
             provider,
           );
-          const accData = await contract.getUserAccountData(address);
-          return accData;
+          const accountData = await contract.getUserAccountData(walletAddress);
+          return accountData;
         },
       );
 
-      const balances = await Promise.all(balancePromises);
-      return balances;
+      const balanceData = await Promise.all(balanceDataPromises);
+      return balanceData;
     } catch (error) {
       this.portfolioLogger.error(
         `while getting zerolend total values ${error}`,
@@ -108,9 +132,14 @@ export class PortfolioService {
     }
   }
 
-  async getSeamlessTotalValue(address: string) {
+  /**
+   * Fetches the total value of Seamless protocol assets for a specific user.
+   * @param walletAddress - The wallet address of the user.
+   * @returns An array containing account data from Seamless.
+   */
+  async getSeamlessTotalValue(walletAddress: string) {
     try {
-      const balancePromises = Object.keys(seamlessConfig).map(
+      const balanceDataPromises = Object.keys(seamlessConfig).map(
         async (networkId) => {
           const provider = new ethers.JsonRpcProvider(RPC_URLS[networkId]);
           const contractAddress = seamlessConfig[networkId].poolAddress;
@@ -119,12 +148,12 @@ export class PortfolioService {
             SEAMLESS_POOL_ABI,
             provider,
           );
-          const accData = await contract.getUserAccountData(address);
-          return accData;
+          const accountData = await contract.getUserAccountData(walletAddress);
+          return accountData;
         },
       );
-      const balances = await Promise.all(balancePromises);
-      return balances;
+      const balanceData = await Promise.all(balanceDataPromises);
+      return balanceData;
     } catch (error) {
       this.portfolioLogger.error(
         `while getting seamless total values ${error}`,
@@ -134,6 +163,12 @@ export class PortfolioService {
     }
   }
 
+  /**
+   * Calculates the sum of specific index of balances array.
+   * @param balances - An array of balances.
+   * @param index - The index to sum up in each balance entry.
+   * @returns The total sum as a string.
+   */
   private calculateTotal(balances: any[], index: number) {
     let total = BigInt(0);
 
@@ -142,21 +177,5 @@ export class PortfolioService {
     });
 
     return total.toString();
-  }
-
-  private convertBigIntToString(data: any): any {
-    if (typeof data === 'bigint') {
-      return data.toString();
-    } else if (Array.isArray(data)) {
-      return data.map((item) =>
-        typeof item === 'bigint' ? item.toString() : item,
-      );
-    } else if (typeof data === 'object' && data !== null) {
-      return Object.entries(data).reduce((acc, [key, value]) => {
-        acc[key] = typeof value === 'bigint' ? value.toString() : value;
-        return acc;
-      }, {});
-    }
-    return data;
   }
 }

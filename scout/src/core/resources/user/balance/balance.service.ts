@@ -21,49 +21,56 @@ export class BalanceService {
     private readonly balanceLogger: BalanceLogger,
   ) {}
 
-  async getAssetBalance(address: string) {
+  /**
+   * Fetches the balance details of all assets for a specific user across different protocols.
+   * @param userAddress - The wallet address of the user.
+   * @returns A filtered array of balance details.
+   */
+  async getUserAssetBalances(userAddress: string) {
     const assets = await this.assetModel.find();
 
     const balancePromises = assets.map(async (asset) => {
       try {
-        let balance: any;
+        let balanceData: any;
         switch (asset.protocolName) {
           case 'Aave':
-            balance = await this.getBalance(
+            balanceData = await this.fetchAssetBalance(
               asset.assetAddress,
               asset.chainId,
-              address,
+              userAddress,
               aaveConfig,
               AAVE_DATA_PROVIDER_ABI,
             );
             break;
           case 'Zerolend':
-            balance = await this.getBalance(
+            balanceData = await this.fetchAssetBalance(
               asset.assetAddress,
               asset.chainId,
-              address,
+              userAddress,
               zerolendConfig,
               ZEROLEND_DATA_PROVIDER_ABI,
             );
             break;
           case 'Seamless':
-            balance = await this.getBalance(
+            balanceData = await this.fetchAssetBalance(
               asset.assetAddress,
               asset.chainId,
-              address,
+              userAddress,
               seamlessConfig,
               SEAMLESS_DATA_PROVIDER_ABI,
             );
             break;
         }
-        return balance
+        return balanceData
           ? {
-              asset: asset.assetAddress,
+              assetAddress: asset.assetAddress,
               protocol: asset.protocolName,
               chainId: asset.chainId,
-              currentATokenBalance: this.convertBalanceToStrings(balance[0]),
-              currentStableDebt: this.convertBalanceToStrings(balance[1]),
-              currentVariableDebt: this.convertBalanceToStrings(balance[2]),
+              currentATokenBalance: this.convertBalanceToStrings(
+                balanceData[0],
+              ),
+              currentStableDebt: this.convertBalanceToStrings(balanceData[1]),
+              currentVariableDebt: this.convertBalanceToStrings(balanceData[2]),
             }
           : null;
       } catch (error) {
@@ -74,8 +81,8 @@ export class BalanceService {
       }
     });
 
-    const balanceValues = await Promise.allSettled(balancePromises);
-    const balanceFiltered = balanceValues
+    const balanceResults = await Promise.allSettled(balancePromises);
+    const filteredBalances = balanceResults
       .filter(
         (result) =>
           result.status === 'fulfilled' &&
@@ -86,33 +93,50 @@ export class BalanceService {
       )
       .map((result: any) => result.value);
 
-    return balanceFiltered;
+    return filteredBalances;
   }
 
-  async getBalance(
+  /**
+   * Fetches the balance data for a specific asset and user from a protocol.
+   * @param assetAddress - The address of the asset.
+   * @param chainId - The ID of the blockchain network.
+   * @param userAddress - The wallet address of the user.
+   * @param protocolConfig - The configuration object of the protocol.
+   * @param protocolAbi - The ABI of the protocol's data provider contract.
+   * @returns The user's reserve data for the specified asset.
+   */
+  async fetchAssetBalance(
     assetAddress: string,
     chainId: string,
     userAddress: string,
-    config: any,
-    abi: any,
+    protocolConfig: any,
+    protocolAbi: any,
   ) {
     try {
       const provider = new ethers.JsonRpcProvider(RPC_URLS[chainId]);
-      const address = config[chainId].poolDataProvider;
-      const contract = new ethers.Contract(address, abi, provider);
-      const reserveData = await contract.getUserReserveData(
+      const dataProviderAddress = protocolConfig[chainId].poolDataProvider;
+      const dataProviderContract = new ethers.Contract(
+        dataProviderAddress,
+        protocolAbi,
+        provider,
+      );
+      const userReserveData = await dataProviderContract.getUserReserveData(
         assetAddress,
         userAddress,
       );
-      return reserveData;
+      return userReserveData;
     } catch (error) {
       this.balanceLogger.error(
         `Error fetching balance for user ${userAddress} on chain ${chainId} for asset ${assetAddress}: ${error.message}`,
       );
-      throw new Error(error);
     }
   }
 
+  /**
+   * Converts balances from BigInt to string format.
+   * @param balance - The balance to be converted.
+   * @returns The balance in string format.
+   */
   private convertBalanceToStrings(balance: any): any {
     if (Array.isArray(balance)) {
       return balance.map((item) =>
