@@ -11,16 +11,21 @@ import {
 import { AssetService } from './asset.service';
 import { CreateAssetDto } from 'src/core/resources/asset/dto/create-asset.dto';
 import { SerializeInterceptor } from 'interceptors/serialize.interceptor';
+import { ApiSendOkResponse } from 'src/common/decorators/swagger/response.decorator';
+import { AssetListResponseDto } from './dto/asset-list-response.dto';
 
 @Controller('asset')
 export class AssetController {
   constructor(private readonly assetService: AssetService) {}
 
+  @ApiSendOkResponse(
+    'Returns ok response after successfully fetching assets',
+    AssetListResponseDto,
+  )
   @HttpCode(HttpStatus.OK)
   @Get()
   async getAssets() {
     const data = await this.assetService.getAssets();
-
     return {
       statusCode: HttpStatus.OK,
       message: 'Fetched assets successfully',

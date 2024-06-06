@@ -3,21 +3,22 @@ import { Model } from 'mongoose';
 import { Asset } from './asset.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAssetDto } from 'src/core/resources/asset/dto/create-asset.dto';
+import { TGetAssetListResponse } from 'src/common/types/asset';
 
 @Injectable()
 export class AssetRepository {
   constructor(@InjectModel(Asset.name) private assetModel: Model<Asset>) {}
 
   async getAssets() {
-    const data = await this.assetModel.aggregate([
+    const data: Array<TGetAssetListResponse> = await this.assetModel.aggregate([
       {
         $group: {
           _id: { assetSymbol: '$assetSymbol', protocolType: '$protocolType' },
           points: { $addToSet: '$points' },
           chainIds: { $addToSet: '$chainId' },
           protocolNames: { $addToSet: '$protocolName' },
-          assetApys: { $addToSet: '$assetApy' },
-          boostedApys: { $addToSet: '$boostedApy' },
+          assetSupplyApys: { $addToSet: '$assetSupplyApy' },
+          assetSupplyBoostedApys: { $addToSet: '$assetSupplyBoostedApy' },
         },
       },
       {
@@ -27,15 +28,19 @@ export class AssetRepository {
           protocolType: '$_id.protocolType',
           chainIds: 1,
           protocolNames: 1,
-          assetApys: 1,
-          boostedApys: 1,
+          assetSupplyApys: 1,
+          assetSupplyBoostedApys: 1,
           points: 1,
         },
       },
       {
         $addFields: {
-          assetApys: { $sortArray: { input: '$assetApys', sortBy: 1 } },
-          boostedApys: { $sortArray: { input: '$boostedApys', sortBy: 1 } },
+          assetSupplyApys: {
+            $sortArray: { input: '$assetSupplyApys', sortBy: 1 },
+          },
+          assetSupplyBoostedApys: {
+            $sortArray: { input: '$assetSupplyBoostedApys', sortBy: 1 },
+          },
         },
       },
     ]);
