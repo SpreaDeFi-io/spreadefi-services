@@ -17,6 +17,15 @@ export class AssetListResponseDto implements ScoutResponse {
 
   @ApiProperty({
     description: 'Response data',
+    example: {
+      points: [['2X LP Points', '1X Zerolend Points']],
+      chainIds: ['42161', '10'],
+      protocolNames: ['Aave', 'Seamless'],
+      assetSupplyApys: [1.4, 2.1],
+      assetSupplyBoostedApys: [22, 9.7],
+      assetSymbol: 'USDC',
+      protocolType: 'Lending',
+    },
   })
-  data: TGetAssetListResponse; //!it should be a class only
+  data: TGetAssetListResponse;
 }

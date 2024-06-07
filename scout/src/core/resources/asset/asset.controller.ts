@@ -13,7 +13,9 @@ import { CreateAssetDto } from 'src/core/resources/asset/dto/create-asset.dto';
 import { SerializeInterceptor } from 'interceptors/serialize.interceptor';
 import { ApiSendOkResponse } from 'src/common/decorators/swagger/response.decorator';
 import { AssetListResponseDto } from './dto/asset-list-response.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('asset')
 @Controller('asset')
 export class AssetController {
   constructor(private readonly assetService: AssetService) {}
