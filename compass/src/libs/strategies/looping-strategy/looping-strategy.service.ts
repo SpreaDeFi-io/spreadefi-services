@@ -113,7 +113,7 @@ export class LoopingStrategyService {
           txDetails.toToken,
           chains[txDetails.fromChain].wethAddress,
           txDetails.fromAmount,
-          'leverage will be 3 or 6, need to modify the txdetails thingy',
+          txDetails.leverage,
           txDetails.fromAddress,
           '105', //!TODO: Hardcoded as of now but make it dynamic later
           '100', //!TODO: Hardcoded as of now but make it dynamic later

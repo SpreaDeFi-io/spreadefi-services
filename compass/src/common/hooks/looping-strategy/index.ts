@@ -33,7 +33,7 @@ export const loopStrategyHandler = (txdetails: TransactionDetailsDto) => {
       txdetails.toToken,
       chains[txdetails.toChain].wethAddress,
       1, //* this amount gets overwritten by payload
-      'leverage will come here modify the txdetails',
+      txdetails.leverage,
       txdetails.toAddress,
       105, //!TODO: Hardcoded as of now but make it dynamic later
       100, //!TODO: Hardcoded as of now but make it dynamic later

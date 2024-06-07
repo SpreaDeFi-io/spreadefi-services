@@ -1,6 +1,7 @@
 import {
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsObject,
   IsOptional,
   IsString,
@@ -20,6 +21,11 @@ export class TransactionDetailsDto extends CreateSquidQuoteDto {
   @IsString()
   @IsOptional()
   fundAmount?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @IsEnum([3, 6])
+  leverage?: number; //* looping strategy leverage
 }
 
 export class PrepareTransactionDto {
