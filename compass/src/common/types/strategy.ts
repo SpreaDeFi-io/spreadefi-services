@@ -20,4 +20,7 @@ export enum Action {
   REPAY = 'Repay',
   WITHDRAW_SUPPLY = 'Withdraw-Supply',
   BORROW_SUPPLY = 'Borrow-Supply',
+  E_MODE = 'Set-Aave-EMode',
+  APPROVE_DELEGATION = 'Approve-Delegation',
+  LOOP_STRATEGY = 'Loop-Strategy',
 }
