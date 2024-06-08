@@ -9,6 +9,7 @@ import { ZerolendService } from 'src/libs/strategies/zerolend/zerolend.service';
 import { AaveSeamlessService } from 'src/libs/strategies/aave-seamless/aave-seamless.service';
 import { AaveZerolendService } from 'src/libs/strategies/aave-zerolend/aave-zerolend.service';
 import { SeamlessZerolendService } from 'src/libs/strategies/seamless-zerolend/seamless-zerolend.service';
+import { LoopingStrategyService } from 'src/libs/strategies/looping-strategy/looping-strategy.service';
 
 @Injectable()
 export class TransactionService {
@@ -20,6 +21,7 @@ export class TransactionService {
     private readonly aaveSeamlessService: AaveSeamlessService,
     private readonly aaveZerolendService: AaveZerolendService,
     private readonly seamlessZerolendService: SeamlessZerolendService,
+    private readonly loopingStrategyService: LoopingStrategyService,
   ) {}
 
   async createQuote(createQuoteDto: CreateSquidQuoteDto) {
@@ -79,6 +81,8 @@ export class TransactionService {
             txDetails,
           });
 
+        return transactions;
+
       //* If it is a combined strategy, related to seamless and zerolend
       case StrategyName.SEAMLESS_ZEROLEND || StrategyName.ZEROLEND_SEAMLESS:
         transactions =
@@ -89,6 +93,15 @@ export class TransactionService {
               txDetails,
             },
           );
+
+        return transactions;
+
+      //* If it is a looping strategy
+      case StrategyName.LOOPING_STRATEGY:
+        transactions =
+          await this.loopingStrategyService.createLoopingStrategy(txDetails);
+
+        return transactions;
 
       default:
         throw new BadRequestException('Protocol or action not supported');

@@ -8,6 +8,7 @@ import { ZerolendModule } from 'src/libs/strategies/zerolend/zerolend.module';
 import { AaveSeamlessModule } from 'src/libs/strategies/aave-seamless/aave-seamless.module';
 import { AaveZerolendModule } from 'src/libs/strategies/aave-zerolend/aave-zerolend.module';
 import { SeamlessZerolendModule } from 'src/libs/strategies/seamless-zerolend/seamless-zerolend.module';
+import { LoopingStrategyModule } from 'src/libs/strategies/looping-strategy/looping-strategy.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SeamlessZerolendModule } from 'src/libs/strategies/seamless-zerolend/se
     SeamlessModule.register(),
     AaveSeamlessModule.register(),
     AaveZerolendModule.register(),
+    LoopingStrategyModule.register(),
     SeamlessZerolendModule.register(),
   ],
   controllers: [TransactionController],

@@ -9,6 +9,7 @@ export enum StrategyName {
   ZEROLEND_AAVE = 'Zerolend-Aave',
   SEAMLESS_ZEROLEND = 'Seamless-Zerolend',
   ZEROLEND_SEAMLESS = 'Zerolend-Seamless',
+  LOOPING_STRATEGY = 'Looping-Strategy',
 }
 
 export enum Action {
@@ -23,4 +24,6 @@ export enum Action {
   E_MODE = 'Set-Aave-EMode',
   APPROVE_DELEGATION = 'Approve-Delegation',
   LOOP_STRATEGY = 'Loop-Strategy',
+  WITHDRAW_LOOP = 'Withdraw-Loop',
+  BORROW_LOOP = 'Borrow-Loop',
 }
