@@ -65,19 +65,17 @@ export class LoopingStrategyService {
     );
 
     //* check if user has already approved delegation
-    //!reconfirm how much amount should be delegated atleast -> the amount delegated should be 2x value of weth amount
-    //! 1 wstETH = 1.15 WETH
-    const isDelegationApproved = await aaveDelegationContract.borrowAllowance(
+    const borrowAllowance = await aaveDelegationContract.borrowAllowance(
       txDetails.fromAddress,
       chains[txDetails.toChain].loopingStrategy,
     );
 
-    //* if delegation is not approved then approve delegation
-    if (!isDelegationApproved) {
+    //* if borrow allowance is less than 2000 ETH in wei, then ask for delegation approval
+    if (BigInt(borrowAllowance.toString()) < BigInt('2000000000000000000000')) {
       const approveDelegationTx =
         await aaveDelegationContract.approveDelegation(
           chains[txDetails.toChain].loopingStrategy,
-          ethers.MaxUint256, //!decide on the amount to approve
+          ethers.MaxUint256 - BigInt(borrowAllowance.toString()),
         );
 
       transactions.push({
