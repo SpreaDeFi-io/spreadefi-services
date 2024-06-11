@@ -14,6 +14,8 @@ import { SerializeInterceptor } from 'interceptors/serialize.interceptor';
 import { ApiSendOkResponse } from 'src/common/decorators/swagger/response.decorator';
 import { AssetListResponseDto } from './dto/asset-list-response.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AssetBySymbolResponseDto } from './dto/asset-by-symbol-response-dto';
+import { AssetByIdResponseDto } from './dto/asset-by-id-response-dto';
 
 @ApiTags('asset')
 @Controller('asset')
@@ -35,6 +37,10 @@ export class AssetController {
     };
   }
 
+  @ApiSendOkResponse(
+    'Returns ok response after successfully fetching asset by symbol',
+    AssetBySymbolResponseDto,
+  )
   @HttpCode(HttpStatus.OK)
   @Get('symbol/:symbol')
   async getAssetBySymbol(@Param('symbol') symbol: string) {
@@ -42,11 +48,15 @@ export class AssetController {
 
     return {
       statusCode: HttpStatus.OK,
-      message: 'Fetched asset successfully',
+      message: 'Fetched assets successfully by symbol',
       data,
     };
   }
 
+  @ApiSendOkResponse(
+    'Returns ok response after successfully fetching asset by id',
+    AssetByIdResponseDto,
+  )
   @HttpCode(HttpStatus.OK)
   @Get('id/:id')
   async getAssetById(@Param('id') id: string) {
@@ -54,7 +64,7 @@ export class AssetController {
 
     return {
       statusCode: HttpStatus.OK,
-      message: 'Fetched asset successfully',
+      message: 'Fetched asset successfully by id',
       data,
     };
   }
