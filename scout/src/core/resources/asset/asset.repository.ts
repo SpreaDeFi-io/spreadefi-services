@@ -17,8 +17,8 @@ export class AssetRepository {
           points: { $addToSet: '$points' },
           chainIds: { $addToSet: '$chainId' },
           protocolNames: { $addToSet: '$protocolName' },
-          assetSupplyApys: { $addToSet: '$assetSupplyApy' },
-          assetSupplyBoostedApys: { $addToSet: '$assetSupplyBoostedApy' },
+          assetSupplyApys: { $push: '$assetSupplyApy' },
+          assetSupplyBoostedApys: { $push: '$assetSupplyBoostedApy' },
         },
       },
       {
@@ -35,11 +35,30 @@ export class AssetRepository {
       },
       {
         $addFields: {
+          totalApys: {
+            $map: {
+              input: { $range: [0, { $size: '$assetSupplyApys' }] },
+              as: 'idx',
+              in: {
+                $add: [
+                  { $arrayElemAt: ['$assetSupplyApys', '$$idx'] },
+                  { $arrayElemAt: ['$assetSupplyBoostedApys', '$$idx'] },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
           assetSupplyApys: {
             $sortArray: { input: '$assetSupplyApys', sortBy: 1 },
           },
           assetSupplyBoostedApys: {
             $sortArray: { input: '$assetSupplyBoostedApys', sortBy: 1 },
+          },
+          totalApys: {
+            $sortArray: { input: '$totalApys', sortBy: 1 },
           },
         },
       },
