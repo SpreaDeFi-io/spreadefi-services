@@ -14,6 +14,7 @@ import { ApiSendCreatedResponse } from 'src/common/decorators/swagger/response.d
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
+
   @ApiSendCreatedResponse(
     'Returns created response after successfully creating transactions',
     PrepareTransactionResponseDto,
@@ -33,6 +34,7 @@ export class TransactionController {
       data,
     };
   }
+
   @ApiSendCreatedResponse(
     'Returns created response after successfully creating quote',
     CreateSquidQuoteResponseDto,

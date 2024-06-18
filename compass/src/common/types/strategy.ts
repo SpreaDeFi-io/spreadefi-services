@@ -26,4 +26,5 @@ export enum Action {
   LOOP_STRATEGY = 'Loop-Strategy',
   WITHDRAW_LOOP = 'Withdraw-Loop',
   BORROW_LOOP = 'Borrow-Loop',
+  ADD_LIQUIDITY = 'Add-Liquidity',
 }
