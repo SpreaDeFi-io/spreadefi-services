@@ -10,6 +10,10 @@ import { AaveSeamlessService } from 'src/libs/strategies/aave-seamless/aave-seam
 import { AaveZerolendService } from 'src/libs/strategies/aave-zerolend/aave-zerolend.service';
 import { SeamlessZerolendService } from 'src/libs/strategies/seamless-zerolend/seamless-zerolend.service';
 import { LoopingStrategyService } from 'src/libs/strategies/looping-strategy/looping-strategy.service';
+import { HopBeefyService } from 'src/libs/strategies/hop-beefy/hop-beefy.service';
+import { LoopingAaveService } from 'src/libs/strategies/looping-aave/looping-aave.service';
+import { LoopingZerolendService } from 'src/libs/strategies/looping-zerolend/looping-zerolend.service';
+import { LoopingSeamlessService } from 'src/libs/strategies/looping-seamless/looping-seamless.service';
 
 @Injectable()
 export class TransactionService {
@@ -22,6 +26,10 @@ export class TransactionService {
     private readonly aaveZerolendService: AaveZerolendService,
     private readonly seamlessZerolendService: SeamlessZerolendService,
     private readonly loopingStrategyService: LoopingStrategyService,
+    private readonly loopingAaveService: LoopingAaveService,
+    private readonly loopingSeamlessService: LoopingSeamlessService,
+    private readonly loopingZerolendService: LoopingZerolendService,
+    private readonly hopBeefyService: HopBeefyService,
   ) {}
 
   async createQuote(createQuoteDto: CreateSquidQuoteDto) {
@@ -100,6 +108,43 @@ export class TransactionService {
       case StrategyName.LOOPING_STRATEGY:
         transactions =
           await this.loopingStrategyService.createLoopingStrategy(txDetails);
+
+        return transactions;
+
+      //* If it is a looping strategy combined with aave
+      case StrategyName.LOOPING_AAVE:
+        transactions =
+          await this.loopingAaveService.prepareLoopingAaveTransaction({
+            action,
+            txDetails,
+          });
+
+        return transactions;
+
+      //* If it is a looping strategy combined with seamless
+      case StrategyName.LOOPING_SEAMLESS:
+        transactions =
+          await this.loopingSeamlessService.prepareLoopingSeamlessTransaction({
+            action,
+            txDetails,
+          });
+
+        return transactions;
+
+      //* If it is a looping strategy combined with zerolend
+      case StrategyName.LOOPING_ZEROLEND:
+        transactions =
+          await this.loopingZerolendService.prepareLoopingZerolendTransaction({
+            action,
+            txDetails,
+          });
+
+        return transactions;
+
+      //* If we are depositing into hop and beefy
+      case StrategyName.HOP_BEEFY:
+        transactions =
+          await this.hopBeefyService.addLiquidityAndDeposit(txDetails);
 
         return transactions;
 

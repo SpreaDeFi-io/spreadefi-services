@@ -18,7 +18,7 @@ export class HopBeefyService {
     private readonly squidService: SquidService,
   ) {}
 
-  async addLiquidity(txDetails: TransactionDetailsDto) {
+  async addLiquidityAndDeposit(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
     const toTokenDetails = await this.assetRepository.getAssetByAddress(

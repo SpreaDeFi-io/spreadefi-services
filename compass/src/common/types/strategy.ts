@@ -10,6 +10,10 @@ export enum StrategyName {
   SEAMLESS_ZEROLEND = 'Seamless-Zerolend',
   ZEROLEND_SEAMLESS = 'Zerolend-Seamless',
   LOOPING_STRATEGY = 'Looping-Strategy',
+  LOOPING_AAVE = 'Looping-Aave',
+  LOOPING_SEAMLESS = 'Looping-Seamless', //looping is currently only present in aave and borrow/withdraw can happend from aave/seamless/zerolend
+  LOOPING_ZEROLEND = 'Looping-Zerolend',
+  HOP_BEEFY = 'Hop-Beefy',
 }
 
 export enum Action {

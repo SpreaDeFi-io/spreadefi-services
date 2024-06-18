@@ -9,6 +9,10 @@ import { AaveSeamlessModule } from 'src/libs/strategies/aave-seamless/aave-seaml
 import { AaveZerolendModule } from 'src/libs/strategies/aave-zerolend/aave-zerolend.module';
 import { SeamlessZerolendModule } from 'src/libs/strategies/seamless-zerolend/seamless-zerolend.module';
 import { LoopingStrategyModule } from 'src/libs/strategies/looping-strategy/looping-strategy.module';
+import { HopBeefyModule } from 'src/libs/strategies/hop-beefy/hop-beefy.module';
+import { LoopingAaveModule } from 'src/libs/strategies/looping-aave/looping-aave.module';
+import { LoopingSeamlessModule } from 'src/libs/strategies/looping-seamless/looping-seamless.module';
+import { LoopingZerolendModule } from 'src/libs/strategies/looping-zerolend/looping-zerolend.module';
 
 @Module({
   imports: [
@@ -20,6 +24,10 @@ import { LoopingStrategyModule } from 'src/libs/strategies/looping-strategy/loop
     AaveZerolendModule.register(),
     LoopingStrategyModule.register(),
     SeamlessZerolendModule.register(),
+    LoopingAaveModule.register(),
+    LoopingSeamlessModule.register(),
+    LoopingZerolendModule.register(),
+    HopBeefyModule.register(),
   ],
   controllers: [TransactionController],
   providers: [TransactionService],
