@@ -31,4 +31,5 @@ export enum Action {
   WITHDRAW_LOOP = 'Withdraw-Loop',
   BORROW_LOOP = 'Borrow-Loop',
   ADD_LIQUIDITY = 'Add-Liquidity',
+  DEPOSIT = 'Deposit',
 }

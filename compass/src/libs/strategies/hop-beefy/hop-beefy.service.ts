@@ -1,10 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { MaxUint256 } from 'ethers';
 import { ERC20_ABI } from 'src/common/constants/abi';
 import { BEEFY_VAULT_ABI } from 'src/common/constants/abi/beefy';
 import { HOP_SWAP_ABI } from 'src/common/constants/abi/hop';
 import { beefyConfig } from 'src/common/constants/config/beefy';
+import { chains } from 'src/common/constants/config/chain';
 import { hopConfig } from 'src/common/constants/config/hop';
-import { encodeFunctionData } from 'src/common/ethers';
+import { encodeFunctionData, ethersContract } from 'src/common/ethers';
 import { hopBeefyHandler } from 'src/common/hooks/hop-beefy';
 import { Action, ExecutableTransaction } from 'src/common/types';
 import { AssetRepository } from 'src/core/resources/asset/asset.repository';
@@ -66,12 +68,42 @@ export class HopBeefyService {
         tx: tx2,
       });
 
-      const tx3 = encodeFunctionData(ERC20_ABI, 'approve', [
-        beefyVault,
-        txDetails.fromAmount,
-      ]);
+      const erc20Contract = ethersContract(
+        lpTokenAddress,
+        ERC20_ABI,
+        chains[txDetails.toChain].rpc,
+      );
 
-      //! figure out how to pass the balance of lptoken in the next transaction
+      //* check how much allowance beefyvault Contract has of lptoken
+      const allowance = await erc20Contract.allowance(
+        txDetails.toAddress,
+        beefyVault,
+      );
+
+      //* approve lptoken to make the approval max
+      if (BigInt(allowance.toString()) !== MaxUint256) {
+        const tx3 = encodeFunctionData(ERC20_ABI, 'approve', [
+          beefyVault,
+          MaxUint256 - BigInt(allowance.toString()),
+        ]);
+
+        transactions.push({
+          to: lpTokenAddress,
+          type: Action.APPROVE,
+          tx: tx3,
+        });
+      }
+
+      //* call deposit all on beefy vault contract
+      const tx4 = encodeFunctionData(BEEFY_VAULT_ABI, 'depositAll', []);
+
+      transactions.push({
+        to: beefyVault,
+        type: Action.DEPOSIT,
+        tx: tx4,
+      });
+
+      return transactions;
     } else {
       //* get the quote from squid
       //* prepare the post hook

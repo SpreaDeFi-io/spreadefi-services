@@ -79,6 +79,21 @@ export const hopBeefyHandler = (
     callData: beefyEncodedData,
   });
 
+  const transferEncodedData = encodeFunctionData(ERC20_ABI, 'transfer', [
+    txDetails.toAddress,
+    1, //* this value will be overwritten by payload
+  ]);
+
+  calls.push({
+    target: beefyVaultAddress,
+    callType: SquidCallType.FULL_TOKEN_BALANCE,
+    callData: transferEncodedData,
+    payload: {
+      tokenAddress: beefyVaultAddress,
+      inputPos: 1,
+    },
+  });
+
   const hooks = hookBuilder({
     fundToken: txDetails.fundToken,
     fundAmount: txDetails.fundAmount,
