@@ -7,10 +7,10 @@ import {
   AAVE_CREDIT_DELEGATION_ABI,
   AAVE_POOL_ABI,
   ERC20_ABI,
+  LOOPING_STRATEGY_ABI,
 } from 'src/common/constants/abi';
 import { Action, ExecutableTransaction } from 'src/common/types';
 import { chains } from 'src/common/constants/config/chain';
-import { LOOPING_STRATEGY_ABI } from 'src/common/constants/abi/looping-strategy';
 import { loopStrategyHandler } from 'src/common/hooks/looping-strategy';
 import { SquidService } from 'src/libs/squid/squid.service';
 

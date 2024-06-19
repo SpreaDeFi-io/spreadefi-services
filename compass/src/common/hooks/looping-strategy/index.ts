@@ -1,6 +1,5 @@
 import { SquidCallType } from '@0xsquid/squid-types';
-import { ERC20_ABI } from 'src/common/constants/abi';
-import { LOOPING_STRATEGY_ABI } from 'src/common/constants/abi/looping-strategy';
+import { ERC20_ABI, LOOPING_STRATEGY_ABI } from 'src/common/constants/abi';
 import { chains } from 'src/common/constants/config/chain';
 import { encodeFunctionData } from 'src/common/ethers';
 import { HookBuilderArgs } from 'src/common/types';
