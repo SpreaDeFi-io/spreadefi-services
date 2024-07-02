@@ -29,16 +29,15 @@ export class HopBeefyService {
 
     //* fetch the swap address and beefy vault address
     const swapAddress =
-      hopConfig[txDetails.toChain][toTokenDetails.assetSymbol].swapAddress;
+      hopConfig[txDetails.toChain][toTokenDetails.assetSymbol]?.swapAddress;
     const lpTokenAddress =
-      hopConfig[txDetails.toChain][toTokenDetails.assetSymbol].lpTokenAddress;
+      hopConfig[txDetails.toChain][toTokenDetails.assetSymbol]?.lpTokenAddress;
     const beefyVault =
       beefyConfig[txDetails.toChain][toTokenDetails.assetSymbol]
-        .beefyVaultAddress;
+        ?.beefyVaultAddress;
 
     if (!swapAddress || !lpTokenAddress || !beefyVault)
       throw new BadRequestException('Token not supported');
-
     if (
       txDetails.fromChain === txDetails.toChain &&
       txDetails.fromToken === txDetails.toToken
@@ -57,7 +56,7 @@ export class HopBeefyService {
 
       //* add liquidity to hop protocol
       const tx2 = encodeFunctionData(HOP_SWAP_ABI, 'addLiquidity', [
-        txDetails.fromAmount,
+        [txDetails.fromAmount, 0],
         0,
         Date.now() + 5000000,
       ]);

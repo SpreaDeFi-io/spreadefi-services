@@ -15,5 +15,7 @@ export const encodeFunctionData = (
 ) => {
   const contractInterface = new Interface(abi);
 
-  return contractInterface.encodeFunctionData(functionName, params);
+  return params.length > 0
+    ? contractInterface.encodeFunctionData(functionName, params)
+    : contractInterface.encodeFunctionData(functionName);
 };

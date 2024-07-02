@@ -12,6 +12,7 @@ import {
   PrepareTransactionDto,
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
+import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 import { SquidService } from 'src/libs/squid/squid.service';
 
 @Injectable()
@@ -23,6 +24,22 @@ export class ZerolendService {
     txDetails,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
+
+    //* check if protocol exists on both chains
+    const isAvailableOnFromChain = isProtocolAvailable(
+      'Zerolend',
+      txDetails.fromChain,
+    );
+    const isAvailableOnToChain = isProtocolAvailable(
+      'Zerolend',
+      txDetails.toChain,
+    );
+
+    if (!isAvailableOnFromChain || !isAvailableOnToChain)
+      throw new BadRequestException(
+        'Protocol does not exist on From chain or To chain',
+      );
+
     switch (action) {
       case Action.SUPPLY:
         transactions = await this.supply(txDetails);

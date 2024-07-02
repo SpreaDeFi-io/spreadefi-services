@@ -13,6 +13,7 @@ import {
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { ETHEREUM_ADDRESS } from 'src/common/constants';
+import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 
 @Injectable()
 export class SeamlessService {
@@ -23,6 +24,22 @@ export class SeamlessService {
     txDetails,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
+
+    //* check if protocol exists on both chains
+    const isAvailableOnFromChain = isProtocolAvailable(
+      'Seamless',
+      txDetails.fromChain,
+    );
+    const isAvailableOnToChain = isProtocolAvailable(
+      'Seamless',
+      txDetails.toChain,
+    );
+
+    if (!isAvailableOnFromChain || !isAvailableOnToChain)
+      throw new BadRequestException(
+        'Protocol does not exist on From chain or To chain',
+      );
+
     switch (action) {
       case Action.SUPPLY:
         transactions = await this.supply(txDetails);

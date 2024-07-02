@@ -10,6 +10,7 @@ import {
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { ETHEREUM_ADDRESS } from 'src/common/constants';
+import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 
 @Injectable()
 export class AaveService {
@@ -20,6 +21,19 @@ export class AaveService {
     txDetails,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
+
+    //* check if protocol exists on both chains
+    const isAvailableOnFromChain = isProtocolAvailable(
+      'Aave',
+      txDetails.fromChain,
+    );
+    const isAvailableOnToChain = isProtocolAvailable('Aave', txDetails.toChain);
+
+    if (!isAvailableOnFromChain || !isAvailableOnToChain)
+      throw new BadRequestException(
+        'Protocol does not exist on from chain or to chain',
+      );
+
     switch (action) {
       case Action.SUPPLY:
         transactions = await this.supply(txDetails);

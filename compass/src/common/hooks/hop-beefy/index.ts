@@ -37,7 +37,7 @@ export const hopBeefyHandler = (
   const hopAddLiquidityEncodedData = encodeFunctionData(
     HOP_SWAP_ABI,
     'addLiquidity',
-    [1, 0, Date.now() + 5000000], //* value at index 0 will be overwritten by payload
+    [[1, 0], 0, Math.floor((Date.now() + 5000000) / 1000).toString()], //* value at index 0 will be overwritten by payload
   );
 
   calls.push({

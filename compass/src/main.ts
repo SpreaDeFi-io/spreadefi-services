@@ -20,6 +20,8 @@ async function bootstrap() {
       validationError: { target: true, value: true },
     }),
   );
+
+  app.enableCors();
   await app.listen(8000);
 }
 bootstrap();

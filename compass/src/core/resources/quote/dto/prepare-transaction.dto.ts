@@ -56,8 +56,8 @@ export class PrepareTransactionDto {
   })
   @IsEnum(Action)
   @IsString()
-  @IsNotEmpty()
-  action: Action;
+  @IsOptional()
+  action?: Action;
 
   @ApiProperty({
     description: 'Transaction Details',
