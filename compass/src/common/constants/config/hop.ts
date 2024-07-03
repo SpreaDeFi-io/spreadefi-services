@@ -1,5 +1,6 @@
 export const hopConfig = {
   '42161': {
+    hopWrapperAddress: '0xB84d3Fa88367Dbc10f46c9C9ebBd768295D773C7',
     WETH: {
       swapAddress: '0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97',
       lpTokenAddress: '0x59745774Ed5EfF903e615F5A2282Cae03484985a',
@@ -18,6 +19,7 @@ export const hopConfig = {
     },
   },
   '10': {
+    hopWrapperAddress: '0x7e4CE6f92100a494D5c5C77cF55698B0dCD55580',
     WETH: {
       swapAddress: '0xaa30D6bba6285d0585722e2440Ff89E23EF68864',
       lpTokenAddress: '0x5C2048094bAaDe483D0b1DA85c3Da6200A88a849',

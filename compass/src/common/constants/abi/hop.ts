@@ -480,3 +480,64 @@ export const HOP_SWAP_ABI = [
     type: 'function',
   },
 ];
+
+export const HOP_WRAPPER_ABI = [
+  {
+    type: 'function',
+    name: 'deposit',
+    inputs: [
+      { name: '_swap', type: 'address', internalType: 'address' },
+      { name: '_token', type: 'address', internalType: 'address' },
+      { name: '_lpToken', type: 'address', internalType: 'address' },
+      { name: '_tokenAmount', type: 'uint256', internalType: 'uint256' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'Deposit',
+    inputs: [
+      {
+        name: 'HopSwap',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+      {
+        name: 'TokenAddr',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+      {
+        name: 'HopLpToken',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+      {
+        name: 'user',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+      {
+        name: 'TokenAmount',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'LpTokenAmount',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  { type: 'error', name: 'FAILED_TO_RECEIVE', inputs: [] },
+  { type: 'error', name: 'TOKEN_AMOUNT_NOT_APPROVED', inputs: [] },
+  { type: 'error', name: 'TRANSFER_FAILED', inputs: [] },
+];

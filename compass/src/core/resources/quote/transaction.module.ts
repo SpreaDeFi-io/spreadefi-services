@@ -13,6 +13,7 @@ import { HopBeefyModule } from 'src/libs/strategies/hop-beefy/hop-beefy.module';
 import { LoopingAaveModule } from 'src/libs/strategies/looping-aave/looping-aave.module';
 import { LoopingSeamlessModule } from 'src/libs/strategies/looping-seamless/looping-seamless.module';
 import { LoopingZerolendModule } from 'src/libs/strategies/looping-zerolend/looping-zerolend.module';
+import { AaveHopBeefyModule } from 'src/libs/strategies/aave-hop-beefy/aave-hop-beefy.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { LoopingZerolendModule } from 'src/libs/strategies/looping-zerolend/loop
     LoopingSeamlessModule.register(),
     LoopingZerolendModule.register(),
     HopBeefyModule.register(),
+    AaveHopBeefyModule.register(),
   ],
   controllers: [TransactionController],
   providers: [TransactionService],

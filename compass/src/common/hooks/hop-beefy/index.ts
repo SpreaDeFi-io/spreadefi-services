@@ -1,11 +1,13 @@
 import { SquidCallType } from '@0xsquid/squid-types';
 import { ERC20_ABI } from 'src/common/constants/abi';
-import { HOP_SWAP_ABI } from 'src/common/constants/abi/hop';
+import { HOP_WRAPPER_ABI } from 'src/common/constants/abi/hop';
 import { encodeFunctionData } from 'src/common/ethers';
 import { HookBuilderArgs } from 'src/common/types';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { hookBuilder } from '../hook-builder';
 import { BEEFY_VAULT_ABI } from 'src/common/constants/abi/beefy';
+import { hopConfig } from 'src/common/constants/config/hop';
+import { ethers } from 'ethers';
 
 //* Hop and beefy need to be created together since they can not work seperately
 //* as in hop it requires an additional step to transfer the lp token to the user
@@ -19,7 +21,7 @@ export const hopBeefyHandler = (
 
   //*provide approval first
   const erc20EncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
-    swapAddress,
+    hopConfig[txDetails.toChain].hopWrapperAddress,
     1, //* this amount gets overwritten by payload
   ]);
 
@@ -33,32 +35,32 @@ export const hopBeefyHandler = (
     },
   });
 
-  //* add liquidity to hop
+  //* add liquidity to hop uaing hop wrapper
   const hopAddLiquidityEncodedData = encodeFunctionData(
-    HOP_SWAP_ABI,
-    'addLiquidity',
-    [[1, 0], 0, Math.floor((Date.now() + 5000000) / 1000).toString()], //* value at index 0 will be overwritten by payload
+    HOP_WRAPPER_ABI,
+    'deposit',
+    [swapAddress, txDetails.toToken, lpTokenAddress, 1], //* value at index 3 will be overwritten by payload
   );
 
   calls.push({
-    target: swapAddress,
+    target: hopConfig[txDetails.toChain].hopWrapperAddress,
     callType: SquidCallType.FULL_TOKEN_BALANCE,
     callData: hopAddLiquidityEncodedData,
     payload: {
       tokenAddress: txDetails.toToken,
-      inputPos: 0,
+      inputPos: 3,
     },
   });
 
   //* approve the lp token
   const lpTokenApprovalEncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
     beefyVaultAddress,
-    1, //* this amount gets overwritten by payload
+    ethers.MaxUint256.toString(), //* this amount gets overwritten by payload
   ]);
 
   calls.push({
     target: lpTokenAddress,
-    callType: SquidCallType.FULL_TOKEN_BALANCE,
+    callType: SquidCallType.DEFAULT,
     callData: lpTokenApprovalEncodedData,
     payload: {
       tokenAddress: lpTokenAddress,
@@ -77,6 +79,10 @@ export const hopBeefyHandler = (
     target: beefyVaultAddress,
     callType: SquidCallType.DEFAULT,
     callData: beefyEncodedData,
+    payload: {
+      tokenAddress: lpTokenAddress,
+      inputPos: 0,
+    },
   });
 
   const transferEncodedData = encodeFunctionData(ERC20_ABI, 'transfer', [
@@ -90,6 +96,22 @@ export const hopBeefyHandler = (
     callData: transferEncodedData,
     payload: {
       tokenAddress: beefyVaultAddress,
+      inputPos: 1,
+    },
+  });
+
+  //* set the approval of lp token to zero
+  const removeApprovalEncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
+    beefyVaultAddress,
+    0, //* set the approval to 0
+  ]);
+
+  calls.push({
+    target: lpTokenAddress,
+    callType: SquidCallType.DEFAULT,
+    callData: removeApprovalEncodedData,
+    payload: {
+      tokenAddress: lpTokenAddress,
       inputPos: 1,
     },
   });

@@ -14,6 +14,7 @@ import { HopBeefyService } from 'src/libs/strategies/hop-beefy/hop-beefy.service
 import { LoopingAaveService } from 'src/libs/strategies/looping-aave/looping-aave.service';
 import { LoopingZerolendService } from 'src/libs/strategies/looping-zerolend/looping-zerolend.service';
 import { LoopingSeamlessService } from 'src/libs/strategies/looping-seamless/looping-seamless.service';
+import { AaveHopBeefyService } from 'src/libs/strategies/aave-hop-beefy/aave-hop-beefy.service';
 
 @Injectable()
 export class TransactionService {
@@ -30,6 +31,7 @@ export class TransactionService {
     private readonly loopingSeamlessService: LoopingSeamlessService,
     private readonly loopingZerolendService: LoopingZerolendService,
     private readonly hopBeefyService: HopBeefyService,
+    private readonly aaveHopBeefyService: AaveHopBeefyService,
   ) {}
 
   async createQuote(createQuoteDto: CreateSquidQuoteDto) {
@@ -145,6 +147,15 @@ export class TransactionService {
       case StrategyName.HOP_BEEFY:
         transactions =
           await this.hopBeefyService.addLiquidityAndDeposit(txDetails);
+
+        return transactions;
+
+      case StrategyName.AAAVE_HOP_BEEFY:
+        transactions =
+          await this.aaveHopBeefyService.prepareAaveHopBeefyTransactions({
+            action,
+            txDetails,
+          });
 
         return transactions;
 

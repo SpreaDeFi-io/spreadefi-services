@@ -11,9 +11,10 @@ export enum StrategyName {
   ZEROLEND_SEAMLESS = 'Zerolend-Seamless',
   LOOPING_STRATEGY = 'Looping-Strategy',
   LOOPING_AAVE = 'Looping-Aave',
-  LOOPING_SEAMLESS = 'Looping-Seamless', //looping is currently only present in aave and borrow/withdraw can happend from aave/seamless/zerolend
+  LOOPING_SEAMLESS = 'Looping-Seamless', //looping is currently only present in aave and borrow/withdraw can happen from aave/seamless/zerolend
   LOOPING_ZEROLEND = 'Looping-Zerolend',
   HOP_BEEFY = 'Hop-Beefy',
+  AAAVE_HOP_BEEFY = 'Aave-Hop-Beefy',
 }
 
 export enum Action {
@@ -25,6 +26,8 @@ export enum Action {
   REPAY = 'Repay',
   WITHDRAW_SUPPLY = 'Withdraw-Supply',
   BORROW_SUPPLY = 'Borrow-Supply',
+  WITHDRAW_DEPOSIT = 'Withdraw-Deposit',
+  BORROW_DEPOSIT = 'Borrow-Deposit',
   E_MODE = 'Set-Aave-EMode',
   APPROVE_DELEGATION = 'Approve-Delegation',
   LOOP_STRATEGY = 'Loop-Strategy',

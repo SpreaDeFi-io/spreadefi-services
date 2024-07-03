@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { MaxUint256 } from 'ethers';
 import { ERC20_ABI } from 'src/common/constants/abi';
 import { BEEFY_VAULT_ABI } from 'src/common/constants/abi/beefy';
-import { HOP_SWAP_ABI } from 'src/common/constants/abi/hop';
+import { HOP_WRAPPER_ABI } from 'src/common/constants/abi/hop';
 import { beefyConfig } from 'src/common/constants/config/beefy';
 import { chains } from 'src/common/constants/config/chain';
 import { hopConfig } from 'src/common/constants/config/hop';
@@ -55,10 +55,11 @@ export class HopBeefyService {
       });
 
       //* add liquidity to hop protocol
-      const tx2 = encodeFunctionData(HOP_SWAP_ABI, 'addLiquidity', [
-        [txDetails.fromAmount, 0],
-        0,
-        Date.now() + 5000000,
+      const tx2 = encodeFunctionData(HOP_WRAPPER_ABI, 'deposit', [
+        swapAddress,
+        txDetails.toToken,
+        lpTokenAddress,
+        txDetails.fromAmount,
       ]);
 
       transactions.push({
@@ -83,7 +84,7 @@ export class HopBeefyService {
       if (BigInt(allowance.toString()) !== MaxUint256) {
         const tx3 = encodeFunctionData(ERC20_ABI, 'approve', [
           beefyVault,
-          MaxUint256 - BigInt(allowance.toString()),
+          MaxUint256.toString(),
         ]);
 
         transactions.push({
