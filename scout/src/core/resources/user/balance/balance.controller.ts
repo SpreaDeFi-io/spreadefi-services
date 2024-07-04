@@ -32,4 +32,29 @@ export class BalanceController {
       data,
     };
   }
+
+  @ApiSendOkResponse(
+    'Returns ok response after successfully fetching all assets balance of a address',
+    BalanceResponseDto,
+  )
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(SerializeInterceptor)
+  @Get('/:address/:protocolName/:chainId')
+  async getSpecificProtocolBalance(
+    @Param('address') address: string,
+    @Param('protocolName') protocolName: string,
+    @Param('chainId') chainId: string,
+  ) {
+    const data = await this.balanceService.getUserSpecificProtocolBalances(
+      address,
+      protocolName,
+      chainId,
+    );
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Fetched all assets balance of this address successfully',
+      data,
+    };
+  }
 }

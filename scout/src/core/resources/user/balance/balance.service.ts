@@ -96,6 +96,89 @@ export class BalanceService {
     return filteredBalances;
   }
 
+  async getUserSpecificProtocolBalances(
+    userAddress: string,
+    protocolName: string,
+    chainId: string,
+  ) {
+    const assets = await this.assetModel.find({
+      protocolName: protocolName,
+      chainId: chainId,
+    });
+
+    let config: any;
+    let provider_abi: any;
+
+    switch (protocolName) {
+      case 'Aave':
+        config = aaveConfig;
+        provider_abi = AAVE_DATA_PROVIDER_ABI;
+        break;
+      case 'Zerolend':
+        config = zerolendConfig;
+        provider_abi = ZEROLEND_DATA_PROVIDER_ABI;
+        break;
+      case 'Seamless':
+        config = seamlessConfig;
+        provider_abi = SEAMLESS_DATA_PROVIDER_ABI;
+        break;
+    }
+
+    const balancePromises = assets.map(async (asset) => {
+      try {
+        const balanceData: any = await this.fetchAssetBalance(
+          asset.assetAddress,
+          asset.chainId,
+          userAddress,
+          config,
+          provider_abi,
+        );
+
+        return balanceData
+          ? {
+              asset: asset,
+              currentATokenBalance: this.convertBalanceToStrings(
+                balanceData[0],
+              ),
+              currentStableDebt: this.convertBalanceToStrings(balanceData[1]),
+              currentVariableDebt: this.convertBalanceToStrings(balanceData[2]),
+            }
+          : null;
+      } catch (error) {
+        this.balanceLogger.error(
+          `Error fetching balance for asset ${asset.assetAddress} on protocol ${asset.protocolName}: ${error.message}`,
+        );
+        return null;
+      }
+    });
+
+    const balanceResults = await Promise.allSettled(balancePromises);
+    const filteredBalances = balanceResults
+      .filter(
+        (result) =>
+          result.status === 'fulfilled' &&
+          result.value &&
+          (result.value.currentATokenBalance > 0 ||
+            result.value.currentStableDebt > 0 ||
+            result.value.currentVariableDebt > 0),
+      )
+      .map((result: any) => result.value);
+
+    const supplied = filteredBalances.filter(
+      (value) => value.currentATokenBalance > 0,
+    );
+
+    const borrowed = filteredBalances.filter(
+      (value) => value.currentStableDebt > 0 || value.currentVariableDebt > 0,
+    );
+    return {
+      filteredBalances,
+      supplied: supplied,
+      borrowed: borrowed,
+      assets: assets,
+    };
+  }
+
   /**
    * Fetches the balance data for a specific asset and user from a protocol.
    * @param assetAddress - The address of the asset.
