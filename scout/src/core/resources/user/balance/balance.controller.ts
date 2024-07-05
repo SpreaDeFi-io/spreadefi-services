@@ -10,7 +10,10 @@ import { BalanceService } from './balance.service';
 import { SerializeInterceptor } from 'interceptors/serialize.interceptor';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiSendOkResponse } from 'src/common/decorators/swagger/response.decorator';
-import { BalanceResponseDto } from '../../asset/dto/balance-response-dto';
+import {
+  BalanceResponseDto,
+  SpecificProtocolBalanceResponseDto,
+} from '../../asset/dto/balance-response-dto';
 
 @ApiTags('balance')
 @Controller('balance')
@@ -34,8 +37,8 @@ export class BalanceController {
   }
 
   @ApiSendOkResponse(
-    'Returns ok response after successfully fetching all assets balance of a address',
-    BalanceResponseDto,
+    'Returns ok response after successfully fetching all assets balance of a specific chain of aprotocol',
+    SpecificProtocolBalanceResponseDto,
   )
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(SerializeInterceptor)
