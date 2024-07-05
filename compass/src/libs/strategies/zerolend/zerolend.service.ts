@@ -25,20 +25,14 @@ export class ZerolendService {
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
 
-    //* check if protocol exists on both chains
-    const isAvailableOnFromChain = isProtocolAvailable(
-      'Zerolend',
-      txDetails.fromChain,
-    );
+    //* check if protocol exists on to chain
     const isAvailableOnToChain = isProtocolAvailable(
       'Zerolend',
       txDetails.toChain,
     );
 
-    if (!isAvailableOnFromChain || !isAvailableOnToChain)
-      throw new BadRequestException(
-        'Protocol does not exist on From chain or To chain',
-      );
+    if (!isAvailableOnToChain)
+      throw new BadRequestException('Protocol does not exist on To chain');
 
     switch (action) {
       case Action.SUPPLY:

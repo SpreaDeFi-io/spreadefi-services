@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { encodeFunctionData, ethersContract } from 'src/common/ethers';
 import {
@@ -26,13 +26,6 @@ export class SeamlessLoopingStrategyService {
    */
   async createLoopingStrategy(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
-
-    if (
-      !txDetails.toToken ||
-      txDetails.toToken !== chains[txDetails.toChain].wstETHAddress
-    ) {
-      throw new BadRequestException('Only wstETH is supported as of now!'); //! ask ayush if other tokens are now supported
-    }
 
     const rpcUrl = chains[txDetails.toChain].rpc;
 
@@ -92,8 +85,7 @@ export class SeamlessLoopingStrategyService {
     //* if user wants to make the tx on same chain and the token is wstETH as well, then we don't need squid
     if (
       txDetails.fromChain === txDetails.toChain &&
-      txDetails.fromToken === txDetails.toToken &&
-      txDetails.fromToken === chains[txDetails.fromChain].wstETHAddress
+      txDetails.fromToken === txDetails.toToken
     ) {
       //* approve the wstETH token
       const approveTx = encodeFunctionData(ERC20_ABI, 'approve', [
@@ -103,7 +95,7 @@ export class SeamlessLoopingStrategyService {
 
       transactions.push({
         chain: txDetails.fromChain,
-        to: chains[txDetails.fromChain].wstETHAddress,
+        to: txDetails.toToken,
         type: Action.APPROVE,
         tx: approveTx,
       });

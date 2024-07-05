@@ -20,6 +20,9 @@ export class AaveHopBeefyService {
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
 
+    //* we don't have to verify if protocol exists on a chain because it's a combined action
+    //* and it automatically verifies that for each protocol
+
     switch (action) {
       case Action.WITHDRAW_DEPOSIT:
         transactions = await this.aaveWithdrawHopBeefyDeposit(txDetails);

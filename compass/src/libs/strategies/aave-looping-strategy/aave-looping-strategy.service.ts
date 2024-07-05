@@ -13,6 +13,7 @@ import { Action, ExecutableTransaction } from 'src/common/types';
 import { chains } from 'src/common/constants/config/chain';
 import { loopStrategyHandler } from 'src/common/hooks/looping-strategy';
 import { SquidService } from 'src/libs/squid/squid.service';
+import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 
 @Injectable()
 export class AaveLoopingStrategyService {
@@ -20,19 +21,19 @@ export class AaveLoopingStrategyService {
 
   /**
    * * Creates the looping strategy for aave
-   * * Takes any token as input and converts it to wstETH for starter
+   * * Takes any token as input and converts it to toToken for starter
    * * sets the e-mode as enabled for user on destination chain and approves the delegation
    * * then calls squid's SDK to allow bridging and calling the looping strategy function
    */
   async createLoopingStrategy(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    if (
-      !txDetails.toToken ||
-      txDetails.toToken !== chains[txDetails.toChain].wstETHAddress
-    ) {
-      throw new BadRequestException('Only wstETH is supported as of now!');
-    }
+    const isAvailableOnToChain = isProtocolAvailable('Aave', txDetails.toChain);
+
+    if (!isAvailableOnToChain)
+      throw new BadRequestException('Protocol does not exist on to chain');
+
+    //! add a check here to only allow supported tokens maybe
 
     const rpcUrl = chains[txDetails.toChain].rpc;
 
@@ -49,7 +50,9 @@ export class AaveLoopingStrategyService {
 
     //* if e mode is not enabled then enable it for the user
     if (Number(isEModeEnabled.toString()) === 0) {
-      const eModeTx = encodeFunctionData(AAVE_POOL_ABI, 'setUserEMode', [2]); //! set e-mode to 1 if blockchain is base
+      const eModeTx = encodeFunctionData(AAVE_POOL_ABI, 'setUserEMode', [
+        txDetails.toChain === '8453' ? 1 : 2,
+      ]); //! set e-mode to 1 if blockchain is base
 
       transactions.push({
         chain: txDetails.toChain,
@@ -90,8 +93,7 @@ export class AaveLoopingStrategyService {
     //* if user wants to make the tx on same chain and the token is wstETH as well, then we don't need squid
     if (
       txDetails.fromChain === txDetails.toChain &&
-      txDetails.fromToken === txDetails.toToken &&
-      txDetails.fromToken === chains[txDetails.fromChain].wstETHAddress
+      txDetails.fromToken === txDetails.toToken
     ) {
       //* approve the wstETH token
       const approveTx = encodeFunctionData(ERC20_ABI, 'approve', [
@@ -101,7 +103,7 @@ export class AaveLoopingStrategyService {
 
       transactions.push({
         chain: txDetails.fromChain,
-        to: chains[txDetails.fromChain].wstETHAddress,
+        to: txDetails.toToken,
         type: Action.APPROVE,
         tx: approveTx,
       });
@@ -116,8 +118,8 @@ export class AaveLoopingStrategyService {
           txDetails.fromAmount,
           txDetails.leverage,
           txDetails.fromAddress,
-          '105', //!TODO: Hardcoded as of now but make it dynamic later
-          '100', //!TODO: Hardcoded as of now but make it dynamic later
+          '105', //!TODO: Hardcoded as of now but make it dynamic later, needs to change now
+          '100', //!TODO: Hardcoded as of now but make it dynamic later, needs to change now
         ],
       );
 

@@ -22,17 +22,11 @@ export class AaveService {
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
 
-    //* check if protocol exists on both chains
-    const isAvailableOnFromChain = isProtocolAvailable(
-      'Aave',
-      txDetails.fromChain,
-    );
+    //* check if protocol exists on dest chain
     const isAvailableOnToChain = isProtocolAvailable('Aave', txDetails.toChain);
 
-    if (!isAvailableOnFromChain || !isAvailableOnToChain)
-      throw new BadRequestException(
-        'Protocol does not exist on from chain or to chain',
-      );
+    if (!isAvailableOnToChain)
+      throw new BadRequestException('Protocol does not exist on to chain');
 
     switch (action) {
       case Action.SUPPLY:
