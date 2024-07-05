@@ -73,6 +73,7 @@ export class AaveService {
         ]);
 
         transactions.push({
+          chain: txDetails.fromChain,
           to: txDetails.fromToken,
           type: Action.APPROVE,
           tx: tx1,
@@ -88,6 +89,7 @@ export class AaveService {
       ]);
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: aaveConfig[txDetails.fromChain].poolAddress,
         type: Action.SUPPLY,
         tx: tx2,
@@ -106,6 +108,7 @@ export class AaveService {
       });
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: '',
         type: Action.SQUID,
         tx: tx1,
@@ -128,6 +131,7 @@ export class AaveService {
     ]);
 
     transactions.push({
+      chain: txDetails.fromChain,
       to: aaveConfig[txDetails.fromChain].poolAddress,
       type: Action.BORROW,
       tx: tx1,
@@ -142,6 +146,7 @@ export class AaveService {
       const tx2 = await this.squidService.createQuote(txDetails);
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: '',
         type: Action.SQUID,
         tx: tx2,
@@ -168,6 +173,7 @@ export class AaveService {
       });
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: '',
         type: Action.SQUID,
         tx: tx1,
@@ -182,6 +188,7 @@ export class AaveService {
         ]);
 
         transactions.push({
+          chain: txDetails.fromChain,
           to: txDetails.fromToken,
           type: Action.APPROVE,
           tx: tx1,
@@ -196,6 +203,7 @@ export class AaveService {
       ]);
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: aaveConfig[txDetails.fromChain].poolAddress,
         type: Action.REPAY,
         tx: tx2,
@@ -215,6 +223,7 @@ export class AaveService {
     ]);
 
     transactions.push({
+      chain: txDetails.fromChain,
       to: txDetails.fundToken,
       type: Action.APPROVE,
       tx: tx1,
@@ -228,6 +237,7 @@ export class AaveService {
     ]);
 
     transactions.push({
+      chain: txDetails.fromChain,
       to: aaveConfig[txDetails.fromChain].poolAddress,
       type: Action.WITHDRAW,
       tx: tx2,
@@ -242,6 +252,7 @@ export class AaveService {
       const tx3 = await this.squidService.createQuote(txDetails);
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: '',
         type: Action.SQUID,
         tx: tx3,

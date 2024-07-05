@@ -9,11 +9,11 @@ import { ZerolendService } from 'src/libs/strategies/zerolend/zerolend.service';
 import { AaveSeamlessService } from 'src/libs/strategies/aave-seamless/aave-seamless.service';
 import { AaveZerolendService } from 'src/libs/strategies/aave-zerolend/aave-zerolend.service';
 import { SeamlessZerolendService } from 'src/libs/strategies/seamless-zerolend/seamless-zerolend.service';
-import { LoopingStrategyService } from 'src/libs/strategies/looping-strategy/looping-strategy.service';
+import { AaveLoopingStrategyService } from 'src/libs/strategies/aave-looping-strategy/aave-looping-strategy.service';
 import { HopBeefyService } from 'src/libs/strategies/hop-beefy/hop-beefy.service';
-import { LoopingAaveService } from 'src/libs/strategies/looping-aave/looping-aave.service';
-import { LoopingZerolendService } from 'src/libs/strategies/looping-zerolend/looping-zerolend.service';
-import { LoopingSeamlessService } from 'src/libs/strategies/looping-seamless/looping-seamless.service';
+import { AaveLoopingAaveService } from 'src/libs/strategies/aave-looping-aave/aave-looping-aave.service';
+import { AaveLoopingZerolendService } from 'src/libs/strategies/aave-looping-zerolend/aave-looping-zerolend.service';
+import { AaveLoopingSeamlessService } from 'src/libs/strategies/aave-looping-seamless/aave-looping-seamless.service';
 import { AaveHopBeefyService } from 'src/libs/strategies/aave-hop-beefy/aave-hop-beefy.service';
 
 @Injectable()
@@ -26,10 +26,10 @@ export class TransactionService {
     private readonly aaveSeamlessService: AaveSeamlessService,
     private readonly aaveZerolendService: AaveZerolendService,
     private readonly seamlessZerolendService: SeamlessZerolendService,
-    private readonly loopingStrategyService: LoopingStrategyService,
-    private readonly loopingAaveService: LoopingAaveService,
-    private readonly loopingSeamlessService: LoopingSeamlessService,
-    private readonly loopingZerolendService: LoopingZerolendService,
+    private readonly aaveLoopingStrategyService: AaveLoopingStrategyService,
+    private readonly aaveLoopingAaveService: AaveLoopingAaveService,
+    private readonly aaveLoopingSeamlessService: AaveLoopingSeamlessService,
+    private readonly aaveLoopingZerolendService: AaveLoopingZerolendService,
     private readonly hopBeefyService: HopBeefyService,
     private readonly aaveHopBeefyService: AaveHopBeefyService,
   ) {}
@@ -109,14 +109,16 @@ export class TransactionService {
       //* If it is a looping strategy
       case StrategyName.LOOPING_STRATEGY:
         transactions =
-          await this.loopingStrategyService.createLoopingStrategy(txDetails);
+          await this.aaveLoopingStrategyService.createLoopingStrategy(
+            txDetails,
+          );
 
         return transactions;
 
       //* If it is a looping strategy combined with aave
       case StrategyName.LOOPING_AAVE:
         transactions =
-          await this.loopingAaveService.prepareLoopingAaveTransaction({
+          await this.aaveLoopingAaveService.prepareAaveLoopingAaveTransaction({
             action,
             txDetails,
           });
@@ -126,20 +128,24 @@ export class TransactionService {
       //* If it is a looping strategy combined with seamless
       case StrategyName.LOOPING_SEAMLESS:
         transactions =
-          await this.loopingSeamlessService.prepareLoopingSeamlessTransaction({
-            action,
-            txDetails,
-          });
+          await this.aaveLoopingSeamlessService.prepareAaveLoopingSeamlessTransaction(
+            {
+              action,
+              txDetails,
+            },
+          );
 
         return transactions;
 
       //* If it is a looping strategy combined with zerolend
       case StrategyName.LOOPING_ZEROLEND:
         transactions =
-          await this.loopingZerolendService.prepareLoopingZerolendTransaction({
-            action,
-            txDetails,
-          });
+          await this.aaveLoopingZerolendService.prepareAaveLoopingZerolendTransaction(
+            {
+              action,
+              txDetails,
+            },
+          );
 
         return transactions;
 

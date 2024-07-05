@@ -1,32 +1,31 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { LoopingStrategyService } from '../looping-strategy/looping-strategy.service';
-import { AaveService } from '../aave/aave.service';
+import { AaveLoopingStrategyService } from '../aave-looping-strategy/aave-looping-strategy.service';
 import {
   PrepareTransactionDto,
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
-import { ExecutableTransaction } from 'src/common/types';
-import { Action } from 'src/common/types';
+import { Action, ExecutableTransaction } from 'src/common/types';
+import { SeamlessService } from '../seamless/seamless.service';
 
 @Injectable()
-export class LoopingAaveService {
+export class AaveLoopingSeamlessService {
   constructor(
-    private readonly loopingStrategyService: LoopingStrategyService,
-    private readonly aaveService: AaveService,
+    private readonly loopingStrategyService: AaveLoopingStrategyService,
+    private readonly seamlessService: SeamlessService,
   ) {}
 
-  async prepareLoopingAaveTransaction({
+  async prepareAaveLoopingSeamlessTransaction({
     action,
     txDetails,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
     switch (action) {
       case Action.BORROW_LOOP:
-        transactions = await this.aaveBorrowLoopingSupply(txDetails);
+        transactions = await this.seamlessBorrowLoopingSupply(txDetails);
         return transactions;
 
       case Action.WITHDRAW_LOOP:
-        transactions = await this.aaveWithdrawLoopingSupply(txDetails);
+        transactions = await this.seamlessWithdrawLoopingSupply(txDetails);
         return transactions;
 
       default:
@@ -34,18 +33,19 @@ export class LoopingAaveService {
     }
   }
 
-  async aaveBorrowLoopingSupply(txDetails: TransactionDetailsDto) {
+  async seamlessBorrowLoopingSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    const txDetailsAave = {
+    const txDetailsSeamless = {
       ...txDetails,
       toChain: txDetails.fromChain,
       toToken: txDetails.fromToken,
     };
 
-    const aaveTransactions = await this.aaveService.borrow(txDetailsAave);
+    const seamlessTransactions =
+      await this.seamlessService.borrow(txDetailsSeamless);
 
-    transactions.push(...aaveTransactions);
+    transactions.push(...seamlessTransactions);
 
     const loopingStrategyTransactions =
       await this.loopingStrategyService.createLoopingStrategy(txDetails);
@@ -55,18 +55,19 @@ export class LoopingAaveService {
     return transactions;
   }
 
-  async aaveWithdrawLoopingSupply(txDetails: TransactionDetailsDto) {
+  async seamlessWithdrawLoopingSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    const txDetailsAave = {
+    const txDetailsSeamless = {
       ...txDetails,
       toChain: txDetails.fromChain,
       toToken: txDetails.fromToken,
     };
 
-    const aaveTransactions = await this.aaveService.withdraw(txDetailsAave);
+    const seamlessTransactions =
+      await this.seamlessService.withdraw(txDetailsSeamless);
 
-    transactions.push(...aaveTransactions);
+    transactions.push(...seamlessTransactions);
 
     const loopingStrategyTransactions =
       await this.loopingStrategyService.createLoopingStrategy(txDetails);

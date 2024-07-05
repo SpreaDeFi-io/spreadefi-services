@@ -2,24 +2,24 @@ import { ethers } from 'ethers';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { encodeFunctionData, ethersContract } from 'src/common/ethers';
-import { aaveConfig } from 'src/common/constants/config/aave';
 import {
-  AAVE_CREDIT_DELEGATION_ABI,
-  AAVE_POOL_ABI,
   ERC20_ABI,
   LOOPING_STRATEGY_ABI,
+  ZEROLEND_CREDIT_DELEGATION_ABI,
+  ZEROLEND_POOL_ABI,
 } from 'src/common/constants/abi';
 import { Action, ExecutableTransaction } from 'src/common/types';
 import { chains } from 'src/common/constants/config/chain';
 import { loopStrategyHandler } from 'src/common/hooks/looping-strategy';
 import { SquidService } from 'src/libs/squid/squid.service';
+import { zerolendConfig } from 'src/common/constants/config/zerolend';
 
 @Injectable()
-export class LoopingStrategyService {
+export class ZerolendLoopingStrategyService {
   constructor(private readonly squidService: SquidService) {}
 
   /**
-   * * Creates the looping strategy for aave
+   * * Creates the looping strategy for zerolend
    * * Takes any token as input and converts it to wstETH for starter
    * * sets the e-mode as enabled for user on destination chain and approves the delegation
    * * then calls squid's SDK to allow bridging and calling the looping strategy function
@@ -31,41 +31,44 @@ export class LoopingStrategyService {
       !txDetails.toToken ||
       txDetails.toToken !== chains[txDetails.toChain].wstETHAddress
     ) {
-      throw new BadRequestException('Only wstETH is supported as of now!');
+      throw new BadRequestException('Only wstETH is supported as of now!'); //! ask ayush if other tokens are now supported
     }
 
     const rpcUrl = chains[txDetails.toChain].rpc;
 
-    const aavePoolContract = ethersContract(
-      aaveConfig[txDetails.toChain].poolAddress,
-      AAVE_POOL_ABI,
+    const zerolendPoolContract = ethersContract(
+      zerolendConfig[txDetails.toChain].poolAddress,
+      ZEROLEND_POOL_ABI,
       rpcUrl,
     );
 
     //* check if e mode is enabled
-    const isEModeEnabled = await aavePoolContract.getUserEMode(
+    const isEModeEnabled = await zerolendPoolContract.getUserEMode(
       txDetails.fromAddress,
     );
 
     //* if e mode is not enabled then enable it for the user
     if (Number(isEModeEnabled.toString()) === 0) {
-      const eModeTx = encodeFunctionData(AAVE_POOL_ABI, 'setUserEMode', [2]);
+      const eModeTx = encodeFunctionData(ZEROLEND_POOL_ABI, 'setUserEMode', [
+        2,
+      ]); //! set e-mode to 2 since blockchain for zerolend is line and not base
 
       transactions.push({
-        to: aaveConfig[txDetails.toChain].poolAddress,
+        chain: txDetails.toChain,
+        to: zerolendConfig[txDetails.toChain].poolAddress,
         type: Action.E_MODE,
         tx: eModeTx,
       });
     }
 
-    const aaveDelegationContract = ethersContract(
-      aaveConfig[txDetails.toChain].wethDebtToken,
-      AAVE_CREDIT_DELEGATION_ABI,
+    const zerolendDelegationContract = ethersContract(
+      zerolendConfig[txDetails.toChain].wethDebtToken,
+      ZEROLEND_CREDIT_DELEGATION_ABI,
       rpcUrl,
     );
 
     //* check if user has already approved delegation
-    const borrowAllowance = await aaveDelegationContract.borrowAllowance(
+    const borrowAllowance = await zerolendDelegationContract.borrowAllowance(
       txDetails.fromAddress,
       chains[txDetails.toChain].loopingStrategy,
     );
@@ -73,13 +76,14 @@ export class LoopingStrategyService {
     //* if borrow allowance is less than 2000 ETH in wei, then ask for delegation approval
     if (BigInt(borrowAllowance.toString()) < BigInt('2000000000000000000000')) {
       const approveDelegationTx =
-        await aaveDelegationContract.approveDelegation(
+        await zerolendDelegationContract.approveDelegation(
           chains[txDetails.toChain].loopingStrategy,
           ethers.MaxUint256 - BigInt(borrowAllowance.toString()),
         );
 
       transactions.push({
-        to: aaveConfig[txDetails.toChain].wethDebtToken,
+        chain: txDetails.toChain,
+        to: zerolendConfig[txDetails.toChain].wethDebtToken,
         type: Action.APPROVE_DELEGATION,
         tx: approveDelegationTx,
       });
@@ -98,6 +102,7 @@ export class LoopingStrategyService {
       ]);
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: chains[txDetails.fromChain].wstETHAddress,
         type: Action.APPROVE,
         tx: approveTx,
@@ -119,6 +124,7 @@ export class LoopingStrategyService {
       );
 
       transactions.push({
+        chain: txDetails.toChain,
         to: chains[txDetails.toChain].loopingStrategy,
         type: Action.LOOP_STRATEGY,
         tx: loopStrategyTx,
@@ -132,6 +138,7 @@ export class LoopingStrategyService {
       });
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: '',
         type: Action.SQUID,
         tx: squidTx,

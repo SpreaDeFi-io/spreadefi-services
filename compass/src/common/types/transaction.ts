@@ -3,6 +3,7 @@ import { Action } from './strategy';
 import { BytesLike } from 'ethers';
 
 export type ExecutableTransaction = {
+  chain: string;
   to: string;
   type: Action;
   tx:

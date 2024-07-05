@@ -1,31 +1,32 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { LoopingStrategyService } from '../looping-strategy/looping-strategy.service';
+import { AaveLoopingStrategyService } from '../aave-looping-strategy/aave-looping-strategy.service';
+import { ZerolendService } from '../zerolend/zerolend.service';
 import {
   PrepareTransactionDto,
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
-import { Action, ExecutableTransaction } from 'src/common/types';
-import { SeamlessService } from '../seamless/seamless.service';
+import { ExecutableTransaction } from 'src/common/types';
+import { Action } from 'src/common/types';
 
 @Injectable()
-export class LoopingSeamlessService {
+export class AaveLoopingZerolendService {
   constructor(
-    private readonly loopingStrategyService: LoopingStrategyService,
-    private readonly seamlessService: SeamlessService,
+    private readonly loopingStrategyService: AaveLoopingStrategyService,
+    private readonly zerolendService: ZerolendService,
   ) {}
 
-  async prepareLoopingSeamlessTransaction({
+  async prepareAaveLoopingZerolendTransaction({
     action,
     txDetails,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
     switch (action) {
       case Action.BORROW_LOOP:
-        transactions = await this.seamlessBorrowLoopingSupply(txDetails);
+        transactions = await this.zerolendBorrowLoopingSupply(txDetails);
         return transactions;
 
       case Action.WITHDRAW_LOOP:
-        transactions = await this.seamlessWithdrawLoopingSupply(txDetails);
+        transactions = await this.zerolendWithdrawLoopingSupply(txDetails);
         return transactions;
 
       default:
@@ -33,19 +34,19 @@ export class LoopingSeamlessService {
     }
   }
 
-  async seamlessBorrowLoopingSupply(txDetails: TransactionDetailsDto) {
+  async zerolendBorrowLoopingSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    const txDetailsSeamless = {
+    const txDetailsZerolend = {
       ...txDetails,
       toChain: txDetails.fromChain,
       toToken: txDetails.fromToken,
     };
 
-    const seamlessTransactions =
-      await this.seamlessService.borrow(txDetailsSeamless);
+    const zerolendTransactions =
+      await this.zerolendService.borrow(txDetailsZerolend);
 
-    transactions.push(...seamlessTransactions);
+    transactions.push(...zerolendTransactions);
 
     const loopingStrategyTransactions =
       await this.loopingStrategyService.createLoopingStrategy(txDetails);
@@ -55,19 +56,19 @@ export class LoopingSeamlessService {
     return transactions;
   }
 
-  async seamlessWithdrawLoopingSupply(txDetails: TransactionDetailsDto) {
+  async zerolendWithdrawLoopingSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    const txDetailsSeamless = {
+    const txDetailsZerolend = {
       ...txDetails,
       toChain: txDetails.fromChain,
       toToken: txDetails.fromToken,
     };
 
-    const seamlessTransactions =
-      await this.seamlessService.withdraw(txDetailsSeamless);
+    const zerolendTransactions =
+      await this.zerolendService.withdraw(txDetailsZerolend);
 
-    transactions.push(...seamlessTransactions);
+    transactions.push(...zerolendTransactions);
 
     const loopingStrategyTransactions =
       await this.loopingStrategyService.createLoopingStrategy(txDetails);

@@ -55,7 +55,7 @@ export const hopBeefyHandler = (
   //* approve the lp token
   const lpTokenApprovalEncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
     beefyVaultAddress,
-    ethers.MaxUint256.toString(), //* this amount gets overwritten by payload
+    ethers.MaxUint256.toString(),
   ]);
 
   calls.push({

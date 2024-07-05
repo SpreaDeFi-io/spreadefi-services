@@ -49,6 +49,7 @@ export class HopBeefyService {
       ]);
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: txDetails.toToken,
         type: Action.APPROVE,
         tx: tx1,
@@ -63,6 +64,7 @@ export class HopBeefyService {
       ]);
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: swapAddress,
         type: Action.ADD_LIQUIDITY,
         tx: tx2,
@@ -88,6 +90,7 @@ export class HopBeefyService {
         ]);
 
         transactions.push({
+          chain: txDetails.fromChain,
           to: lpTokenAddress,
           type: Action.APPROVE,
           tx: tx3,
@@ -98,6 +101,7 @@ export class HopBeefyService {
       const tx4 = encodeFunctionData(BEEFY_VAULT_ABI, 'depositAll', []);
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: beefyVault,
         type: Action.DEPOSIT,
         tx: tx4,
@@ -121,6 +125,7 @@ export class HopBeefyService {
       });
 
       transactions.push({
+        chain: txDetails.fromChain,
         to: '',
         type: Action.SQUID,
         tx: tx1,

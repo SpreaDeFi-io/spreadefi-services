@@ -8,11 +8,11 @@ import { ZerolendModule } from 'src/libs/strategies/zerolend/zerolend.module';
 import { AaveSeamlessModule } from 'src/libs/strategies/aave-seamless/aave-seamless.module';
 import { AaveZerolendModule } from 'src/libs/strategies/aave-zerolend/aave-zerolend.module';
 import { SeamlessZerolendModule } from 'src/libs/strategies/seamless-zerolend/seamless-zerolend.module';
-import { LoopingStrategyModule } from 'src/libs/strategies/looping-strategy/looping-strategy.module';
+import { AaveLoopingStrategyModule } from 'src/libs/strategies/aave-looping-strategy/aave-looping-strategy.module';
 import { HopBeefyModule } from 'src/libs/strategies/hop-beefy/hop-beefy.module';
-import { LoopingAaveModule } from 'src/libs/strategies/looping-aave/looping-aave.module';
-import { LoopingSeamlessModule } from 'src/libs/strategies/looping-seamless/looping-seamless.module';
-import { LoopingZerolendModule } from 'src/libs/strategies/looping-zerolend/looping-zerolend.module';
+import { AaveLoopingAaveModule } from 'src/libs/strategies/aave-looping-aave/aave-looping-aave.module';
+import { AaveLoopingSeamlessModule } from 'src/libs/strategies/aave-looping-seamless/aave-looping-seamless.module';
+import { AaveLoopingZerolendModule } from 'src/libs/strategies/aave-looping-zerolend/aave-looping-zerolend.module';
 import { AaveHopBeefyModule } from 'src/libs/strategies/aave-hop-beefy/aave-hop-beefy.module';
 
 @Module({
@@ -23,11 +23,11 @@ import { AaveHopBeefyModule } from 'src/libs/strategies/aave-hop-beefy/aave-hop-
     SeamlessModule.register(),
     AaveSeamlessModule.register(),
     AaveZerolendModule.register(),
-    LoopingStrategyModule.register(),
+    AaveLoopingStrategyModule.register(),
     SeamlessZerolendModule.register(),
-    LoopingAaveModule.register(),
-    LoopingSeamlessModule.register(),
-    LoopingZerolendModule.register(),
+    AaveLoopingAaveModule.register(),
+    AaveLoopingSeamlessModule.register(),
+    AaveLoopingZerolendModule.register(),
     HopBeefyModule.register(),
     AaveHopBeefyModule.register(),
   ],

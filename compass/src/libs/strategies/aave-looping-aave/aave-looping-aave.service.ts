@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { LoopingStrategyService } from '../looping-strategy/looping-strategy.service';
-import { ZerolendService } from '../zerolend/zerolend.service';
+import { AaveLoopingStrategyService } from '../aave-looping-strategy/aave-looping-strategy.service';
+import { AaveService } from '../aave/aave.service';
 import {
   PrepareTransactionDto,
   TransactionDetailsDto,
@@ -8,25 +8,26 @@ import {
 import { ExecutableTransaction } from 'src/common/types';
 import { Action } from 'src/common/types';
 
+//* This looping strategy is in aave and it withdraws/borrows funds from aave to deposit into aave looping strategy
 @Injectable()
-export class LoopingZerolendService {
+export class AaveLoopingAaveService {
   constructor(
-    private readonly loopingStrategyService: LoopingStrategyService,
-    private readonly zerolendService: ZerolendService,
+    private readonly aaveLoopingStrategyService: AaveLoopingStrategyService,
+    private readonly aaveService: AaveService,
   ) {}
 
-  async prepareLoopingZerolendTransaction({
+  async prepareAaveLoopingAaveTransaction({
     action,
     txDetails,
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
     switch (action) {
       case Action.BORROW_LOOP:
-        transactions = await this.zerolendBorrowLoopingSupply(txDetails);
+        transactions = await this.aaveBorrowLoopingSupply(txDetails);
         return transactions;
 
       case Action.WITHDRAW_LOOP:
-        transactions = await this.zerolendWithdrawLoopingSupply(txDetails);
+        transactions = await this.aaveWithdrawLoopingSupply(txDetails);
         return transactions;
 
       default:
@@ -34,44 +35,42 @@ export class LoopingZerolendService {
     }
   }
 
-  async zerolendBorrowLoopingSupply(txDetails: TransactionDetailsDto) {
+  async aaveBorrowLoopingSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    const txDetailsZerolend = {
+    const txDetailsAave = {
       ...txDetails,
       toChain: txDetails.fromChain,
       toToken: txDetails.fromToken,
     };
 
-    const zerolendTransactions =
-      await this.zerolendService.borrow(txDetailsZerolend);
+    const aaveTransactions = await this.aaveService.borrow(txDetailsAave);
 
-    transactions.push(...zerolendTransactions);
+    transactions.push(...aaveTransactions);
 
     const loopingStrategyTransactions =
-      await this.loopingStrategyService.createLoopingStrategy(txDetails);
+      await this.aaveLoopingStrategyService.createLoopingStrategy(txDetails);
 
     transactions.push(...loopingStrategyTransactions);
 
     return transactions;
   }
 
-  async zerolendWithdrawLoopingSupply(txDetails: TransactionDetailsDto) {
+  async aaveWithdrawLoopingSupply(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    const txDetailsZerolend = {
+    const txDetailsAave = {
       ...txDetails,
       toChain: txDetails.fromChain,
       toToken: txDetails.fromToken,
     };
 
-    const zerolendTransactions =
-      await this.zerolendService.withdraw(txDetailsZerolend);
+    const aaveTransactions = await this.aaveService.withdraw(txDetailsAave);
 
-    transactions.push(...zerolendTransactions);
+    transactions.push(...aaveTransactions);
 
     const loopingStrategyTransactions =
-      await this.loopingStrategyService.createLoopingStrategy(txDetails);
+      await this.aaveLoopingStrategyService.createLoopingStrategy(txDetails);
 
     transactions.push(...loopingStrategyTransactions);
 
