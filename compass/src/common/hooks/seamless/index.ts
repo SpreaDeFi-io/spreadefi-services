@@ -120,6 +120,21 @@ export const seamlessRepayHandler = (txDetails: TransactionDetailsDto) => {
     },
   });
 
+  const returnAmountEncodeData = encodeFunctionData(ERC20_ABI, 'transfer', [
+    txDetails.toAddress,
+    1,
+  ]); //* the amount at index 1 will be overwritten by payload
+
+  calls.push({
+    target: txDetails.toToken,
+    callType: SquidCallType.FULL_TOKEN_BALANCE,
+    callData: returnAmountEncodeData,
+    payload: {
+      tokenAddress: txDetails.toToken,
+      inputPos: 1,
+    },
+  });
+
   const hook = hookBuilder({
     fundToken: txDetails.fundToken,
     fundAmount: txDetails.fundAmount,
