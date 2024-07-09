@@ -1,0 +1,64 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-compass:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Setup node environment ${{matrix.node-version}}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{matrix.node-version}}
+        cache: 'yarn'
+    - name: Install dependencies for compass
+      run: |
+        cd compass
+        yarn install
+    - name: Build compass
+      run: |
+        cd compass
+        yarn build
+    - name: Deploy
+      run: yarn deploy
+
+
+  build-scout:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Setup node environment ${{matrix.node-version}}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{matrix.node-version}}
+        cache: 'yarn'
+    - name: Install dependencies for scout
+      run: |
+        cd scout
+        yarn install
+    - name: Build scout
+      run: |
+        cd scout
+        yarn build
+    - name: Deploy
+      run: yarn deploy
