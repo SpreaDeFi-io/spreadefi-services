@@ -34,7 +34,9 @@ jobs:
           cd compass
           yarn build
       - name: Deploy
-        run: yarn deploy
+        run: |
+        cd compass
+        yarn deploy
 
   build-scout:
     runs-on: self-hosted
@@ -62,4 +64,6 @@ jobs:
           cd scout
           yarn build
       - name: Deploy
-        run: yarn deploy
+        run: |
+        cd scout
+        yarn deploy
