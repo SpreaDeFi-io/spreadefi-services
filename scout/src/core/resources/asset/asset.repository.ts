@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Asset } from './asset.schema';
+import { Asset, ProtocolType } from './asset.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAssetDto } from 'src/core/resources/asset/dto/create-asset.dto';
 import { TGetAssetListResponse } from 'src/common/types/asset';
@@ -87,5 +87,21 @@ export class AssetRepository {
     const newAsset = new this.assetModel(asset);
 
     return newAsset.save();
+  }
+
+  async isAssetSupported(
+    protocolName: string,
+    chainId: string,
+    assetAddress: string,
+    type: ProtocolType,
+  ) {
+    const asset = await this.assetModel.findOne({
+      protocolName,
+      chainId,
+      assetAddress,
+      protocolType: type,
+    });
+
+    return asset ? true : false;
   }
 }

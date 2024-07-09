@@ -6,6 +6,7 @@ export type AssetDocument = HydratedDocument<Asset>;
 export enum ProtocolType {
   LENDING = 'Lending',
   YIELD = 'Yield',
+  LOOPING = 'Looping',
 }
 
 @Schema({
@@ -15,7 +16,6 @@ export class Asset {
   @Prop({
     type: String,
     required: true,
-    unique: true,
   })
   assetId: string;
 
