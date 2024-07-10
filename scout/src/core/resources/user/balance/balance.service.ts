@@ -13,11 +13,13 @@ import {
 } from 'src/common/constants/abi';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
 import { seamlessConfig } from 'src/common/constants/config/seamless';
+import { CovalentService } from 'src/libs/covalent/covalent.service';
 
 @Injectable()
 export class BalanceService {
   constructor(
     @InjectModel(Asset.name) private assetModel: Model<Asset>,
+    private readonly covalentService: CovalentService,
     private readonly balanceLogger: BalanceLogger,
   ) {}
 
@@ -171,11 +173,24 @@ export class BalanceService {
     const borrowed = filteredBalances.filter(
       (value) => value.currentStableDebt > 0 || value.currentVariableDebt > 0,
     );
+
+    const chainBalanceData =
+      await this.covalentService.getWalletBalanceForChain(
+        userAddress,
+        chainId as any,
+      );
+
+    const result = chainBalanceData.reduce((acc, item) => {
+      acc[item.contract_address] = item.pretty_quote;
+      return acc;
+    }, {});
+
     return {
       filteredBalances,
       supplied: supplied,
       borrowed: borrowed,
       assets: assets,
+      chainBalanceData: result,
     };
   }
 

@@ -72,7 +72,30 @@ export class SpecificProtocolBalanceResponseDto implements ScoutResponse {
           currentVariableDebt: '15845011664377910762',
         },
       ],
-      supplied: [],
+      supplied: [
+        {
+          asset: {
+            points: [],
+            _id: '6647267ac3ad53f41c05cfce',
+            protocolName: 'Aave',
+            chainId: '42161',
+            assetName: 'Wrapped BTC',
+            assetSymbol: 'WBTC',
+            assetAddress: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
+            createdAt: '2024-05-17T09:42:18.288Z',
+            updatedAt: '2024-07-10T04:00:00.844Z',
+            __v: 0,
+            assetId: 'Aave-WBTC-42161',
+            protocolType: 'Lending',
+            assetSupplyApy: 0.030620580018151967,
+            assetSupplyBoostedApy: 0,
+            assetBorrowApy: 0.5832912367491518,
+          },
+          currentATokenBalance: '45551479',
+          currentStableDebt: '0',
+          currentVariableDebt: '0',
+        },
+      ],
       borrowed: [
         {
           asset: {
@@ -116,6 +139,11 @@ export class SpecificProtocolBalanceResponseDto implements ScoutResponse {
           assetBorrowApy: 8.24663469433511,
         },
       ],
+      chainBalanceData: {
+        '0x078f358208685046a11c85e8ad32895ded33a249': '$26,442.37',
+        '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': '$49.03',
+        '0xaf88d065e77c8cc2239327c5edb3a432268e5831': '$6.70',
+      },
     },
   })
   data: BalanceListResponse;

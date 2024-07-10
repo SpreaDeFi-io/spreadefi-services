@@ -5,6 +5,7 @@ import { AssetModule } from '../../asset/asset.module';
 import { BalanceLogger } from './balance.logger';
 import { Asset, AssetSchema } from '../../asset/asset.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CovalentService } from 'src/libs/covalent/covalent.service';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     AssetModule,
   ],
   controllers: [BalanceController],
-  providers: [BalanceService, BalanceLogger],
+  providers: [BalanceService, BalanceLogger, CovalentService],
   exports: [BalanceService],
 })
 export class BalanceModule {}
