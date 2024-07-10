@@ -18,7 +18,6 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
         run: git pull origin main
       - name: Setup node environment ${{matrix.node-version}}
         uses: actions/setup-node@v3
@@ -49,7 +48,6 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
         run: git pull origin main
       - name: Setup node environment ${{matrix.node-version}}
         uses: actions/setup-node@v3
