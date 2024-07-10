@@ -1,0 +1,85 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js deployment
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  SQUID_INTEGRATOR_ID: ${{ secrets.SQUID_INTEGRATOR_ID }}
+  MONGODB_URI: ${{ secrets.MONGODB_URI }}
+  COVALENT_API_KEY: ${{ secrets.COVALENT_API_KEY }}
+  ARB_RPC: ${{ secrets.ARB_RPC }}
+  OP_RPC: ${{ secrets.OP_RPC }}
+  BASE_RPC: ${{ secrets.BASE_RPC }}
+  LINEA_RPC: ${{ secrets.LINEA_RPC }}
+
+jobs:
+  build-compass:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - name: Checkout code
+        id: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup node environment ${{matrix.node-version}}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{matrix.node-version}}
+          cache: "yarn"
+          cache-dependency-path: "./compass/yarn.lock"
+      - name: Install dependencies for compass
+        run: |
+          cd compass
+          yarn install
+      - name: Build compass
+        run: |
+          cd compass
+          yarn build
+      - name: Deploy
+        run: |
+          cd compass
+          yarn deploy
+
+  build-scout:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - name: Checkout code
+        id: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: Setup node environment ${{matrix.node-version}}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{matrix.node-version}}
+          cache: "yarn"
+          cache-dependency-path: "./scout/yarn.lock"
+      - name: Install dependencies for scout
+        run: |
+          cd scout
+          yarn install
+      - name: Build scout
+        run: |
+          cd scout
+          yarn build
+      - name: Deploy
+        run: |
+          cd scout
+          yarn deploy
