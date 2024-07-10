@@ -8,8 +8,17 @@ on:
     branches: ["main"]
 
 jobs:
+  checkout-code:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        id: checkout
+        uses: actions/checkout@v2
+
   build-compass:
     runs-on: self-hosted
+    needs: checkout-code
 
     strategy:
       matrix:
@@ -17,8 +26,6 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-      - name: Checkout code
-        run: git pull origin main
       - name: Setup node environment ${{matrix.node-version}}
         uses: actions/setup-node@v3
         with:
@@ -40,6 +47,7 @@ jobs:
 
   build-scout:
     runs-on: self-hosted
+    needs: checkout-code
 
     strategy:
       matrix:
@@ -47,8 +55,6 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-      - name: Checkout code
-        run: git pull origin main
       - name: Setup node environment ${{matrix.node-version}}
         uses: actions/setup-node@v3
         with:
