@@ -7,15 +7,6 @@ on:
   push:
     branches: ["main"]
 
-env:
-  SQUID_INTEGRATOR_ID: ${{ secrets.SQUID_INTEGRATOR_ID }}
-  MONGODB_URI: ${{ secrets.MONGODB_URI }}
-  COVALENT_API_KEY: ${{ secrets.COVALENT_API_KEY }}
-  ARB_RPC: ${{ secrets.ARB_RPC }}
-  OP_RPC: ${{ secrets.OP_RPC }}
-  BASE_RPC: ${{ secrets.BASE_RPC }}
-  LINEA_RPC: ${{ secrets.LINEA_RPC }}
-
 jobs:
   build-compass:
     runs-on: self-hosted
@@ -37,6 +28,12 @@ jobs:
           node-version: ${{matrix.node-version}}
           cache: "yarn"
           cache-dependency-path: "./compass/yarn.lock"
+      - name: Setup env
+        run: |
+          cd compass
+          touch .env
+          echo SQUID_INTEGRATOR_ID=${{ secrets.SQUID_INTEGRATOR_ID }} >> .env
+          echo MONGODB_URI=${{ secrets.MONGODB_URI }} >> .env
       - name: Install dependencies for compass
         run: |
           cd compass
@@ -71,6 +68,16 @@ jobs:
           node-version: ${{matrix.node-version}}
           cache: "yarn"
           cache-dependency-path: "./scout/yarn.lock"
+      - name: Setup env
+        run: |
+          cd scout
+          touch .env
+          echo MONGODB_URI=${{ secrets.MONGODB_URI }} >> .env
+          echo COVALENT_API_KEY=${{ secrets.COVALENT_API_KEY }} >> .env
+          echo ARB_RPC=${{ secrets.ARB_RPC }} >> .env
+          echo OP_RPC=${{ secrets.OP_RPC }} >> .env
+          echo BASE_RPC=${{ secrets.BASE_RPC }} >> .env
+          echo LINEA_RPC=${{ secrets.LINEA_RPC }} >> .env
       - name: Install dependencies for scout
         run: |
           cd scout
