@@ -4,7 +4,6 @@ import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-tran
 import { encodeFunctionData, ethersContract } from 'src/common/ethers';
 import {
   ERC20_ABI,
-  LOOPING_STRATEGY_ABI,
   ZEROLEND_CREDIT_DELEGATION_ABI,
   ZEROLEND_POOL_ABI,
 } from 'src/common/constants/abi';
@@ -13,6 +12,7 @@ import { chains } from 'src/common/constants/config/chain';
 import { loopStrategyHandler } from 'src/common/hooks/looping-strategy';
 import { SquidService } from 'src/libs/squid/squid.service';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
+import { loopingConfig } from 'src/common/constants/config/looping';
 
 @Injectable()
 export class ZerolendLoopingStrategyService {
@@ -44,7 +44,7 @@ export class ZerolendLoopingStrategyService {
     if (Number(isEModeEnabled.toString()) === 0) {
       const eModeTx = encodeFunctionData(ZEROLEND_POOL_ABI, 'setUserEMode', [
         2,
-      ]); //! set e-mode to 2 since blockchain for zerolend is line and not base
+      ]); //! set e-mode to 2 since blockchain for zerolend is linea and not base
 
       transactions.push({
         chain: txDetails.toChain,
@@ -102,7 +102,7 @@ export class ZerolendLoopingStrategyService {
 
       //* call the looping strategy function here
       const loopStrategyTx = encodeFunctionData(
-        LOOPING_STRATEGY_ABI,
+        loopingConfig['Zerolend'][txDetails.toChain][txDetails.toToken].abi,
         'loopStrategy',
         [
           txDetails.toToken,
@@ -110,8 +110,10 @@ export class ZerolendLoopingStrategyService {
           txDetails.fromAmount,
           txDetails.leverage,
           txDetails.fromAddress,
-          '105', //!TODO: Hardcoded as of now but make it dynamic later
-          '100', //!TODO: Hardcoded as of now but make it dynamic later
+          loopingConfig['Zerolend'][txDetails.toChain][txDetails.toToken]
+            .borrowPercentage,
+          100,
+          10,
         ],
       );
 
@@ -122,7 +124,7 @@ export class ZerolendLoopingStrategyService {
         tx: loopStrategyTx,
       });
     } else {
-      const hook = loopStrategyHandler(txDetails);
+      const hook = loopStrategyHandler(txDetails, 'Seamless');
 
       const squidTx = await this.squidService.createQuote({
         ...txDetails,

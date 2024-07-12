@@ -10,7 +10,6 @@ export const chains = {
     usdtAddress: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
     daiAddress: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
     rethAddress: '0xEC70Dcb4A1EFa46b8F2D97C310C9c4790ba5ffA8',
-    loopingStrategy: '0x',
   },
   '8453': {
     name: 'BASE',
@@ -18,7 +17,6 @@ export const chains = {
     chainId: 8453,
     wstETHAddress: '0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452',
     wethAddress: '0x4200000000000000000000000000000000000006',
-    loopingStrategy: '0x',
   },
   '10': {
     name: 'OP',
@@ -28,7 +26,6 @@ export const chains = {
     wethAddress: '0x4200000000000000000000000000000000000006',
     usdtAddress: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58',
     daiAddress: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
-    loopingStrategy: '0x',
   },
   '59144': {
     name: 'LINEA',

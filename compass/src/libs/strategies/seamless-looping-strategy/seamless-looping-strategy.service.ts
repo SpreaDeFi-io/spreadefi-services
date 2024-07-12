@@ -4,7 +4,6 @@ import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-tran
 import { encodeFunctionData, ethersContract } from 'src/common/ethers';
 import {
   ERC20_ABI,
-  LOOPING_STRATEGY_ABI,
   SEAMLESS_CREDIT_DELEGATION_ABI,
   SEAMLESS_POOL_ABI,
 } from 'src/common/constants/abi';
@@ -13,6 +12,7 @@ import { chains } from 'src/common/constants/config/chain';
 import { loopStrategyHandler } from 'src/common/hooks/looping-strategy';
 import { SquidService } from 'src/libs/squid/squid.service';
 import { seamlessConfig } from 'src/common/constants/config/seamless';
+import { loopingConfig } from 'src/common/constants/config/looping';
 
 @Injectable()
 export class SeamlessLoopingStrategyService {
@@ -102,7 +102,7 @@ export class SeamlessLoopingStrategyService {
 
       //* call the looping strategy function here
       const loopStrategyTx = encodeFunctionData(
-        LOOPING_STRATEGY_ABI,
+        loopingConfig['Seamless'][txDetails.toChain][txDetails.toToken].abi,
         'loopStrategy',
         [
           txDetails.toToken,
@@ -110,8 +110,10 @@ export class SeamlessLoopingStrategyService {
           txDetails.fromAmount,
           txDetails.leverage,
           txDetails.fromAddress,
-          '105', //!TODO: Hardcoded as of now but make it dynamic later
-          '100', //!TODO: Hardcoded as of now but make it dynamic later
+          loopingConfig['Seamless'][txDetails.toChain][txDetails.toToken]
+            .borrowPercentage,
+          100,
+          10,
         ],
       );
 
@@ -122,7 +124,7 @@ export class SeamlessLoopingStrategyService {
         tx: loopStrategyTx,
       });
     } else {
-      const hook = loopStrategyHandler(txDetails);
+      const hook = loopStrategyHandler(txDetails, 'Seamless');
 
       const squidTx = await this.squidService.createQuote({
         ...txDetails,

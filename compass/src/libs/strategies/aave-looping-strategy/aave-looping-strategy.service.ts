@@ -7,13 +7,13 @@ import {
   AAVE_CREDIT_DELEGATION_ABI,
   AAVE_POOL_ABI,
   ERC20_ABI,
-  LOOPING_STRATEGY_ABI,
 } from 'src/common/constants/abi';
 import { Action, ExecutableTransaction } from 'src/common/types';
 import { chains } from 'src/common/constants/config/chain';
 import { loopStrategyHandler } from 'src/common/hooks/looping-strategy';
 import { SquidService } from 'src/libs/squid/squid.service';
 import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
+import { loopingConfig } from 'src/common/constants/config/looping';
 
 @Injectable()
 export class AaveLoopingStrategyService {
@@ -110,7 +110,7 @@ export class AaveLoopingStrategyService {
 
       //* call the looping strategy function here
       const loopStrategyTx = encodeFunctionData(
-        LOOPING_STRATEGY_ABI,
+        loopingConfig['Aave'][txDetails.toChain][txDetails.toToken].abi,
         'loopStrategy',
         [
           txDetails.toToken,
@@ -118,19 +118,22 @@ export class AaveLoopingStrategyService {
           txDetails.fromAmount,
           txDetails.leverage,
           txDetails.fromAddress,
-          '105', //!TODO: Hardcoded as of now but make it dynamic later, needs to change now
-          '100', //!TODO: Hardcoded as of now but make it dynamic later, needs to change now
+          loopingConfig['Aave'][txDetails.toChain][txDetails.toToken]
+            .borrowPercentage,
+          100,
+          10,
         ],
       );
 
       transactions.push({
         chain: txDetails.toChain,
-        to: chains[txDetails.toChain].loopingStrategy,
+        to: loopingConfig['Aave'][txDetails.toChain][txDetails.toToken]
+          .loopingContract,
         type: Action.LOOP_STRATEGY,
         tx: loopStrategyTx,
       });
     } else {
-      const hook = loopStrategyHandler(txDetails);
+      const hook = loopStrategyHandler(txDetails, 'Aave');
 
       const squidTx = await this.squidService.createQuote({
         ...txDetails,
