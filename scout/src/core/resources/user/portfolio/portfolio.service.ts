@@ -32,17 +32,18 @@ export class PortfolioService {
         this.getSeamlessTotalValue(walletAddress),
       ]);
 
+    const mergedBalance = this.mergeBalances([
+      aaveBalances,
+      zerolendBalances,
+      seamlessBalances,
+    ]);
+
     //add more params here based on frontend requirement
-    const totalCollateralBase = this.calculateTotal(
-      [...aaveBalances, ...zerolendBalances, ...seamlessBalances],
-      0,
-    );
-    const totalDebtBase = this.calculateTotal(
-      [...aaveBalances, ...zerolendBalances, ...seamlessBalances],
-      1,
-    );
+    const totalCollateralBase = this.calculateTotal(mergedBalance, 0);
+    const totalDebtBase = this.calculateTotal(mergedBalance, 1);
 
     let totalBalanceUSD = 0;
+    const chainBalance = {};
 
     await Promise.all(
       Object.values(CHAINS).map(async (chainId: any) => {
@@ -51,6 +52,16 @@ export class PortfolioService {
             walletAddress,
             chainId,
           );
+
+        const result = chainBalanceData.reduce((acc, item) => {
+          acc[item.contract_address] = {
+            balance: item.balance,
+            price: item.pretty_quote,
+          };
+          return acc;
+        }, {});
+
+        chainBalance[chainId] = result;
 
         // Calculate total USD for the current chain
         const chainTotalBalanceUSD = chainBalanceData.reduce(
@@ -68,6 +79,10 @@ export class PortfolioService {
       totalCollateralBase: totalCollateralBase,
       totalDebtBase: totalDebtBase,
       totalBalanceUSD: totalBalanceUSD,
+      chainBalance: this.convertBalanceToStrings(chainBalance),
+      aaveBalances: this.convertBalanceToStrings(aaveBalances),
+      seamlessBalances: this.convertBalanceToStrings(seamlessBalances),
+      zerolendBalances: this.convertBalanceToStrings(zerolendBalances),
     };
   }
 
@@ -89,12 +104,16 @@ export class PortfolioService {
           );
           const accountData =
             await aaveContract.getUserAccountData(walletAddress);
-          return accountData;
+          return { [networkId]: accountData };
         },
       );
 
       const balanceData = await Promise.all(balanceDataPromises);
-      return balanceData;
+      const balanceDataObject = balanceData.reduce((acc, data) => {
+        return { ...acc, ...data };
+      }, {});
+
+      return balanceDataObject;
     } catch (error) {
       this.portfolioLogger.error(`while getting Aave total values ${error}`);
       return null;
@@ -118,12 +137,16 @@ export class PortfolioService {
             provider,
           );
           const accountData = await contract.getUserAccountData(walletAddress);
-          return accountData;
+          return { [networkId]: accountData };
         },
       );
 
       const balanceData = await Promise.all(balanceDataPromises);
-      return balanceData;
+      const balanceDataObject = balanceData.reduce((acc, data) => {
+        return { ...acc, ...data };
+      }, {});
+
+      return balanceDataObject;
     } catch (error) {
       this.portfolioLogger.error(
         `while getting zerolend total values ${error}`,
@@ -149,11 +172,15 @@ export class PortfolioService {
             provider,
           );
           const accountData = await contract.getUserAccountData(walletAddress);
-          return accountData;
+          return { [networkId]: accountData };
         },
       );
       const balanceData = await Promise.all(balanceDataPromises);
-      return balanceData;
+      const balanceDataObject = balanceData.reduce((acc, data) => {
+        return { ...acc, ...data };
+      }, {});
+
+      return balanceDataObject;
     } catch (error) {
       this.portfolioLogger.error(
         `while getting seamless total values ${error}`,
@@ -169,13 +196,40 @@ export class PortfolioService {
    * @param index - The index to sum up in each balance entry.
    * @returns The total sum as a string.
    */
-  private calculateTotal(balances: any[], index: number) {
+  private calculateTotal(balances: any, index: number) {
     let total = BigInt(0);
 
-    balances.forEach((balance) => {
-      total += BigInt(balance[index]);
+    Object.values(balances).forEach((entry: any) => {
+      total += BigInt(entry[index]);
     });
 
     return total.toString();
+  }
+
+  private mergeBalances(balancesList: any[]): any {
+    return balancesList.reduce((acc, balance) => ({ ...acc, ...balance }), {});
+  }
+
+  /**
+   * Converts balances from BigInt to string format.
+   * @param balance - The balance to be converted.
+   * @returns The balance in string format.
+   */
+  private convertBalanceToStrings(balance: any): any {
+    if (Array.isArray(balance)) {
+      return balance.map((item) =>
+        typeof item === 'bigint'
+          ? item.toString()
+          : this.convertBalanceToStrings(item),
+      );
+    } else if (typeof balance === 'bigint') {
+      return balance.toString();
+    } else if (typeof balance === 'object' && balance !== null) {
+      return Object.entries(balance).reduce((acc, [key, value]) => {
+        acc[key] = this.convertBalanceToStrings(value);
+        return acc;
+      }, {} as any);
+    }
+    return balance;
   }
 }

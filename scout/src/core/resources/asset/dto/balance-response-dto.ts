@@ -17,62 +17,8 @@ export class BalanceResponseDto implements ScoutResponse {
 
   @ApiProperty({
     description: 'Response data',
-    example: [
-      {
-        assetAddress: '0xe50fA9b3c56FfB159cB0FCA61F5c9D750e8128c8',
-        protocolName: 'Aave',
-        chainId: '10',
-        currentATokenBalance: '10000000',
-        currentStableDebt: '0',
-        currentVariableDebt: '1232334',
-      },
-    ],
-  })
-  data: BalanceListResponse;
-}
-
-export class SpecificProtocolBalanceResponseDto implements ScoutResponse {
-  @ApiProperty({
-    description: 'Response status code',
-    example: 200,
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    description: 'Response message',
-    example:
-      'Fetched all assets balance of a specific chain of a protocol successfully',
-  })
-  message: string;
-
-  @ApiProperty({
-    description: 'Response data',
     example: {
       filteredBalances: [
-        {
-          asset: {
-            points: [],
-            _id: '664734fe953fc462e9535d64',
-            assetId: 'Aave-WETH-10',
-            protocolName: 'Aave',
-            chainId: '10',
-            assetName: 'Wrapped Ether',
-            assetSymbol: 'WETH',
-            assetAddress: '0x4200000000000000000000000000000000000006',
-            createdAt: '2024-05-17T10:44:14.707Z',
-            updatedAt: '2024-07-04T12:31:10.231Z',
-            __v: 0,
-            protocolType: 'Lending',
-            assetSupplyApy: 1.5088122770908226,
-            assetSupplyBoostedApy: 0,
-            assetBorrowApy: 2.307643776993542,
-          },
-          currentATokenBalance: '0',
-          currentStableDebt: '0',
-          currentVariableDebt: '15845011664377910762',
-        },
-      ],
-      supplied: [
         {
           asset: {
             points: [],
@@ -83,67 +29,57 @@ export class SpecificProtocolBalanceResponseDto implements ScoutResponse {
             assetSymbol: 'WBTC',
             assetAddress: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
             createdAt: '2024-05-17T09:42:18.288Z',
-            updatedAt: '2024-07-10T04:00:00.844Z',
+            updatedAt: '2024-07-12T06:30:00.856Z',
             __v: 0,
             assetId: 'Aave-WBTC-42161',
             protocolType: 'Lending',
-            assetSupplyApy: 0.030620580018151967,
+            assetSupplyApy: 0.031147674505379162,
             assetSupplyBoostedApy: 0,
-            assetBorrowApy: 0.5832912367491518,
+            assetBorrowApy: 0.5882901259429658,
           },
-          currentATokenBalance: '45551479',
+          protocol: 'Aave',
+          chainId: '42161',
+          currentATokenBalance: '45551695',
           currentStableDebt: '0',
           currentVariableDebt: '0',
-        },
-      ],
-      borrowed: [
-        {
-          asset: {
-            points: [],
-            _id: '664734fe953fc462e9535d64',
-            assetId: 'Aave-WETH-10',
-            protocolName: 'Aave',
-            chainId: '10',
-            assetName: 'Wrapped Ether',
-            assetSymbol: 'WETH',
-            assetAddress: '0x4200000000000000000000000000000000000006',
-            createdAt: '2024-05-17T10:44:14.707Z',
-            updatedAt: '2024-07-04T12:31:10.231Z',
-            __v: 0,
-            protocolType: 'Lending',
-            assetSupplyApy: 1.5088122770908226,
-            assetSupplyBoostedApy: 0,
-            assetBorrowApy: 2.307643776993542,
-          },
-          currentATokenBalance: '0',
-          currentStableDebt: '0',
-          currentVariableDebt: '15845011664377910762',
         },
       ],
       assets: [
         {
           points: [],
-          _id: '664734d6953fc462e9535d62',
-          assetId: 'Aave-USDC-10',
+          _id: '66472a794a029041aefb358b',
+          assetId: 'Aave-LINK-42161',
           protocolName: 'Aave',
-          chainId: '10',
-          assetName: 'USD Coin',
-          assetSymbol: 'USDC',
-          assetAddress: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
-          createdAt: '2024-05-17T10:43:34.853Z',
-          updatedAt: '2024-07-04T12:31:10.231Z',
+          chainId: '42161',
+          assetName: 'ChainLink Token',
+          assetSymbol: 'LINK',
+          assetAddress: '0xf97f4df75117a78c1A5a0DBb814Af92458539FB4',
+          createdAt: '2024-05-17T09:59:21.620Z',
+          updatedAt: '2024-07-12T06:30:00.856Z',
           __v: 0,
           protocolType: 'Lending',
-          assetSupplyApy: 6.1206285403630405,
-          assetSupplyBoostedApy: 3.27,
-          assetBorrowApy: 8.24663469433511,
+          assetSupplyApy: 0.021230976097171485,
+          assetSupplyBoostedApy: 0,
+          assetBorrowApy: 0.6425142295877803,
+        },
+        {
+          points: [],
+          _id: '66472b02953fc462e9535d50',
+          assetId: 'Aave-USDC.e-42161',
+          protocolName: 'Aave',
+          chainId: '42161',
+          assetName: 'Bridged USDC',
+          assetSymbol: 'USDC.e',
+          assetAddress: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
+          createdAt: '2024-05-17T10:01:38.287Z',
+          updatedAt: '2024-07-12T06:30:00.856Z',
+          __v: 0,
+          protocolType: 'Lending',
+          assetSupplyApy: 5.048118398177447,
+          assetSupplyBoostedApy: 0,
+          assetBorrowApy: 9.938741036669242,
         },
       ],
-      chainBalanceData: {
-        '0x078f358208685046a11c85e8ad32895ded33a249': '$26,442.37',
-        '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': '$49.03',
-        '0xaf88d065e77c8cc2239327c5edb3a432268e5831': '$6.70',
-      },
     },
   })
   data: BalanceListResponse;

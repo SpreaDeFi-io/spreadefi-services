@@ -39,13 +39,20 @@ export class ApyService {
     //* apy value may return null if rpc is down for some reason, filter the null values
     const bulkOperations = assets
       .map((asset, index) => {
-        const { supplyApy, borrowApy } = apyValues[index];
-        if (supplyApy !== null && borrowApy !== null) {
+        const apyValue = apyValues[index];
+        if (
+          apyValue &&
+          apyValue.supplyApy !== null &&
+          apyValue.borrowApy !== null
+        ) {
           return {
             updateOne: {
               filter: { assetId: asset.assetId },
               update: {
-                $set: { assetSupplyApy: supplyApy, assetBorrowApy: borrowApy },
+                $set: {
+                  assetSupplyApy: apyValue.supplyApy,
+                  assetBorrowApy: apyValue.borrowApy,
+                },
               },
             },
           };
