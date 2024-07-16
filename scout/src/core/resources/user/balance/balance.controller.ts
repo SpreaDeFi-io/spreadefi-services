@@ -25,7 +25,6 @@ export class BalanceController {
   @Get('/:address')
   async getTotalBalance(@Param('address') address: string) {
     const data = await this.balanceService.getUserAssetBalances(address);
-
     return {
       statusCode: HttpStatus.OK,
       message: 'Fetched all assets balance of this address successfully',

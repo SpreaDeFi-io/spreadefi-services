@@ -248,7 +248,7 @@ export class ZerolendService {
     });
 
     if (
-      txDetails.fromChain !== txDetails.toChain &&
+      txDetails.fromChain !== txDetails.toChain ||
       txDetails.fromToken !== txDetails.toToken
     ) {
       const tx3 = await this.squidService.createQuote(txDetails);

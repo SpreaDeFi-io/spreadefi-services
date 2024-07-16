@@ -250,7 +250,7 @@ export class SeamlessService {
     //* if user wants different token or wants on different chain or wants different token on different chain
     //* then use squid
     if (
-      txDetails.fromChain !== txDetails.toChain &&
+      txDetails.fromChain !== txDetails.toChain ||
       txDetails.fromToken !== txDetails.toToken
     ) {
       const tx3 = await this.squidService.createQuote(txDetails);

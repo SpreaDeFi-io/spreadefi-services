@@ -9,10 +9,12 @@ export enum StrategyName {
   ZEROLEND_AAVE = 'Zerolend-Aave',
   SEAMLESS_ZEROLEND = 'Seamless-Zerolend',
   ZEROLEND_SEAMLESS = 'Zerolend-Seamless',
-  LOOPING_STRATEGY = 'Looping-Strategy',
-  LOOPING_AAVE = 'Looping-Aave',
-  LOOPING_SEAMLESS = 'Looping-Seamless', //looping is currently only present in aave and borrow/withdraw can happen from aave/seamless/zerolend
-  LOOPING_ZEROLEND = 'Looping-Zerolend',
+  AAVE_LOOPING = 'Aave-Looping',
+  SEAMLESS_LOOPING = 'Seamless-Looping', //looping is currently only present in aave and borrow/withdraw can happen from aave/seamless/zerolend
+  ZEROLEND_LOOPING = 'Zerolend-Looping',
+  AAVE_LOOPING_AAVE = 'Aave-Looping-Aave',
+  AAVE_LOOPING_SEAMLESS = 'Aave-Looping-Seamless',
+  AAVE_LOOPING_ZEROLEND = 'Aave-Looping-Zerolend',
   HOP_BEEFY = 'Hop-Beefy',
   AAAVE_HOP_BEEFY = 'Aave-Hop-Beefy',
 }

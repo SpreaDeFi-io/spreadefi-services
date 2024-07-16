@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   Get,
   Param,
+  Query,
 } from '@nestjs/common';
 import { AssetService } from './asset.service';
 import { CreateAssetDto } from 'src/core/resources/asset/dto/create-asset.dto';
@@ -49,6 +50,36 @@ export class AssetController {
     return {
       statusCode: HttpStatus.OK,
       message: 'Fetched assets successfully by symbol',
+      data,
+    };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('protocoltype/:protocolType')
+  async getAssetByProtocolType(@Param('protocolType') protocolType: string) {
+    const data = await this.assetService.getAssetByProtocolType(protocolType);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Fetched assets successfully by protocol type',
+      data,
+    };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/filter')
+  async getFilteredAssets(
+    @Query('excludeProtocol') excludeProtocol: string,
+    @Query('excludeProtocolType') excludeProtocolType: string,
+  ) {
+    const data = await this.assetService.getFilteredAssets(
+      excludeProtocol,
+      excludeProtocolType,
+    );
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Fetched filtered assets successfully',
       data,
     };
   }

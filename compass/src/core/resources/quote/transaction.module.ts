@@ -14,6 +14,8 @@ import { AaveLoopingAaveModule } from 'src/libs/strategies/aave-looping-aave/aav
 import { AaveLoopingSeamlessModule } from 'src/libs/strategies/aave-looping-seamless/aave-looping-seamless.module';
 import { AaveLoopingZerolendModule } from 'src/libs/strategies/aave-looping-zerolend/aave-looping-zerolend.module';
 import { AaveHopBeefyModule } from 'src/libs/strategies/aave-hop-beefy/aave-hop-beefy.module';
+import { SeamlessLoopingStrategyModule } from 'src/libs/strategies/seamless-looping-strategy/seamless-looping-strategy.module';
+import { ZerolendLoopingStrategyModule } from 'src/libs/strategies/zerolend-looping-strategy/zerolend-looping-strategy.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { AaveHopBeefyModule } from 'src/libs/strategies/aave-hop-beefy/aave-hop-
     AaveSeamlessModule.register(),
     AaveZerolendModule.register(),
     AaveLoopingStrategyModule.register(),
+    SeamlessLoopingStrategyModule.register(),
+    ZerolendLoopingStrategyModule.register(),
     SeamlessZerolendModule.register(),
     AaveLoopingAaveModule.register(),
     AaveLoopingSeamlessModule.register(),

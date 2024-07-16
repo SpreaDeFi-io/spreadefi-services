@@ -40,11 +40,11 @@ export class ZerolendLoopingStrategyService {
       txDetails.fromAddress,
     );
 
-    //* if e mode is not enabled then enable it for the user
-    if (Number(isEModeEnabled.toString()) === 0) {
+    //* we need to disable e mode since there is only 1 token supported as of now with disabled e mode
+    if (Number(isEModeEnabled.toString()) !== 0) {
       const eModeTx = encodeFunctionData(ZEROLEND_POOL_ABI, 'setUserEMode', [
-        2,
-      ]); //! set e-mode to 2 since blockchain for zerolend is linea and not base
+        0,
+      ]);
 
       transactions.push({
         chain: txDetails.toChain,

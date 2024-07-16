@@ -15,6 +15,8 @@ import { AaveLoopingAaveService } from 'src/libs/strategies/aave-looping-aave/aa
 import { AaveLoopingZerolendService } from 'src/libs/strategies/aave-looping-zerolend/aave-looping-zerolend.service';
 import { AaveLoopingSeamlessService } from 'src/libs/strategies/aave-looping-seamless/aave-looping-seamless.service';
 import { AaveHopBeefyService } from 'src/libs/strategies/aave-hop-beefy/aave-hop-beefy.service';
+import { SeamlessLoopingStrategyService } from 'src/libs/strategies/seamless-looping-strategy/seamless-looping-strategy.service';
+import { ZerolendLoopingStrategyService } from 'src/libs/strategies/zerolend-looping-strategy/zerolend-looping-strategy.service';
 
 @Injectable()
 export class TransactionService {
@@ -27,6 +29,8 @@ export class TransactionService {
     private readonly aaveZerolendService: AaveZerolendService,
     private readonly seamlessZerolendService: SeamlessZerolendService,
     private readonly aaveLoopingStrategyService: AaveLoopingStrategyService,
+    private readonly seamlessLoopingStrategyService: SeamlessLoopingStrategyService,
+    private readonly zerolendLoopingStrategyService: ZerolendLoopingStrategyService,
     private readonly aaveLoopingAaveService: AaveLoopingAaveService,
     private readonly aaveLoopingSeamlessService: AaveLoopingSeamlessService,
     private readonly aaveLoopingZerolendService: AaveLoopingZerolendService,
@@ -106,8 +110,8 @@ export class TransactionService {
 
         return transactions;
 
-      //* If it is a looping strategy
-      case StrategyName.LOOPING_STRATEGY:
+      //* If it is a looping strategy of aave
+      case StrategyName.AAVE_LOOPING:
         transactions =
           await this.aaveLoopingStrategyService.createLoopingStrategy(
             txDetails,
@@ -115,8 +119,24 @@ export class TransactionService {
 
         return transactions;
 
+      case StrategyName.SEAMLESS_LOOPING:
+        transactions =
+          await this.seamlessLoopingStrategyService.createLoopingStrategy(
+            txDetails,
+          );
+
+        return transactions;
+
+      case StrategyName.ZEROLEND_LOOPING:
+        transactions =
+          await this.zerolendLoopingStrategyService.createLoopingStrategy(
+            txDetails,
+          );
+
+        return transactions;
+
       //* If it is a looping strategy combined with aave
-      case StrategyName.LOOPING_AAVE:
+      case StrategyName.AAVE_LOOPING_AAVE:
         transactions =
           await this.aaveLoopingAaveService.prepareAaveLoopingAaveTransaction({
             action,
@@ -126,7 +146,7 @@ export class TransactionService {
         return transactions;
 
       //* If it is a looping strategy combined with seamless
-      case StrategyName.LOOPING_SEAMLESS:
+      case StrategyName.AAVE_LOOPING_SEAMLESS:
         transactions =
           await this.aaveLoopingSeamlessService.prepareAaveLoopingSeamlessTransaction(
             {
@@ -138,7 +158,7 @@ export class TransactionService {
         return transactions;
 
       //* If it is a looping strategy combined with zerolend
-      case StrategyName.LOOPING_ZEROLEND:
+      case StrategyName.AAVE_LOOPING_ZEROLEND:
         transactions =
           await this.aaveLoopingZerolendService.prepareAaveLoopingZerolendTransaction(
             {

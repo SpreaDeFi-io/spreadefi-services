@@ -75,10 +75,43 @@ export class AssetRepository {
     return data;
   }
 
+  async getAssetByProtocolType(protocolType: string) {
+    const data = await this.assetModel.find({ protocolType }).lean();
+
+    if (data.length === 0) throw new NotFoundException('No assets found');
+
+    return data;
+  }
+
   async getAssetById(id: string) {
     const data = await this.assetModel.findOne({ assetId: id });
 
     if (!data) throw new NotFoundException('No asset found');
+
+    return data;
+  }
+
+  async getFilteredAssets(
+    excludeProtocol: string,
+    excludeProtocolType: string,
+  ) {
+    let query = {};
+
+    if (excludeProtocol) {
+      query = {
+        ...query,
+        protocolName: { $ne: excludeProtocol },
+      };
+    }
+
+    if (excludeProtocolType) {
+      query = {
+        ...query,
+        protocolType: { $ne: excludeProtocolType },
+      };
+    }
+
+    const data = await this.assetModel.find(query);
 
     return data;
   }
