@@ -71,16 +71,21 @@ export class AaveLoopingStrategyService {
     //* check if user has already approved delegation
     const borrowAllowance = await aaveDelegationContract.borrowAllowance(
       txDetails.fromAddress,
-      chains[txDetails.toChain].loopingStrategy,
+      loopingConfig['Aave'][txDetails.toChain][txDetails.toToken]
+        .loopingContract,
     );
 
     //* if borrow allowance is less than 2000 ETH in wei, then ask for delegation approval
     if (BigInt(borrowAllowance.toString()) < BigInt('2000000000000000000000')) {
-      const approveDelegationTx =
-        await aaveDelegationContract.approveDelegation(
-          chains[txDetails.toChain].loopingStrategy,
-          ethers.MaxUint256 - BigInt(borrowAllowance.toString()),
-        );
+      const approveDelegationTx = encodeFunctionData(
+        AAVE_CREDIT_DELEGATION_ABI,
+        'approveDelegation',
+        [
+          loopingConfig['Aave'][txDetails.toChain][txDetails.toToken]
+            .loopingContract,
+          ethers.MaxUint256,
+        ],
+      );
 
       transactions.push({
         chain: txDetails.toChain,
@@ -93,11 +98,13 @@ export class AaveLoopingStrategyService {
     //* if user wants to make the tx on same chain and the token is wstETH as well, then we don't need squid
     if (
       txDetails.fromChain === txDetails.toChain &&
-      txDetails.fromToken === txDetails.toToken
+      ethers.getAddress(txDetails.fromToken) ===
+        ethers.getAddress(txDetails.toToken)
     ) {
       //* approve the wstETH token
       const approveTx = encodeFunctionData(ERC20_ABI, 'approve', [
-        chains[txDetails.toChain].loopingStrategy,
+        loopingConfig['Aave'][txDetails.toChain][txDetails.toToken]
+          .loopingContract,
         txDetails.fromAmount,
       ]);
 
@@ -113,7 +120,7 @@ export class AaveLoopingStrategyService {
         loopingConfig['Aave'][txDetails.toChain][txDetails.toToken].abi,
         'loopStrategy',
         [
-          txDetails.toToken,
+          txDetails.toToken, //!check with aayush if this will be the address of wsteth or weth
           chains[txDetails.fromChain].wethAddress,
           txDetails.fromAmount,
           txDetails.leverage,
@@ -137,6 +144,11 @@ export class AaveLoopingStrategyService {
 
       const squidTx = await this.squidService.createQuote({
         ...txDetails,
+        toToken:
+          ethers.getAddress(txDetails.toToken) ===
+          ethers.getAddress(chains[txDetails.toChain].wstETHAddress)
+            ? chains[txDetails.toChain].wethAddress
+            : txDetails.toToken,
         postHook: hook,
       });
 

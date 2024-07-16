@@ -6,6 +6,7 @@ import { HookBuilderArgs } from 'src/common/types';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { hookBuilder } from '../hook-builder';
 import { loopingConfig } from 'src/common/constants/config/looping';
+import { ethers } from 'ethers';
 
 export const loopStrategyHandler = (
   txDetails: TransactionDetailsDto,
@@ -15,12 +16,17 @@ export const loopStrategyHandler = (
 
   //* give the approval of wstETH first
   const erc20EncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
-    chains[txDetails.toChain].loopingStrategy,
+    loopingConfig[protocolName][txDetails.toChain][txDetails.toToken]
+      .loopingContract,
     1,
   ]); //* this amount gets overwritten by payload
 
   calls.push({
-    target: txDetails.toToken,
+    target:
+      ethers.getAddress(txDetails.toToken) ===
+      ethers.getAddress(chains[txDetails.toChain].wstETHAddress)
+        ? chains[txDetails.toChain].wethAddress
+        : txDetails.toToken,
     callType: SquidCallType.FULL_TOKEN_BALANCE,
     callData: erc20EncodedData,
     payload: {

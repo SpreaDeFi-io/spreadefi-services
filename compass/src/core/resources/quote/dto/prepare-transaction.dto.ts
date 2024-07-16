@@ -36,7 +36,6 @@ export class TransactionDetailsDto extends CreateSquidQuoteDto {
   })
   @IsNumber()
   @IsOptional()
-  @IsEnum([3, 6])
   leverage?: number; //* looping strategy leverage
 }
 

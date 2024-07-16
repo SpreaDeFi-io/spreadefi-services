@@ -63,16 +63,21 @@ export class SeamlessLoopingStrategyService {
     //* check if user has already approved delegation
     const borrowAllowance = await seamlessDelegationContract.borrowAllowance(
       txDetails.fromAddress,
-      chains[txDetails.toChain].loopingStrategy,
+      loopingConfig['Seamless'][txDetails.toChain][txDetails.toToken]
+        .loopingContract,
     );
 
     //* if borrow allowance is less than 2000 ETH in wei, then ask for delegation approval
     if (BigInt(borrowAllowance.toString()) < BigInt('2000000000000000000000')) {
-      const approveDelegationTx =
-        await seamlessDelegationContract.approveDelegation(
-          chains[txDetails.toChain].loopingStrategy,
-          ethers.MaxUint256 - BigInt(borrowAllowance.toString()),
-        );
+      const approveDelegationTx = encodeFunctionData(
+        SEAMLESS_CREDIT_DELEGATION_ABI,
+        'approveDelegation',
+        [
+          loopingConfig['Seamless'][txDetails.toChain][txDetails.toToken]
+            .loopingContract,
+          ethers.MaxUint256,
+        ],
+      );
 
       transactions.push({
         chain: txDetails.toChain,
@@ -85,11 +90,13 @@ export class SeamlessLoopingStrategyService {
     //* if user wants to make the tx on same chain and the token is wstETH as well, then we don't need squid
     if (
       txDetails.fromChain === txDetails.toChain &&
-      txDetails.fromToken === txDetails.toToken
+      ethers.getAddress(txDetails.fromToken) ===
+        ethers.getAddress(txDetails.toToken)
     ) {
       //* approve the wstETH token
       const approveTx = encodeFunctionData(ERC20_ABI, 'approve', [
-        chains[txDetails.toChain].loopingStrategy,
+        loopingConfig['Seamless'][txDetails.toChain][txDetails.toToken]
+          .loopingContract,
         txDetails.fromAmount,
       ]);
 
@@ -119,7 +126,8 @@ export class SeamlessLoopingStrategyService {
 
       transactions.push({
         chain: txDetails.toChain,
-        to: chains[txDetails.toChain].loopingStrategy,
+        to: loopingConfig['Seamless'][txDetails.toChain][txDetails.toToken]
+          .loopingContract,
         type: Action.LOOP_STRATEGY,
         tx: loopStrategyTx,
       });
@@ -128,6 +136,11 @@ export class SeamlessLoopingStrategyService {
 
       const squidTx = await this.squidService.createQuote({
         ...txDetails,
+        toToken:
+          ethers.getAddress(txDetails.toToken) ===
+          ethers.getAddress(chains[txDetails.toChain].wstETHAddress)
+            ? chains[txDetails.toChain].wethAddress
+            : txDetails.toToken,
         postHook: hook,
       });
 

@@ -31,5 +31,7 @@ export const chains = {
     name: 'LINEA',
     rpc: process.env.LINEA_RPC,
     chainId: 59144,
+    wstETHAddress: '0xB5beDd42000b71FddE22D3eE8a79Bd49A568fC8F',
+    wethAddress: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f',
   },
 };

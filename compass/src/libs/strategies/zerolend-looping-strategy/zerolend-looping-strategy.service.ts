@@ -63,16 +63,21 @@ export class ZerolendLoopingStrategyService {
     //* check if user has already approved delegation
     const borrowAllowance = await zerolendDelegationContract.borrowAllowance(
       txDetails.fromAddress,
-      chains[txDetails.toChain].loopingStrategy,
+      loopingConfig['Zerolend'][txDetails.toChain][txDetails.toToken]
+        .loopingContract,
     );
 
     //* if borrow allowance is less than 2000 ETH in wei, then ask for delegation approval
     if (BigInt(borrowAllowance.toString()) < BigInt('2000000000000000000000')) {
-      const approveDelegationTx =
-        await zerolendDelegationContract.approveDelegation(
-          chains[txDetails.toChain].loopingStrategy,
-          ethers.MaxUint256 - BigInt(borrowAllowance.toString()),
-        );
+      const approveDelegationTx = encodeFunctionData(
+        ZEROLEND_CREDIT_DELEGATION_ABI,
+        'approveDelegation',
+        [
+          loopingConfig['Zerolend'][txDetails.toChain][txDetails.toToken]
+            .loopingContract,
+          ethers.MaxUint256,
+        ],
+      );
 
       transactions.push({
         chain: txDetails.toChain,
@@ -85,11 +90,13 @@ export class ZerolendLoopingStrategyService {
     //* if user wants to make the tx on same chain and the token is wstETH as well, then we don't need squid
     if (
       txDetails.fromChain === txDetails.toChain &&
-      txDetails.fromToken === txDetails.toToken
+      ethers.getAddress(txDetails.fromToken) ===
+        ethers.getAddress(txDetails.toToken)
     ) {
       //* approve the wstETH token
       const approveTx = encodeFunctionData(ERC20_ABI, 'approve', [
-        chains[txDetails.toChain].loopingStrategy,
+        loopingConfig['Zerolend'][txDetails.toChain][txDetails.toToken]
+          .loopingContract,
         txDetails.fromAmount,
       ]);
 
@@ -119,7 +126,8 @@ export class ZerolendLoopingStrategyService {
 
       transactions.push({
         chain: txDetails.toChain,
-        to: chains[txDetails.toChain].loopingStrategy,
+        to: loopingConfig['Zerolend'][txDetails.toChain][txDetails.toToken]
+          .loopingContract,
         type: Action.LOOP_STRATEGY,
         tx: loopStrategyTx,
       });
@@ -128,6 +136,11 @@ export class ZerolendLoopingStrategyService {
 
       const squidTx = await this.squidService.createQuote({
         ...txDetails,
+        toToken:
+          ethers.getAddress(txDetails.toToken) ===
+          ethers.getAddress(chains[txDetails.toChain].wstETHAddress)
+            ? chains[txDetails.toChain].wethAddress
+            : txDetails.toToken,
         postHook: hook,
       });
 
