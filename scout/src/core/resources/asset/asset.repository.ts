@@ -93,7 +93,7 @@ export class AssetRepository {
 
   async getFilteredAssets(
     excludeProtocol: string,
-    excludeProtocolType: string,
+    includeProtocolType: string,
   ) {
     let query = {};
 
@@ -104,10 +104,10 @@ export class AssetRepository {
       };
     }
 
-    if (excludeProtocolType) {
+    if (includeProtocolType) {
       query = {
         ...query,
-        protocolType: { $ne: excludeProtocolType },
+        protocolType: includeProtocolType,
       };
     }
 

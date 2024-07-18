@@ -26,16 +26,12 @@ export class SeamlessService {
     let transactions: Array<ExecutableTransaction> = [];
 
     //* check if protocol exists on both chains
-    const isAvailableOnFromChain = isProtocolAvailable(
-      'Seamless',
-      txDetails.fromChain,
-    );
     const isAvailableOnToChain = isProtocolAvailable(
       'Seamless',
       txDetails.toChain,
     );
 
-    if (!isAvailableOnFromChain || !isAvailableOnToChain)
+    if (!isAvailableOnToChain)
       throw new BadRequestException(
         'Protocol does not exist on From chain or To chain',
       );

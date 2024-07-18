@@ -70,11 +70,11 @@ export class AssetController {
   @Get('/filter')
   async getFilteredAssets(
     @Query('excludeProtocol') excludeProtocol: string,
-    @Query('excludeProtocolType') excludeProtocolType: string,
+    @Query('includeProtocolType') includeProtocolType: string,
   ) {
     const data = await this.assetService.getFilteredAssets(
       excludeProtocol,
-      excludeProtocolType,
+      includeProtocolType,
     );
 
     return {

@@ -176,7 +176,7 @@ export class TransactionService {
 
         return transactions;
 
-      case StrategyName.AAAVE_HOP_BEEFY:
+      case StrategyName.AAVE_HOP_BEEFY:
         transactions =
           await this.aaveHopBeefyService.prepareAaveHopBeefyTransactions({
             action,
