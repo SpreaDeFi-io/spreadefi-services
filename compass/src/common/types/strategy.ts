@@ -15,7 +15,7 @@ export enum StrategyName {
   AAVE_LOOPING_AAVE = 'Aave-Looping-Aave',
   AAVE_LOOPING_SEAMLESS = 'Aave-Looping-Seamless',
   AAVE_LOOPING_ZEROLEND = 'Aave-Looping-Zerolend',
-  HOP_BEEFY = 'Hop-Beefy',
+  HOP_BEEFY = 'Hop Beefy',
   AAVE_HOP_BEEFY = 'Aave-Hop Beefy',
 }
 
