@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -37,6 +38,14 @@ export class TransactionDetailsDto extends CreateSquidQuoteDto {
   @IsNumber()
   @IsOptional()
   leverage?: number; //* looping strategy leverage
+
+  @IsNumber()
+  @IsOptional()
+  slippage?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  receiveGasOnDestination?: boolean = false;
 }
 
 export class PrepareTransactionDto {

@@ -43,7 +43,6 @@ export class AssetService {
     excludeProtocol: string,
     includeProtocolType: string,
   ) {
-    console.log('aaa', excludeProtocol, includeProtocolType);
     const data = await this.assetRepository.getFilteredAssets(
       excludeProtocol,
       includeProtocolType,
