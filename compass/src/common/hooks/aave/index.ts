@@ -53,10 +53,7 @@ export const aaveSupplyHandler = (txDetails: TransactionDetailsDto) => {
 
   calls.push({
     target: aaveConfig[txDetails.toChain].poolAddress,
-    callType:
-      txDetails.toToken === ETHEREUM_ADDRESS
-        ? SquidCallType.FULL_NATIVE_BALANCE
-        : SquidCallType.FULL_TOKEN_BALANCE,
+    callType: SquidCallType.FULL_TOKEN_BALANCE,
     callData: aaveSupplyEncodedData,
     payload: {
       tokenAddress: txDetails.toToken,
