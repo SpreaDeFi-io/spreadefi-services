@@ -10,7 +10,7 @@ import {
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { ETHEREUM_ADDRESS } from 'src/common/constants';
-import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
+// import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 
 @Injectable()
 export class AaveService {
@@ -22,11 +22,11 @@ export class AaveService {
   }: Omit<PrepareTransactionDto, 'strategyName'>) {
     let transactions: Array<ExecutableTransaction> = [];
 
-    //* check if protocol exists on dest chain
-    const isAvailableOnToChain = isProtocolAvailable('Aave', txDetails.toChain);
+    // //* check if protocol exists on dest chain
+    // const isAvailableOnToChain = isProtocolAvailable('Aave', txDetails.toChain);
 
-    if (!isAvailableOnToChain)
-      throw new BadRequestException('Protocol does not exist on to chain');
+    // if (!isAvailableOnToChain)
+    //   throw new BadRequestException('Protocol does not exist on to chain');
 
     switch (action) {
       case Action.SUPPLY:

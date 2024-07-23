@@ -77,7 +77,17 @@ export class TransactionService {
         return transactions;
 
       //* If it is a combined strategy, related to aave and seamless
-      case StrategyName.AAVE_SEAMLESS || StrategyName.SEAMLESS_AAVE:
+      case StrategyName.AAVE_SEAMLESS:
+        transactions =
+          await this.aaveSeamlessService.prepareAaveSeamlessTransaction({
+            strategyName,
+            action,
+            txDetails,
+          });
+        return transactions;
+
+      //* If it is a combined strategy, related to aave and seamless
+      case StrategyName.SEAMLESS_AAVE:
         transactions =
           await this.aaveSeamlessService.prepareAaveSeamlessTransaction({
             strategyName,
@@ -87,7 +97,18 @@ export class TransactionService {
         return transactions;
 
       //* If it is a combined strategy, related to aave and zerolend
-      case StrategyName.AAVE_ZEROLEND || StrategyName.ZEROLEND_AAVE:
+      case StrategyName.AAVE_ZEROLEND:
+        transactions =
+          await this.aaveZerolendService.prepareAaveZerolendTransaction({
+            strategyName,
+            action,
+            txDetails,
+          });
+
+        return transactions;
+
+      //* If it is a combined strategy, related to aave and zerolend
+      case StrategyName.ZEROLEND_AAVE:
         transactions =
           await this.aaveZerolendService.prepareAaveZerolendTransaction({
             strategyName,
@@ -98,7 +119,20 @@ export class TransactionService {
         return transactions;
 
       //* If it is a combined strategy, related to seamless and zerolend
-      case StrategyName.SEAMLESS_ZEROLEND || StrategyName.ZEROLEND_SEAMLESS:
+      case StrategyName.SEAMLESS_ZEROLEND:
+        transactions =
+          await this.seamlessZerolendService.prepareSeamlessZerolendTransaction(
+            {
+              strategyName,
+              action,
+              txDetails,
+            },
+          );
+
+        return transactions;
+
+      //* If it is a combined strategy, related to seamless and zerolend
+      case StrategyName.ZEROLEND_SEAMLESS:
         transactions =
           await this.seamlessZerolendService.prepareSeamlessZerolendTransaction(
             {

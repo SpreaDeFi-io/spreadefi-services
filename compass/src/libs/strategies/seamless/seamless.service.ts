@@ -13,7 +13,7 @@ import {
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { ETHEREUM_ADDRESS } from 'src/common/constants';
-import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
+// import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 
 @Injectable()
 export class SeamlessService {
@@ -26,15 +26,15 @@ export class SeamlessService {
     let transactions: Array<ExecutableTransaction> = [];
 
     //* check if protocol exists on both chains
-    const isAvailableOnToChain = isProtocolAvailable(
-      'Seamless',
-      txDetails.toChain,
-    );
+    // const isAvailableOnToChain = isProtocolAvailable(
+    //   'Seamless',
+    //   txDetails.toChain,
+    // );
 
-    if (!isAvailableOnToChain)
-      throw new BadRequestException(
-        'Protocol does not exist on From chain or To chain',
-      );
+    // if (!isAvailableOnToChain)
+    //   throw new BadRequestException(
+    //     'Protocol does not exist on From chain or To chain',
+    //   );
 
     switch (action) {
       case Action.SUPPLY:

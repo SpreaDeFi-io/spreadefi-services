@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { encodeFunctionData, ethersContract } from 'src/common/ethers';
 import { aaveConfig } from 'src/common/constants/config/aave';
@@ -12,7 +12,7 @@ import { Action, ExecutableTransaction } from 'src/common/types';
 import { chains } from 'src/common/constants/config/chain';
 import { loopStrategyHandler } from 'src/common/hooks/looping-strategy';
 import { SquidService } from 'src/libs/squid/squid.service';
-import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
+// import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 import { loopingConfig } from 'src/common/constants/config/looping';
 
 @Injectable()
@@ -28,10 +28,10 @@ export class AaveLoopingStrategyService {
   async createLoopingStrategy(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
 
-    const isAvailableOnToChain = isProtocolAvailable('Aave', txDetails.toChain);
+    // const isAvailableOnToChain = isProtocolAvailable('Aave', txDetails.toChain);
 
-    if (!isAvailableOnToChain)
-      throw new BadRequestException('Protocol does not exist on to chain');
+    // if (!isAvailableOnToChain)
+    //   throw new BadRequestException('Protocol does not exist on to chain');
 
     //! add a check here to only allow supported tokens maybe
 

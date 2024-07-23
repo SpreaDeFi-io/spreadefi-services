@@ -6,7 +6,7 @@ import {
   PrepareTransactionDto,
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
-import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
+// import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 
 //! Repay case not handled yet
 @Injectable()
@@ -24,20 +24,20 @@ export class AaveSeamlessService {
     let transactions: Array<ExecutableTransaction> = [];
 
     if (strategyName === StrategyName.AAVE_SEAMLESS) {
-      //* check if protocol exists on both chains
-      const isAvailableOnFromChain = isProtocolAvailable(
-        'Aave',
-        txDetails.fromChain,
-      );
-      const isAvailableOnToChain = isProtocolAvailable(
-        'Seamless',
-        txDetails.toChain,
-      );
+      // //* check if protocol exists on both chains
+      // const isAvailableOnFromChain = isProtocolAvailable(
+      //   'Aave',
+      //   txDetails.fromChain,
+      // );
+      // const isAvailableOnToChain = isProtocolAvailable(
+      //   'Seamless',
+      //   txDetails.toChain,
+      // );
 
-      if (!isAvailableOnFromChain || !isAvailableOnToChain)
-        throw new BadRequestException(
-          'Protocol does not exist on From chain or To chain',
-        );
+      // if (!isAvailableOnFromChain || !isAvailableOnToChain)
+      //   throw new BadRequestException(
+      //     'Protocol does not exist on From chain or To chain',
+      //   );
 
       switch (action) {
         case Action.WITHDRAW_SUPPLY:
@@ -53,19 +53,19 @@ export class AaveSeamlessService {
       }
     } else if (strategyName === StrategyName.SEAMLESS_AAVE) {
       //* check if protocol exists on both chains
-      const isAvailableOnFromChain = isProtocolAvailable(
-        'Seamless',
-        txDetails.fromChain,
-      );
-      const isAvailableOnToChain = isProtocolAvailable(
-        'Aave',
-        txDetails.toChain,
-      );
+      // const isAvailableOnFromChain = isProtocolAvailable(
+      //   'Seamless',
+      //   txDetails.fromChain,
+      // );
+      // const isAvailableOnToChain = isProtocolAvailable(
+      //   'Aave',
+      //   txDetails.toChain,
+      // );
 
-      if (!isAvailableOnFromChain || !isAvailableOnToChain)
-        throw new BadRequestException(
-          'Protocol does not exist on From chain or To chain',
-        );
+      // if (!isAvailableOnFromChain || !isAvailableOnToChain)
+      //   throw new BadRequestException(
+      //     'Protocol does not exist on From chain or To chain',
+      //   );
 
       switch (action) {
         case Action.WITHDRAW_SUPPLY:

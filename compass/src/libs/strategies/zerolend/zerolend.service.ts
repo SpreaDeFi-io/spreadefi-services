@@ -12,7 +12,7 @@ import {
   PrepareTransactionDto,
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
-import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
+// import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 import { SquidService } from 'src/libs/squid/squid.service';
 
 @Injectable()
@@ -26,13 +26,13 @@ export class ZerolendService {
     let transactions: Array<ExecutableTransaction> = [];
 
     //* check if protocol exists on to chain
-    const isAvailableOnToChain = isProtocolAvailable(
-      'Zerolend',
-      txDetails.toChain,
-    );
+    // const isAvailableOnToChain = isProtocolAvailable(
+    //   'Zerolend',
+    //   txDetails.toChain,
+    // );
 
-    if (!isAvailableOnToChain)
-      throw new BadRequestException('Protocol does not exist on To chain');
+    // if (!isAvailableOnToChain)
+    //   throw new BadRequestException('Protocol does not exist on To chain');
 
     switch (action) {
       case Action.SUPPLY:

@@ -24,19 +24,19 @@ export class SeamlessZerolendService {
 
     if (strategyName === StrategyName.SEAMLESS_ZEROLEND) {
       //* check if protocol exists on both chains
-      const isAvailableOnFromChain = isProtocolAvailable(
-        'Seamless',
-        txDetails.fromChain,
-      );
-      const isAvailableOnToChain = isProtocolAvailable(
-        'Zerolend',
-        txDetails.toChain,
-      );
+      // const isAvailableOnFromChain = isProtocolAvailable(
+      //   'Seamless',
+      //   txDetails.fromChain,
+      // );
+      // const isAvailableOnToChain = isProtocolAvailable(
+      //   'Zerolend',
+      //   txDetails.toChain,
+      // );
 
-      if (!isAvailableOnFromChain || !isAvailableOnToChain)
-        throw new BadRequestException(
-          'Protocol does not exist on From chain or To chain',
-        );
+      // if (!isAvailableOnFromChain || !isAvailableOnToChain)
+      //   throw new BadRequestException(
+      //     'Protocol does not exist on From chain or To chain',
+      //   );
 
       switch (action) {
         case Action.WITHDRAW_SUPPLY:
