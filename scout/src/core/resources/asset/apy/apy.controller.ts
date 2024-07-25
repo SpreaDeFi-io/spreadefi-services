@@ -18,4 +18,16 @@ export class ApyController {
       data,
     };
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Patch('/hop')
+  async updateApyHop() {
+    const data = await this.apyService.updateHopBeefyApy();
+
+    return {
+      httpStatus: HttpStatus.OK,
+      message: 'Successfully updated APY',
+      data,
+    };
+  }
 }

@@ -1,11 +1,16 @@
 import { Model } from 'mongoose';
 import { ApyLogger } from './apy.logger';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Asset } from '../../asset/asset.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ethers } from 'ethers';
-import { RPC_URLS } from 'src/common/constants';
+import {
+  chainToChainId,
+  DEFI_LLAMA_POOLS,
+  DEFI_LLAMA_URI,
+  RPC_URLS,
+} from 'src/common/constants';
 import { aaveConfig } from 'src/common/constants/config/aave';
 import {
   AAVE_POOL_ABI,
@@ -73,6 +78,32 @@ export class ApyService {
     }
   }
 
+  async updateHopBeefyApy() {
+    const apyOfTokens = await this.getHopBeefyApy();
+
+    const bulkOperations = apyOfTokens.map((token) => ({
+      updateOne: {
+        filter: {
+          chainId: token.chainId,
+          assetSymbol: { $regex: new RegExp(`^${token.symbol}$`, 'i') },
+          protocolName: 'Hop Beefy',
+        },
+        update: { $set: { assetSupplyApy: token.apy } },
+      },
+    }));
+
+    if (bulkOperations.length > 0) {
+      const data = await this.assetModel.bulkWrite(bulkOperations);
+      this.apyLogger.log('Successfully updated APY');
+
+      return data;
+    } else {
+      this.apyLogger.log('No APY values to updated');
+
+      return null;
+    }
+  }
+
   @Cron(CronExpression.EVERY_2_HOURS) // Adjust the cron expression as needed
   async updateApyCron() {
     try {
@@ -80,6 +111,16 @@ export class ApyService {
       this.apyLogger.log('[CRON] - APY updated successfully');
     } catch (error) {
       this.apyLogger.error(`[CRON] - APY updation failed: ${error}`);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_1AM) //Adjust the cron expression as needed
+  async updateHopBeefyApyCron() {
+    try {
+      await this.updateHopBeefyApy();
+      this.apyLogger.log('[CRON] - APY updated successfully for Hop');
+    } catch (error) {
+      this.apyLogger.error(`[CRON] - APY updation failed for Hop: ${error}`);
     }
   }
 
@@ -159,5 +200,27 @@ export class ApyService {
       );
       return null;
     }
+  }
+
+  async getHopBeefyApy() {
+    const response = await fetch(`${DEFI_LLAMA_URI}/pools`);
+
+    const data = await response.json();
+
+    if (data.status !== 'success')
+      throw new InternalServerErrorException('Defi Llama API call failed!');
+
+    const hopBeefyPoolsData = data.data.filter((poolData) =>
+      DEFI_LLAMA_POOLS.some((poolInfo) => poolInfo.pool === poolData.pool),
+    );
+
+    const formattedInfo = hopBeefyPoolsData.map((data) => {
+      return {
+        ...data,
+        chainId: chainToChainId[data.chain],
+      };
+    });
+
+    return formattedInfo;
   }
 }
