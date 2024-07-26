@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { encodeFunctionData, ethersContract } from 'src/common/ethers';
 import {
@@ -26,6 +26,13 @@ export class SeamlessLoopingStrategyService {
    */
   async createLoopingStrategy(txDetails: TransactionDetailsDto) {
     const transactions: Array<ExecutableTransaction> = [];
+
+    const isLeverageAllowed =
+      txDetails.leverage <=
+      loopingConfig['Seamless'][txDetails.toChain][txDetails.toToken].leverage;
+
+    if (!isLeverageAllowed)
+      throw new BadRequestException('Leverage is more than specified');
 
     const rpcUrl = chains[txDetails.toChain].rpc;
 

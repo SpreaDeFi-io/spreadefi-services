@@ -30,7 +30,11 @@ export const loopStrategyHandler = (
     callType: SquidCallType.FULL_TOKEN_BALANCE,
     callData: erc20EncodedData,
     payload: {
-      tokenAddress: txDetails.toToken,
+      tokenAddress:
+        ethers.getAddress(txDetails.toToken) ===
+        ethers.getAddress(chains[txDetails.toChain].wstETHAddress)
+          ? chains[txDetails.toChain].wethAddress
+          : txDetails.toToken,
       inputPos: 1,
     },
   });
@@ -42,7 +46,7 @@ export const loopStrategyHandler = (
       txDetails.toToken,
       chains[txDetails.toChain].wethAddress,
       1, //* this amount gets overwritten by payload
-      txDetails.leverage,
+      txDetails.leverage * 10,
       txDetails.toAddress,
       loopingConfig[protocolName][txDetails.toChain][txDetails.toToken]
         .borrowPercentage,
@@ -58,7 +62,11 @@ export const loopStrategyHandler = (
     callType: SquidCallType.FULL_TOKEN_BALANCE,
     callData: loopStrategyEncodedData,
     payload: {
-      tokenAddress: txDetails.toToken,
+      tokenAddress:
+        ethers.getAddress(txDetails.toToken) ===
+        ethers.getAddress(chains[txDetails.toChain].wstETHAddress)
+          ? chains[txDetails.toChain].wethAddress
+          : txDetails.toToken,
       inputPos: 2,
     },
   });

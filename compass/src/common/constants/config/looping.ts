@@ -8,7 +8,7 @@ export const loopingConfig = {
       '0x5979D7b546E38E414F7E9822514be443A4800529': {
         //wstETH
         leverage: 12.5,
-        loopingContract: '0x2Af8a29c47f62965798dA5003218b73eAFb95945',
+        loopingContract: '0xacfc39d994289271ee1309e49a7c252a8c373451',
         abi: LOOPING_STRATEGY_V3_ABI,
         borrowPercentage: 108,
       },
@@ -18,7 +18,7 @@ export const loopingConfig = {
       '0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb': {
         //wstETH
         leverage: 12.5,
-        loopingContract: '0xbeA37afDa1a7320E3646aA6402680952A9f6EF56',
+        loopingContract: '0x48eCe3F01Eb811B174e04Ca88578A826c1204665',
         abi: LOOPING_STRATEGY_V3_ABI,
         borrowPercentage: 108,
       },
@@ -34,7 +34,7 @@ export const loopingConfig = {
       '0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452': {
         //wstETH
         leverage: 8.8,
-        loopingContract: '0xf1b5d1f90c4151d1ecd82401caf1fd68cbc4d5be',
+        loopingContract: '0x7620c00726B24EaCf379d85d35935eE0f01E0847',
         abi: LOOPING_STRATEGY_V3_ABI,
         borrowPercentage: 105,
       },
@@ -52,7 +52,7 @@ export const loopingConfig = {
       '0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452': {
         //wstETH
         leverage: 8.8,
-        loopingContract: '0xaf5eda95b87fcf9767ced0d9c01b69e0a976c725',
+        loopingContract: '0xd27ca92959B9cd8bBd493b2713AFFb05EB0a4252',
         abi: LOOPING_STRATEGY_V3_ABI,
         borrowPercentage: 105,
       },

@@ -13,7 +13,7 @@ export const hookBuilder = (hookBuilderArgs: HookBuilderArgs): Hook => {
         callType: call.callType,
         target: call.target,
         callData: call.callData,
-        estimatedGas: '3000000',
+        estimatedGas: '10000000',
         value: '0',
         payload: call.payload,
       };

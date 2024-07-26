@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { encodeFunctionData, ethersContract } from 'src/common/ethers';
 import { aaveConfig } from 'src/common/constants/config/aave';
@@ -32,6 +32,13 @@ export class AaveLoopingStrategyService {
 
     // if (!isAvailableOnToChain)
     //   throw new BadRequestException('Protocol does not exist on to chain');
+
+    const isLeverageAllowed =
+      txDetails.leverage <=
+      loopingConfig['Aave'][txDetails.toChain][txDetails.toToken].leverage;
+
+    if (!isLeverageAllowed)
+      throw new BadRequestException('Leverage is more than specified');
 
     //! add a check here to only allow supported tokens maybe
 
@@ -120,7 +127,7 @@ export class AaveLoopingStrategyService {
         loopingConfig['Aave'][txDetails.toChain][txDetails.toToken].abi,
         'loopStrategy',
         [
-          txDetails.toToken, //!check with aayush if this will be the address of wsteth or weth
+          txDetails.toToken,
           chains[txDetails.fromChain].wethAddress,
           txDetails.fromAmount,
           txDetails.leverage,
