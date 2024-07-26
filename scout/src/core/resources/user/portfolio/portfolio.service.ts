@@ -32,11 +32,7 @@ export class PortfolioService {
         this.getSeamlessTotalValue(walletAddress),
       ]);
 
-    const mergedBalance = this.mergeBalances([
-      aaveBalances,
-      zerolendBalances,
-      seamlessBalances,
-    ]);
+    const mergedBalance = [aaveBalances, zerolendBalances, seamlessBalances];
 
     //add more params here based on frontend requirement
     const totalCollateralBase = this.calculateTotal(mergedBalance, 0);
@@ -199,15 +195,13 @@ export class PortfolioService {
   private calculateTotal(balances: any, index: number) {
     let total = BigInt(0);
 
-    Object.values(balances).forEach((entry: any) => {
-      total += BigInt(entry[index]);
+    balances.forEach((obj: any) => {
+      for (const key in obj) {
+        total += obj[key][index];
+      }
     });
 
     return total.toString();
-  }
-
-  private mergeBalances(balancesList: any[]): any {
-    return balancesList.reduce((acc, balance) => ({ ...acc, ...balance }), {});
   }
 
   /**
