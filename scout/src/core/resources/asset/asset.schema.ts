@@ -62,6 +62,12 @@ export class Asset {
 
   @Prop({
     type: Number,
+    required: true,
+  })
+  assetDecimals: number;
+
+  @Prop({
+    type: Number,
     default: 0,
   })
   assetSupplyApy: number;

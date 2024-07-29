@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { ProtocolType } from '../asset.schema';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -51,4 +51,12 @@ export class CreateAssetDto {
   @IsString()
   @IsNotEmpty()
   assetAddress: string;
+
+  @ApiProperty({
+    description: 'Decimals of the token',
+    example: 10,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  assetDecimals: number;
 }

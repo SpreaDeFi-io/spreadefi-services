@@ -18,6 +18,7 @@ export type GetAssetBySymbolListResponse = Array<{
   assetName: string;
   assetSymbol: string;
   assetAddress: string;
+  assetDecimals: number;
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -37,6 +38,7 @@ export type GetAssetByIdResponse = {
   assetName: string;
   assetSymbol: string;
   assetAddress: string;
+  assetDecimals: number;
   createdAt: string;
   updatedAt: string;
   __v: number;
