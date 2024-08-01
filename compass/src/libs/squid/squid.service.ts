@@ -12,6 +12,9 @@ export class SquidService {
     this.squid = new Squid({
       baseUrl: SQUID_BASE_URL,
       integratorId: this.configService.get<string>('SQUID_INTEGRATOR_ID'),
+      executionSettings: {
+        infiniteApproval: false,
+      },
     });
   }
 

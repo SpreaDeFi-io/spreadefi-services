@@ -24,7 +24,7 @@ export const loopingConfig = {
       },
       '0x9Bcef72be871e61ED4fBbc7630889beE758eb81D': {
         //rETH
-        leverage: 8,
+        leverage: 6,
         loopingContract: '0x9034Dd164780E43b28D2b048A9CA792b222E657a',
         abi: LOOPING_STRATEGY_ABI,
         borrowPercentage: 103,
