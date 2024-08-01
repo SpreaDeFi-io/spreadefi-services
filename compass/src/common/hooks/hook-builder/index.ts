@@ -13,11 +13,13 @@ export const hookBuilder = (hookBuilderArgs: HookBuilderArgs): Hook => {
         callType: call.callType,
         target: call.target,
         callData: call.callData,
-        estimatedGas: '10000000',
+        estimatedGas: '20000000',
         value: '0',
         payload: call.payload,
       };
     }),
+    provider: 'Spreadefi',
+    logoURI: 'https://spreadefi.svg',
   };
 
   return hook;

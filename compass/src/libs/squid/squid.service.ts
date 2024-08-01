@@ -15,9 +15,7 @@ export class SquidService {
     });
   }
 
-  async createQuote(
-    squidQuoteArgs: Partial<RouteRequest> & { slippage?: number },
-  ) {
+  async createQuote(squidQuoteArgs: Partial<RouteRequest>) {
     try {
       await this.squid.init();
 
@@ -30,13 +28,10 @@ export class SquidService {
         fromAddress: squidQuoteArgs.fromAddress,
         toAddress: squidQuoteArgs.toAddress,
         receiveGasOnDestination: squidQuoteArgs.receiveGasOnDestination,
-        slippageConfig: {
-          autoMode: 1, //!should be changed dynamically
-        },
       };
 
-      if (squidQuoteArgs.slippageConfig?.slippage) {
-        config.slippageConfig.slippage = squidQuoteArgs.slippage;
+      if (squidQuoteArgs?.slippage) {
+        config.slippage = squidQuoteArgs.slippage;
       }
 
       if (squidQuoteArgs.preHook) {
