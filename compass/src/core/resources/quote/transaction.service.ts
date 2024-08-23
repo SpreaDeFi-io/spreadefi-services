@@ -17,6 +17,7 @@ import { AaveLoopingSeamlessService } from 'src/libs/strategies/aave-looping-sea
 import { AaveHopBeefyService } from 'src/libs/strategies/aave-hop-beefy/aave-hop-beefy.service';
 import { SeamlessLoopingStrategyService } from 'src/libs/strategies/seamless-looping-strategy/seamless-looping-strategy.service';
 import { ZerolendLoopingStrategyService } from 'src/libs/strategies/zerolend-looping-strategy/zerolend-looping-strategy.service';
+import { SquidPortalsService } from 'src/libs/strategies/squid-portals/squid-portals.service';
 
 @Injectable()
 export class TransactionService {
@@ -36,6 +37,7 @@ export class TransactionService {
     private readonly aaveLoopingZerolendService: AaveLoopingZerolendService,
     private readonly hopBeefyService: HopBeefyService,
     private readonly aaveHopBeefyService: AaveHopBeefyService,
+    private readonly squidPortalsService: SquidPortalsService,
   ) {}
 
   async createQuote(createQuoteDto: CreateSquidQuoteDto) {
@@ -214,6 +216,15 @@ export class TransactionService {
         transactions =
           await this.aaveHopBeefyService.prepareAaveHopBeefyTransactions({
             action,
+            txDetails,
+          });
+
+        return transactions;
+
+      case StrategyName.YEARN_V3:
+        transactions =
+          await this.squidPortalsService.prepareSquidPortalsTransaction({
+            strategyName,
             txDetails,
           });
 

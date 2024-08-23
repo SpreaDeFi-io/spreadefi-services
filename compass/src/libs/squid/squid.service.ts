@@ -31,6 +31,7 @@ export class SquidService {
         fromAddress: squidQuoteArgs.fromAddress,
         toAddress: squidQuoteArgs.toAddress,
         receiveGasOnDestination: squidQuoteArgs.receiveGasOnDestination,
+        enableBoost: true,
       };
 
       if (squidQuoteArgs?.slippage) {

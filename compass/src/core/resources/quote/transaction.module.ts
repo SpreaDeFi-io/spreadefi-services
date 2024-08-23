@@ -16,6 +16,7 @@ import { AaveLoopingZerolendModule } from 'src/libs/strategies/aave-looping-zero
 import { AaveHopBeefyModule } from 'src/libs/strategies/aave-hop-beefy/aave-hop-beefy.module';
 import { SeamlessLoopingStrategyModule } from 'src/libs/strategies/seamless-looping-strategy/seamless-looping-strategy.module';
 import { ZerolendLoopingStrategyModule } from 'src/libs/strategies/zerolend-looping-strategy/zerolend-looping-strategy.module';
+import { SquidPortalsModule } from 'src/libs/strategies/squid-portals/squid-portals.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ZerolendLoopingStrategyModule } from 'src/libs/strategies/zerolend-loop
     AaveLoopingZerolendModule.register(),
     HopBeefyModule.register(),
     AaveHopBeefyModule.register(),
+    SquidPortalsModule.register(),
   ],
   controllers: [TransactionController],
   providers: [TransactionService],

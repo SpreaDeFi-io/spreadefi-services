@@ -112,4 +112,19 @@ export class AssetController {
       data,
     };
   }
+
+  // @HttpCode(HttpStatus.CREATED)
+  // @Post('portals')
+  // async createPortalsAsset(
+  //   @Query('network') network: string,
+  //   @Query('platform') platform: string,
+  // ) {
+  //   const data = await this.assetService.createPortalsAsset(network, platform);
+
+  //   return {
+  //     statusCode: HttpStatus.CREATED,
+  //     message: 'Created portals assets successfully',
+  //     data,
+  //   };
+  // }
 }

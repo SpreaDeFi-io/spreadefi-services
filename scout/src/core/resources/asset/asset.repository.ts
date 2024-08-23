@@ -122,6 +122,12 @@ export class AssetRepository {
     return newAsset.save();
   }
 
+  async createAssets(assets: Array<CreateAssetDto & { assetId: string }>) {
+    const assetsData = await this.assetModel.insertMany(assets);
+
+    return assetsData;
+  }
+
   async isAssetSupported(
     protocolName: string,
     chainId: string,

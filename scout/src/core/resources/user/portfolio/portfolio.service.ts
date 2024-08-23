@@ -25,61 +25,64 @@ export class PortfolioService {
    * @returns An object containing totalCollateralBase, totalDebtBase, and totalBalanceUSD.
    */
   async getTotalBalance(walletAddress: string) {
-    const [aaveBalances, zerolendBalances, seamlessBalances] =
-      await Promise.all([
-        this.getAaveTotalValue(walletAddress),
-        this.getZerolendTotalValue(walletAddress),
-        this.getSeamlessTotalValue(walletAddress),
-      ]);
+    try {
+      const [aaveBalances, zerolendBalances, seamlessBalances] =
+        await Promise.all([
+          this.getAaveTotalValue(walletAddress),
+          this.getZerolendTotalValue(walletAddress),
+          this.getSeamlessTotalValue(walletAddress),
+        ]);
 
-    const mergedBalance = [aaveBalances, zerolendBalances, seamlessBalances];
+      const mergedBalance = [aaveBalances, zerolendBalances, seamlessBalances];
+      //add more params here based on frontend requirement
+      const totalCollateralBase = this.calculateTotal(mergedBalance, 0);
+      const totalDebtBase = this.calculateTotal(mergedBalance, 1);
 
-    //add more params here based on frontend requirement
-    const totalCollateralBase = this.calculateTotal(mergedBalance, 0);
-    const totalDebtBase = this.calculateTotal(mergedBalance, 1);
+      let totalBalanceUSD = 0;
+      const chainBalance = {};
 
-    let totalBalanceUSD = 0;
-    const chainBalance = {};
+      await Promise.all(
+        Object.values(CHAINS).map(async (chainId: any) => {
+          const chainBalanceData =
+            await this.covalentService.getWalletBalanceForChain(
+              walletAddress,
+              chainId,
+            );
 
-    await Promise.all(
-      Object.values(CHAINS).map(async (chainId: any) => {
-        const chainBalanceData =
-          await this.covalentService.getWalletBalanceForChain(
-            walletAddress,
-            chainId,
+          const result = chainBalanceData.reduce((acc, item) => {
+            acc[item.contract_address] = {
+              balance: item.balance,
+              price: item.pretty_quote,
+            };
+            return acc;
+          }, {});
+
+          chainBalance[chainId] = result;
+
+          // Calculate total USD for the current chain
+          const chainTotalBalanceUSD = chainBalanceData.reduce(
+            (total, balance) => {
+              return total + (balance.quote || 0);
+            },
+            0,
           );
 
-        const result = chainBalanceData.reduce((acc, item) => {
-          acc[item.contract_address] = {
-            balance: item.balance,
-            price: item.pretty_quote,
-          };
-          return acc;
-        }, {});
+          totalBalanceUSD += chainTotalBalanceUSD;
+        }),
+      );
 
-        chainBalance[chainId] = result;
-
-        // Calculate total USD for the current chain
-        const chainTotalBalanceUSD = chainBalanceData.reduce(
-          (total, balance) => {
-            return total + (balance.quote || 0);
-          },
-          0,
-        );
-
-        totalBalanceUSD += chainTotalBalanceUSD;
-      }),
-    );
-
-    return {
-      totalCollateralBase: totalCollateralBase,
-      totalDebtBase: totalDebtBase,
-      totalBalanceUSD: totalBalanceUSD,
-      chainBalance: this.convertBalanceToStrings(chainBalance),
-      aaveBalances: this.convertBalanceToStrings(aaveBalances),
-      seamlessBalances: this.convertBalanceToStrings(seamlessBalances),
-      zerolendBalances: this.convertBalanceToStrings(zerolendBalances),
-    };
+      return {
+        totalCollateralBase: totalCollateralBase,
+        totalDebtBase: totalDebtBase,
+        totalBalanceUSD: totalBalanceUSD,
+        chainBalance: this.convertBalanceToStrings(chainBalance),
+        aaveBalances: this.convertBalanceToStrings(aaveBalances),
+        seamlessBalances: this.convertBalanceToStrings(seamlessBalances),
+        zerolendBalances: this.convertBalanceToStrings(zerolendBalances),
+      };
+    } catch (error: any) {
+      console.log('error: ', error);
+    }
   }
 
   /**

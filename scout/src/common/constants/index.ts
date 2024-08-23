@@ -55,3 +55,15 @@ export const chainToChainId = {
   Base: '8453',
   Linea: '59144',
 };
+
+export const chainIdToChainPortals = {
+  '42161': 'arbitrum',
+  '10': 'optimism',
+  '8453': 'base',
+};
+
+export const chainToChainIdPortals = {
+  arbitrum: '42161',
+  optimism: '10',
+  base: '8453',
+};

@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { AssetRepository } from 'src/core/resources/asset/asset.repository';
 import { CreateAssetDto } from 'src/core/resources/asset/dto/create-asset.dto';
 import { ProtocolType } from './asset.schema';
 import { loopingConfig } from 'src/common/constants/config/looping';
+import { getAddress } from 'ethers';
+import { chainToChainIdPortals } from 'src/common/constants';
 
 @Injectable()
 export class AssetService {
@@ -68,6 +70,42 @@ export class AssetService {
     const data = await this.assetRepository.createAsset(asset);
 
     return data;
+  }
+
+  async createPortalsAsset(network: string, platform: string) {
+    const data = await fetch(
+      `http://localhost:8000/portals/tokens?network=${network}&platform=${platform}`,
+    );
+
+    const response = await data.json();
+
+    if (response.statusCode !== 200)
+      throw new InternalServerErrorException('Failed to fetch tokens');
+
+    const assets = response.data.tokens.map((token) => {
+      const tokenData = {
+        protocolName: platform,
+        protocolType: ProtocolType.YIELD,
+        chainId: chainToChainIdPortals[network],
+        assetName: token.name,
+        assetSymbol: token.symbol,
+        assetAddress: getAddress(token.address),
+        assetDecimals: token.decimals,
+      };
+
+      const assetId = this.generateAssetId(tokenData);
+
+      const asset = {
+        assetId,
+        ...tokenData,
+      };
+
+      return asset;
+    });
+
+    const assetData = await this.assetRepository.createAssets(assets);
+
+    return assetData;
   }
 
   private generateAssetId(createAssetDto: CreateAssetDto) {

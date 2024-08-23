@@ -17,6 +17,7 @@ export enum StrategyName {
   AAVE_LOOPING_ZEROLEND = 'Aave-Looping-Zerolend',
   HOP_BEEFY = 'Hop Beefy',
   AAVE_HOP_BEEFY = 'Aave-Hop Beefy',
+  YEARN_V3 = 'yearn-v3',
 }
 
 export enum Action {
@@ -37,4 +38,5 @@ export enum Action {
   BORROW_LOOP = 'Borrow-Loop',
   ADD_LIQUIDITY = 'Add-Liquidity',
   DEPOSIT = 'Deposit',
+  PORTALS = 'Portals',
 }
