@@ -6,9 +6,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ethers } from 'ethers';
 import {
+  chainIdToChainPortals,
   chainToChainId,
+  chainToChainIdPortals,
   DEFI_LLAMA_POOLS,
   DEFI_LLAMA_URI,
+  PORTALS_PLATFORMS,
+  PORTALS_URL,
   RPC_URLS,
 } from 'src/common/constants';
 import { aaveConfig } from 'src/common/constants/config/aave';
@@ -19,12 +23,14 @@ import {
 } from 'src/common/constants/abi';
 import { seamlessConfig } from 'src/common/constants/config/seamless';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ApyService {
   constructor(
     @InjectModel(Asset.name) private assetModel: Model<Asset>,
     private readonly apyLogger: ApyLogger,
+    private readonly configService: ConfigService,
   ) {}
 
   async updateApy() {
@@ -104,6 +110,44 @@ export class ApyService {
     }
   }
 
+  async upadtePortalsApy() {
+    const assets = await this.assetModel.find({}).lean();
+
+    const portalAssets = assets.filter(
+      (asset) => PORTALS_PLATFORMS.includes(asset.protocolName) && asset,
+    );
+
+    const portalAssetsIds = portalAssets.map(
+      (asset) =>
+        chainIdToChainPortals[asset.chainId] + '%3A' + asset.assetAddress,
+    );
+
+    const tokens = await this.getPortalsApy(portalAssetsIds);
+
+    const bulkOperations = tokens.map((token) => ({
+      updateOne: {
+        filter: {
+          chainId: chainToChainIdPortals[token.network],
+          assetSymbol: { $regex: new RegExp(`^${token.symbol}$`, 'i') },
+          protocolName: token.platform,
+          assetAddress: { $regex: new RegExp(`^${token.address}$`, 'i') },
+        },
+        update: { $set: { assetSupplyApy: token.metrics.apy } },
+      },
+    }));
+
+    if (bulkOperations.length > 0) {
+      const data = await this.assetModel.bulkWrite(bulkOperations);
+      this.apyLogger.log('Successfully updated APY');
+
+      return data;
+    } else {
+      this.apyLogger.log('No APY values to updated');
+
+      return null;
+    }
+  }
+
   @Cron(CronExpression.EVERY_2_HOURS) // Adjust the cron expression as needed
   async updateApyCron() {
     try {
@@ -121,6 +165,18 @@ export class ApyService {
       this.apyLogger.log('[CRON] - APY updated successfully for Hop');
     } catch (error) {
       this.apyLogger.error(`[CRON] - APY updation failed for Hop: ${error}`);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_2_HOURS) //Adjust the cron expression as needed
+  async updatePortalsApyCron() {
+    try {
+      await this.upadtePortalsApy();
+      this.apyLogger.log('[CRON] - APY updated successfully for Portals');
+    } catch (error) {
+      this.apyLogger.error(
+        `[CRON] - APY updation failed for Portals: ${error}`,
+      );
     }
   }
 
@@ -222,5 +278,25 @@ export class ApyService {
     });
 
     return formattedInfo;
+  }
+
+  //!they also have a paging problem so figure that out as well
+  //!max paging limit is 250 -> so we can handle the rest later
+  async getPortalsApy(assetIds: Array<string>) {
+    const ids = assetIds.join('%2C');
+
+    //!add types later
+    const data = await fetch(`${PORTALS_URL}/tokens?ids=${ids}&limit=250`, {
+      headers: {
+        Authorization: `Bearer ${this.configService.get<string>('PORTALS_BEARER_TOKEN')}`,
+      },
+    });
+
+    const response = await data.json();
+
+    if (data.status !== 200)
+      throw new InternalServerErrorException('API call failed!');
+
+    return response.tokens;
   }
 }

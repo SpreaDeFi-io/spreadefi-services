@@ -9,6 +9,10 @@ export const RPC_URLS = {
 
 export const DEFI_LLAMA_URI = 'https://yields.llama.fi';
 
+export const PORTALS_URL = 'https://api.portals.fi/v2';
+
+export const PORTALS_PLATFORMS = ['yearn-v3'];
+
 export const DEFI_LLAMA_POOLS = [
   {
     asset: 'WETH',

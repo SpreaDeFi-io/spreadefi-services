@@ -13,7 +13,7 @@ export class ApyController {
     const data = await this.apyService.updateApy();
 
     return {
-      httpStatus: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
       message: 'Successfully updated APY',
       data,
     };
@@ -25,7 +25,19 @@ export class ApyController {
     const data = await this.apyService.updateHopBeefyApy();
 
     return {
-      httpStatus: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
+      message: 'Successfully updated APY',
+      data,
+    };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Patch('/portals')
+  async updateApyPortals() {
+    const data = await this.apyService.upadtePortalsApy();
+
+    return {
+      statusCode: HttpStatus.OK,
       message: 'Successfully updated APY',
       data,
     };
