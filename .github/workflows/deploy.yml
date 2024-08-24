@@ -79,6 +79,7 @@ jobs:
           touch .env
           echo MONGODB_URI=${{ secrets.MONGODB_URI }} >> .env
           echo COVALENT_API_KEY=${{ secrets.COVALENT_API_KEY }} >> .env
+          echo PORTALS_BEARER_TOKEN=${{secrets.PORTALS_BEARER_TOKEN}} >> .env
           echo ARB_RPC=${{ secrets.ARB_RPC }} >> .env
           echo OP_RPC=${{ secrets.OP_RPC }} >> .env
           echo BASE_RPC=${{ secrets.BASE_RPC }} >> .env
