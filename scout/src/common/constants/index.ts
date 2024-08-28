@@ -13,6 +13,8 @@ export const PORTALS_URL = 'https://api.portals.fi/v2';
 
 export const PORTALS_PLATFORMS = ['yearn-v3'];
 
+export const PORTALS_BALANCE = ['yearn-v3', 'beefy'];
+
 export const DEFI_LLAMA_POOLS = [
   {
     asset: 'WETH',

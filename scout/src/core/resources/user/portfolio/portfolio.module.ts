@@ -4,9 +4,11 @@ import { PortfolioController } from './portfolio.controller';
 import { BalanceModule } from '../balance/balance.module';
 import { PortfolioLogger } from './portfolio.logger';
 import { CovalentService } from 'src/libs/covalent/covalent.service';
+import { AssetModule } from '../../asset/asset.module';
+import { PortalsModule } from 'src/libs/portals/portals.module';
 
 @Module({
-  imports: [BalanceModule],
+  imports: [BalanceModule, AssetModule, PortalsModule.register()],
   controllers: [PortfolioController],
   providers: [PortfolioService, PortfolioLogger, CovalentService],
 })

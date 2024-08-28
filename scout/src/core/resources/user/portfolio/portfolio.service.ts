@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ethers } from 'ethers';
-import { CHAINS, RPC_URLS } from 'src/common/constants';
+import { CHAINS, chainToChainIdPortals, RPC_URLS } from 'src/common/constants';
 import {
   AAVE_POOL_ABI,
   SEAMLESS_POOL_ABI,
@@ -11,12 +11,17 @@ import { seamlessConfig } from 'src/common/constants/config/seamless';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
 import { PortfolioLogger } from './portfolio.logger';
 import { CovalentService } from 'src/libs/covalent/covalent.service';
+import { AssetRepository } from '../../asset/asset.repository';
+import { ProtocolType } from '../../asset/asset.schema';
+import { PortalsService } from 'src/libs/portals/portals.service';
 
 @Injectable()
 export class PortfolioService {
   constructor(
     private readonly covalentService: CovalentService,
     private readonly portfolioLogger: PortfolioLogger,
+    private readonly assetRepository: AssetRepository,
+    private readonly portalsService: PortalsService,
   ) {}
 
   /**
@@ -26,11 +31,12 @@ export class PortfolioService {
    */
   async getTotalBalance(walletAddress: string) {
     try {
-      const [aaveBalances, zerolendBalances, seamlessBalances] =
+      const [aaveBalances, zerolendBalances, seamlessBalances, yieldBalances] =
         await Promise.all([
           this.getAaveTotalValue(walletAddress),
           this.getZerolendTotalValue(walletAddress),
           this.getSeamlessTotalValue(walletAddress),
+          this.getYieldProtocolsTotalValue(walletAddress),
         ]);
 
       const mergedBalance = [aaveBalances, zerolendBalances, seamlessBalances];
@@ -74,6 +80,7 @@ export class PortfolioService {
       return {
         totalCollateralBase: totalCollateralBase,
         totalDebtBase: totalDebtBase,
+        totalYieldBalance: yieldBalances.totalYieldBalance,
         totalBalanceUSD: totalBalanceUSD,
         chainBalance: this.convertBalanceToStrings(chainBalance),
         aaveBalances: this.convertBalanceToStrings(aaveBalances),
@@ -187,6 +194,61 @@ export class PortfolioService {
 
       return null;
     }
+  }
+
+  /**
+   * Fetches the balance of all the tokens that are of yield category and are supported by portals
+   * @param walletAddress address of the owner
+   * @returns the balance of all the yield tokens supported by portals
+   */
+  async getYieldProtocolsTotalValue(walletAddress: string) {
+    const protocols = await this.assetRepository.getProtocols();
+
+    const yieldProtocols = protocols.filter(
+      (protocol) => protocol.protocolType === ProtocolType.YIELD,
+    );
+
+    const networks = Object.keys(chainToChainIdPortals);
+
+    const tokenBalances = await this.portalsService.getBalance(
+      walletAddress,
+      networks,
+    );
+
+    const yieldTokenBalances = tokenBalances.filter(
+      (token) =>
+        yieldProtocols.some(
+          (protocol) => protocol.protocolName === token.platform,
+        ) || token.platform === 'beefy',
+    );
+
+    let totalYieldBalance = 0;
+
+    yieldTokenBalances.forEach(
+      (token) => (totalYieldBalance += token.balanceUSD),
+    );
+
+    // const yieldTokensByProtocol = [];
+
+    // yieldTokenBalances.forEach((token1) => {
+    //   const existingProtocol = yieldTokensByProtocol.find(
+    //     (token2) =>
+    //       token1.platform === token2.protocol &&
+    //       chainToChainIdPortals[token1.network] === token2.chainId,
+    //   );
+
+    //   if (existingProtocol) {
+    //     existingProtocol.assets.push(token1);
+    //   } else {
+    //     yieldTokensByProtocol.push({
+    //       assets: [token1],
+    //       chainId: chainToChainIdPortals[token1.network],
+    //       protocol: token1.platform,
+    //     });
+    //   }
+    // });
+
+    return { totalYieldBalance };
   }
 
   /**

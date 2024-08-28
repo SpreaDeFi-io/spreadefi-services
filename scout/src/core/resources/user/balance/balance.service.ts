@@ -3,8 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Asset } from '../../asset/asset.schema';
 import { Model } from 'mongoose';
 import { BalanceLogger } from './balance.logger';
-import { ethers } from 'ethers';
-import { RPC_URLS } from 'src/common/constants';
+import { ethers, getAddress } from 'ethers';
+import {
+  chainToChainIdPortals,
+  PORTALS_PLATFORMS,
+  RPC_URLS,
+} from 'src/common/constants';
 import { aaveConfig } from 'src/common/constants/config/aave';
 import {
   AAVE_DATA_PROVIDER_ABI,
@@ -14,6 +18,7 @@ import {
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
 import { seamlessConfig } from 'src/common/constants/config/seamless';
 import { CovalentService } from 'src/libs/covalent/covalent.service';
+import { PortalsService } from 'src/libs/portals/portals.service';
 
 @Injectable()
 export class BalanceService {
@@ -21,6 +26,7 @@ export class BalanceService {
     @InjectModel(Asset.name) private assetModel: Model<Asset>,
     private readonly covalentService: CovalentService,
     private readonly balanceLogger: BalanceLogger,
+    private readonly portalsService: PortalsService,
   ) {}
 
   /**
@@ -29,7 +35,7 @@ export class BalanceService {
    * @returns A filtered array of balance details.
    */
   async getUserAssetBalances(userAddress: string) {
-    const assets = await this.assetModel.find();
+    const assets = await this.assetModel.find().lean();
 
     const balancePromises = assets.map(async (asset) => {
       try {
@@ -84,6 +90,33 @@ export class BalanceService {
     });
 
     const balanceResults = await Promise.allSettled(balancePromises);
+
+    const networks = Object.keys(chainToChainIdPortals);
+
+    //*Fetch portals balance
+    const tokensDetail = await this.portalsService.getBalance(
+      userAddress,
+      networks,
+    );
+
+    const supportedTokens = tokensDetail.filter(
+      (token) => PORTALS_PLATFORMS.includes(token.platform) && token,
+    );
+
+    const formattedTokenDetails = supportedTokens.map((token) => {
+      return {
+        asset: assets.find(
+          (asset) =>
+            getAddress(asset.assetAddress) === getAddress(token.address) &&
+            asset.chainId === chainToChainIdPortals[token.network],
+        ),
+        protocol: token.platform,
+        chainId: chainToChainIdPortals[token.network],
+        balance: token.balance,
+        balanceUSD: token.balanceUSD,
+      };
+    });
+
     const filteredBalances = balanceResults
       .filter(
         (result) =>
@@ -94,6 +127,8 @@ export class BalanceService {
             result.value.currentVariableDebt > 0),
       )
       .map((result: any) => result.value);
+
+    filteredBalances.push(...formattedTokenDetails);
 
     return { filteredBalances, assets };
   }

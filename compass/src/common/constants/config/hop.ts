@@ -6,16 +6,16 @@ export const hopConfig = {
       lpTokenAddress: '0x59745774Ed5EfF903e615F5A2282Cae03484985a',
     },
     USDT: {
-      swapAddress: '0x3Aa637D6853f1d9A9354FE4301Ab852A88b237e7',
-      lpTokenAddress: '0x5b10222f2Ada260AAf6C6fC274bd5810AF9d33c0',
+      swapAddress: '0x18f7402B673Ba6Fb5EA4B95768aABb8aaD7ef18a',
+      lpTokenAddress: '0xCe3B19D820CB8B9ae370E423B0a329c4314335fE',
     },
     DAI: {
-      swapAddress: '0x24afDcA4653042C6D08fb1A754b2535dAcF6Eb24',
-      lpTokenAddress: '0x5300648b1cFaa951bbC1d56a4457083D92CFa33F',
+      swapAddress: '0xa5A33aB9063395A90CCbEa2D86a62EcCf27B5742',
+      lpTokenAddress: '0x68f5d998F00bB2460511021741D098c05721d8fF',
     },
     rETH: {
-      swapAddress: '0x9Dd8685463285aD5a94D2c128bda3c5e8a6173c8',
-      lpTokenAddress: '0x0699BC1Ca03761110929b2B56BcCBeb691fa9ca6',
+      swapAddress: '0x0Ded0d521AC7B0d312871D18EA4FDE79f03Ee7CA',
+      lpTokenAddress: '0xbBA837dFFB3eCf4638D200F11B8c691eA641AdCb',
     },
   },
   '10': {

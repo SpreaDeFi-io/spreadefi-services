@@ -44,7 +44,7 @@ export class HopBeefyService {
     ) {
       //* approve the token first
       const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
-        swapAddress,
+        hopConfig[txDetails.toChain].hopWrapperAddress,
         txDetails.fromAmount,
       ]);
 
@@ -65,7 +65,7 @@ export class HopBeefyService {
 
       transactions.push({
         chain: txDetails.fromChain,
-        to: swapAddress,
+        to: hopConfig[txDetails.toChain].hopWrapperAddress,
         type: Action.ADD_LIQUIDITY,
         tx: tx2,
       });

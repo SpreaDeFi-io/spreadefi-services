@@ -67,6 +67,26 @@ export class AssetRepository {
     return data;
   }
 
+  async getProtocols() {
+    const data: Array<{ protocolName: string; protocolType: string }> =
+      await this.assetModel.aggregate([
+        {
+          $group: {
+            _id: '$protocolName', // Group by protocolName to ensure uniqueness
+            protocol: { $first: '$$ROOT' }, // Take the first document in each group
+          },
+        },
+        {
+          $replaceRoot: { newRoot: '$protocol' },
+        }, // Replace the root with the original protocol document
+        {
+          $project: { _id: 0, protocolName: 1, protocolType: 1 },
+        }, // Project only the desired fields
+      ]);
+
+    return data;
+  }
+
   async getAssetBySymbol(symbol: string) {
     const data = await this.assetModel.find({ assetSymbol: symbol });
 

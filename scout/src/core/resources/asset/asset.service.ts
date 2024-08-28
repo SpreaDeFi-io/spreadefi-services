@@ -4,11 +4,15 @@ import { CreateAssetDto } from 'src/core/resources/asset/dto/create-asset.dto';
 import { ProtocolType } from './asset.schema';
 import { loopingConfig } from 'src/common/constants/config/looping';
 import { getAddress } from 'ethers';
-import { chainToChainIdPortals } from 'src/common/constants';
+import { chainToChainIdPortals, PORTALS_URL } from 'src/common/constants';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AssetService {
-  constructor(private readonly assetRepository: AssetRepository) {}
+  constructor(
+    private readonly assetRepository: AssetRepository,
+    private readonly configService: ConfigService,
+  ) {}
 
   async getAssets() {
     const data = await this.assetRepository.getAssets();
@@ -74,7 +78,12 @@ export class AssetService {
 
   async createPortalsAsset(network: string, platform: string) {
     const data = await fetch(
-      `http://localhost:8000/portals/tokens?network=${network}&platform=${platform}`,
+      `${PORTALS_URL}/tokens?network=${network}&platform=${platform}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.configService.get<string>('PORTALS_BEARER_TOKEN')}`,
+        },
+      },
     );
 
     const response = await data.json();

@@ -54,6 +54,7 @@ jobs:
 
   build-scout:
     runs-on: self-hosted
+    needs: build-compass
 
     strategy:
       matrix:
