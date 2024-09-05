@@ -13,7 +13,9 @@ export class AssetService {
   }
 
   async getAssetBySymbol(symbol: string) {
-    const data = await this.assetRepository.getAssetBySymbol(symbol);
+    const data = await this.assetRepository.getAssetBySymbol(
+      decodeURIComponent(symbol),
+    );
 
     return data;
   }

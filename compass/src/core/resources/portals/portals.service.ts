@@ -69,7 +69,7 @@ export class PortalsService {
     slippage?: number,
   ) {
     const data = await fetch(
-      `${PORTALS_URL}/estimate?sender=${sender}&inputToken=${network + '%3A' + inputToken}&inputAmount=${inputAmount}&outputToken=${network + '%3A' + outputToken}&slippage=${slippage ? slippage : '2.5'}`,
+      `${PORTALS_URL}/portal/estimate?sender=${sender}&inputToken=${network + '%3A' + inputToken}&inputAmount=${inputAmount}&outputToken=${network + '%3A' + outputToken}&slippage=${slippage ? slippage : '2.5'}`,
       {
         headers: {
           Authorization: `Bearer ${this.configService.get<string>('PORTALS_BEARER_TOKEN')}`,

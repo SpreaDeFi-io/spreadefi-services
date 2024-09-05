@@ -21,7 +21,9 @@ export class AssetService {
   }
 
   async getAssetBySymbol(symbol: string) {
-    const data = await this.assetRepository.getAssetBySymbol(symbol);
+    const data = await this.assetRepository.getAssetBySymbol(
+      decodeURIComponent(symbol),
+    );
 
     return data;
   }
@@ -78,7 +80,7 @@ export class AssetService {
 
   async createPortalsAsset(network: string, platform: string) {
     const data = await fetch(
-      `${PORTALS_URL}/tokens?network=${network}&platform=${platform}`,
+      `${PORTALS_URL}/tokens?networks=${network}&platforms=${platform}`,
       {
         headers: {
           Authorization: `Bearer ${this.configService.get<string>('PORTALS_BEARER_TOKEN')}`,
@@ -88,10 +90,10 @@ export class AssetService {
 
     const response = await data.json();
 
-    if (response.statusCode !== 200)
+    if (data.status !== 200)
       throw new InternalServerErrorException('Failed to fetch tokens');
 
-    const assets = response.data.tokens.map((token) => {
+    const assets = response.tokens.map((token) => {
       const tokenData = {
         protocolName: platform,
         protocolType: ProtocolType.YIELD,

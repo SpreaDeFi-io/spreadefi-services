@@ -1,6 +1,6 @@
 import { ExecutableTransaction, StrategyName } from 'src/common/types';
 import { SquidService } from 'src/libs/squid/squid.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AaveService } from 'src/libs/strategies/aave/aave.service';
 import { PrepareTransactionDto } from './dto/prepare-transaction.dto';
 import { SeamlessService } from 'src/libs/strategies/seamless/seamless.service';
@@ -18,6 +18,10 @@ import { AaveHopBeefyService } from 'src/libs/strategies/aave-hop-beefy/aave-hop
 import { SeamlessLoopingStrategyService } from 'src/libs/strategies/seamless-looping-strategy/seamless-looping-strategy.service';
 import { ZerolendLoopingStrategyService } from 'src/libs/strategies/zerolend-looping-strategy/zerolend-looping-strategy.service';
 import { SquidPortalsService } from 'src/libs/strategies/squid-portals/squid-portals.service';
+import {
+  PORTALS_MIGRATION_PROTOCOLS,
+  PORTALS_SUPPORTED_PROTOCOLS,
+} from 'src/common/constants';
 
 @Injectable()
 export class TransactionService {
@@ -53,6 +57,7 @@ export class TransactionService {
   }: PrepareTransactionDto) {
     let transactions: Array<ExecutableTransaction> = [];
 
+    //* switch statement for custom strategies
     switch (strategyName) {
       //* If strategy name is aave, then prepare transactions for aave
       case StrategyName.AAVE:
@@ -220,18 +225,27 @@ export class TransactionService {
           });
 
         return transactions;
+    }
 
-      case StrategyName.YEARN_V3:
+    //* switch statement for portals strategies
+    switch (true) {
+      case PORTALS_SUPPORTED_PROTOCOLS.includes(strategyName):
         transactions =
-          await this.squidPortalsService.prepareSquidPortalsTransaction({
-            strategyName,
+          await this.squidPortalsService.prepareSquidPortalsMigration(
             txDetails,
-          });
+          );
 
         return transactions;
+        break;
 
-      default:
-        throw new BadRequestException('Protocol or action not supported');
+      case PORTALS_MIGRATION_PROTOCOLS.includes(strategyName):
+        transactions =
+          await this.squidPortalsService.prepareSquidPortalsMigration(
+            txDetails,
+          );
+
+        return transactions;
+        break;
     }
   }
 }

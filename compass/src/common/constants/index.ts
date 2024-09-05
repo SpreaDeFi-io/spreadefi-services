@@ -1,3 +1,5 @@
+import { StrategyName } from '../types';
+
 export const SQUID_BASE_URL = 'https://apiplus.squidrouter.com';
 
 export const ETHEREUM_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
@@ -27,3 +29,13 @@ export const chainIdToChainPortals = {
   '10': 'optimism',
   '8453': 'base',
 };
+
+export const PORTALS_SUPPORTED_PROTOCOLS = [
+  StrategyName.YEARN_V3,
+  StrategyName.PENDLE,
+];
+
+export const PORTALS_MIGRATION_PROTOCOLS = [
+  StrategyName.YEARN_V3_PENDLE,
+  StrategyName.PENDLE_YEARN_V3,
+];

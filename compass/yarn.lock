@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@0xsquid/sdk@^2.8.23":
-  version "2.8.23"
-  resolved "https://registry.npmjs.org/@0xsquid/sdk/-/sdk-2.8.23.tgz"
-  integrity sha512-1wGlJKGkcmkZJzO8echRLCMssE450sWj8ZN/XCtpq4t+KqKxNPvqnNFv6iTOvOeV98HBnQiQ5HlL0dFACHLkEg==
+"@0xsquid/sdk@^2.8.24":
+  version "2.8.24"
+  resolved "https://registry.npmjs.org/@0xsquid/sdk/-/sdk-2.8.24.tgz"
+  integrity sha512-lwOWmZPE/jt3XwbvHQ+qLufdIxuE12I7+xdo9ZrKqUxUKzss1bsS5xC9qRlIPwERYfneyOtUhBKfYqhhnmUYQA==
   dependencies:
     "@cosmjs/encoding" "^0.31.0"
     "@cosmjs/stargate" "^0.31.3"
@@ -18,10 +18,10 @@
     lodash "^4.17.21"
     long "^5.2.3"
 
-"@0xsquid/squid-types@^0.1.98":
-  version "0.1.98"
-  resolved "https://registry.npmjs.org/@0xsquid/squid-types/-/squid-types-0.1.98.tgz"
-  integrity sha512-RjTLlanC+to77Qnezez8bGtstiQu131rumVpNxHSKdF+RaTnD4Psc5gV0jdBxcOx6X/M63LAUQHV0Ey7zneG/w==
+"@0xsquid/squid-types@^0.1.101":
+  version "0.1.101"
+  resolved "https://registry.npmjs.org/@0xsquid/squid-types/-/squid-types-0.1.101.tgz"
+  integrity sha512-7QxbG4eEYgTwdf/Hjd0OMj390eUeOZCLlt8qTgVxMDgopUC66iOQXruvPKV7OCH9imHl0SVRYT1pT5seaYyeFQ==
   dependencies:
     "@axelar-network/axelarjs-sdk" "^0.16.1"
     "@ethersproject/providers" "^5.7.2"

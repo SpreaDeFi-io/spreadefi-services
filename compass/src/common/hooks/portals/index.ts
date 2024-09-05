@@ -46,3 +46,32 @@ export const portalsHandler = (
 
   return hook;
 };
+
+export const portalsMigrationHandler = (
+  txDetails: TransactionDetailsDto,
+  preHookPortalsTx: PortalsTransaction,
+  postHookPortalsTx: PortalsTransaction,
+) => {
+  const preHookCalls: HookBuilderArgs['calls'] = [];
+
+  preHookCalls.push({
+    target: preHookPortalsTx.tx.to,
+    callType: SquidCallType.DEFAULT,
+    callData: preHookPortalsTx.tx.data,
+    payload: {
+      tokenAddress: txDetails.fromToken,
+      inputPos: 0,
+    },
+  });
+
+  const preHook = hookBuilder({
+    fundToken: txDetails.fromToken,
+    fundAmount: txDetails.fromAmount,
+    description: 'Swap using portals',
+    calls: preHookCalls,
+  });
+
+  const postHook = portalsHandler(txDetails, postHookPortalsTx);
+
+  return { preHook, postHook };
+};
