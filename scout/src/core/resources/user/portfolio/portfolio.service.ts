@@ -205,7 +205,9 @@ export class PortfolioService {
     const protocols = await this.assetRepository.getProtocols();
 
     const yieldProtocols = protocols.filter(
-      (protocol) => protocol.protocolType === ProtocolType.YIELD,
+      (protocol) =>
+        protocol.protocolType === ProtocolType.YIELD &&
+        protocol.protocolName !== 'beefy',
     );
 
     const networks = Object.keys(chainToChainIdPortals);

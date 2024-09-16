@@ -2,13 +2,13 @@ import { SquidCallType } from '@0xsquid/squid-types';
 import { ERC20_ABI } from 'src/common/constants/abi';
 import { encodeFunctionData } from 'src/common/ethers';
 import { HookBuilderArgs } from 'src/common/types';
-import { PortalsTransaction } from 'src/common/types/portals';
+import { SuccessPortalsTransaction } from 'src/common/types/portals';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { hookBuilder } from '../hook-builder';
 
 export const portalsHandler = (
   txDetails: TransactionDetailsDto,
-  portalsTx: PortalsTransaction,
+  portalsTx: SuccessPortalsTransaction,
 ) => {
   const calls: HookBuilderArgs['calls'] = [];
 
@@ -40,7 +40,7 @@ export const portalsHandler = (
   const hook = hookBuilder({
     fundToken: txDetails.fundToken,
     fundAmount: txDetails.fundAmount,
-    description: 'Deposit into protocols using portals',
+    description: 'Deposit or withdraw from protocols using portals',
     calls,
   });
 
@@ -49,8 +49,8 @@ export const portalsHandler = (
 
 export const portalsMigrationHandler = (
   txDetails: TransactionDetailsDto,
-  preHookPortalsTx: PortalsTransaction,
-  postHookPortalsTx: PortalsTransaction,
+  preHookPortalsTx: SuccessPortalsTransaction,
+  postHookPortalsTx: SuccessPortalsTransaction,
 ) => {
   const preHookCalls: HookBuilderArgs['calls'] = [];
 

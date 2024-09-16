@@ -18,6 +18,18 @@ export class SquidService {
     });
   }
 
+  async getSquidTokens() {
+    try {
+      await this.squid.init();
+
+      const tokens = this.squid.tokens;
+
+      return tokens;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async createQuote(squidQuoteArgs: Partial<RouteRequest>) {
     try {
       await this.squid.init();

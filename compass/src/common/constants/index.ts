@@ -6,6 +6,8 @@ export const ETHEREUM_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
 export const PORTALS_URL = 'https://api.portals.fi/v2';
 
+export const ENSO_URL = 'https://api.enso.finance/api/v1';
+
 export const SQUID_MULTICALL_CONTRACT =
   '0xEa749Fd6bA492dbc14c24FE8A3d08769229b896c';
 
@@ -30,12 +32,23 @@ export const chainIdToChainPortals = {
   '8453': 'base',
 };
 
-export const PORTALS_SUPPORTED_PROTOCOLS = [
+export const chainToChainIdPortals = {
+  arbitrum: '42161',
+  optimism: '10',
+  base: '8453',
+};
+
+export const PORTALS_ENSO_SUPPORTED_PROTOCOLS = [
   StrategyName.YEARN_V3,
   StrategyName.PENDLE,
+  StrategyName.BEEFY,
 ];
 
-export const PORTALS_MIGRATION_PROTOCOLS = [
+export const PORTALS_ENSO_MIGRATION_PROTOCOLS = [
   StrategyName.YEARN_V3_PENDLE,
   StrategyName.PENDLE_YEARN_V3,
+  StrategyName.PENDLE_BEEFY,
+  StrategyName.BEEFY_PENDLE,
+  StrategyName.YEARN_V3_BEEFY,
+  StrategyName.BEEFY_YEARN_V3,
 ];
