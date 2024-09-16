@@ -37,7 +37,6 @@ export class PortalsController {
     @Body() simulateTransactionDto: SimulateTransactionDto,
   ) {
     const data = await this.portalsService.simulateTransaction(
-      simulateTransactionDto.sender,
       simulateTransactionDto.network,
       simulateTransactionDto.inputToken,
       simulateTransactionDto.inputAmount,

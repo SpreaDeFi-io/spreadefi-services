@@ -19,9 +19,10 @@ import { SeamlessLoopingStrategyService } from 'src/libs/strategies/seamless-loo
 import { ZerolendLoopingStrategyService } from 'src/libs/strategies/zerolend-looping-strategy/zerolend-looping-strategy.service';
 import { SquidPortalsService } from 'src/libs/strategies/squid-portals/squid-portals.service';
 import {
-  PORTALS_MIGRATION_PROTOCOLS,
-  PORTALS_SUPPORTED_PROTOCOLS,
+  PORTALS_ENSO_MIGRATION_PROTOCOLS,
+  PORTALS_ENSO_SUPPORTED_PROTOCOLS,
 } from 'src/common/constants';
+import { PathFinderService } from 'src/libs/pathfinder/pathfinder.service';
 
 @Injectable()
 export class TransactionService {
@@ -42,6 +43,7 @@ export class TransactionService {
     private readonly hopBeefyService: HopBeefyService,
     private readonly aaveHopBeefyService: AaveHopBeefyService,
     private readonly squidPortalsService: SquidPortalsService,
+    private readonly pathFinderService: PathFinderService,
   ) {}
 
   async createQuote(createQuoteDto: CreateSquidQuoteDto) {
@@ -229,23 +231,21 @@ export class TransactionService {
 
     //* switch statement for portals strategies
     switch (true) {
-      case PORTALS_SUPPORTED_PROTOCOLS.includes(strategyName):
-        transactions =
-          await this.squidPortalsService.prepareSquidPortalsMigration(
-            txDetails,
-          );
+      case PORTALS_ENSO_SUPPORTED_PROTOCOLS.includes(strategyName):
+        transactions = await this.pathFinderService.createPath(
+          txDetails,
+          action,
+        );
 
         return transactions;
-        break;
 
-      case PORTALS_MIGRATION_PROTOCOLS.includes(strategyName):
-        transactions =
-          await this.squidPortalsService.prepareSquidPortalsMigration(
-            txDetails,
-          );
+      case PORTALS_ENSO_MIGRATION_PROTOCOLS.includes(strategyName):
+        transactions = await this.pathFinderService.createPath(
+          txDetails,
+          action,
+        );
 
         return transactions;
-        break;
     }
   }
 }

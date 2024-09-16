@@ -20,6 +20,11 @@ export enum StrategyName {
   PENDLE = 'pendle',
   YEARN_V3_PENDLE = 'yearn-v3-pendle',
   PENDLE_YEARN_V3 = 'pendle-yearn-v3',
+  BEEFY = 'beefy',
+  YEARN_V3_BEEFY = 'yearn-v3-beefy',
+  PENDLE_BEEFY = 'pendle-beefy',
+  BEEFY_YEARN_V3 = 'beefy-yearn-v3',
+  BEEFY_PENDLE = 'beefy-pendle',
 }
 
 export enum Action {
@@ -41,4 +46,5 @@ export enum Action {
   ADD_LIQUIDITY = 'Add-Liquidity',
   DEPOSIT = 'Deposit',
   PORTALS = 'Portals',
+  ENSO = 'Enso',
 }

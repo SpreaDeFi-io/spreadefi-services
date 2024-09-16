@@ -5,7 +5,10 @@ import {
 } from 'src/common/constants';
 import { portalsHandler } from 'src/common/hooks/portals';
 import { Action, ExecutableTransaction } from 'src/common/types';
-import { PortalsTransaction } from 'src/common/types/portals';
+import {
+  PortalsTransaction,
+  SuccessPortalsTransaction,
+} from 'src/common/types/portals';
 import { AssetRepository } from 'src/core/resources/asset/asset.repository';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { PortalsService } from 'src/core/resources/portals/portals.service';
@@ -76,7 +79,6 @@ export class SquidPortalsService {
 
         //*Create portals estimate to get the min amount of weth we will receive
         const portalsEstimate = await this.portalsService.simulateTransaction(
-          txDetails.fromAddress,
           chainIdToChainPortals[txDetails.fromChain],
           txDetails.fromToken,
           txDetails.fromAmount,
@@ -153,7 +155,10 @@ export class SquidPortalsService {
           txDetails.toToken.toLowerCase() !==
           chains[txDetails.toChain].wethAddress.toLowerCase()
         ) {
-          const postHook = portalsHandler(txDetails, portalsPostHookTx);
+          const postHook = portalsHandler(
+            txDetails,
+            portalsPostHookTx as SuccessPortalsTransaction,
+          );
           squidTx = await this.squidService.createQuote({
             ...txDetails,
             fromToken: chains[txDetails.fromChain].wethAddress,

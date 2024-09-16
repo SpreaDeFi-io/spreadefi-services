@@ -17,7 +17,7 @@ type SignedOrder = {
 };
 
 // Define the Context type
-type Context = {
+type TransactionContext = {
   orderId: string;
   minOutputAmount: string;
   minOutputAmountUsd: number;
@@ -58,9 +58,16 @@ type Tx = {
   gasLimit: string;
 };
 
-// Define the main structure that includes Tx, Context, and SignedOrder
-export type PortalsTransaction = {
+export type FailedTransaction = {
+  statusCode: number;
+  message: string;
+};
+
+export type SuccessPortalsTransaction = {
   tx: Tx;
-  context: Context;
+  context: TransactionContext;
   signedOrder: SignedOrder;
 };
+
+// Define the main structure that includes Tx, Context, and SignedOrder
+export type PortalsTransaction = SuccessPortalsTransaction | FailedTransaction;
