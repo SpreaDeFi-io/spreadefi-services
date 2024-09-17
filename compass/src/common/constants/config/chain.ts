@@ -34,4 +34,14 @@ export const chains = {
     wstETHAddress: '0xB5beDd42000b71FddE22D3eE8a79Bd49A568fC8F',
     wethAddress: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f',
   },
+  '56': {
+    name: 'BINANCE SMART CHAIN',
+    rpc: process.env.BSC_RPC,
+    wethAddress: '0x2170Ed0880ac9A755fd29B2688956BD959F933F8', //!this is ether and not wrapped eth
+  },
+  '137': {
+    name: 'POLYGON',
+    rpc: process.env.POLYGON_RPC,
+    wethAddress: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
+  },
 };

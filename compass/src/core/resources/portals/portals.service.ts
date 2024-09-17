@@ -19,12 +19,14 @@ export class PortalsService {
 
   portalsUrlBuilder(
     sender: string,
-    network: string,
+    network: string | undefined,
     inputToken: string,
     inputAmount: string,
     outputToken: string,
     slippage?: number,
   ) {
+    if (!network) throw new BadRequestException('Network not supported');
+
     const url = `${PORTALS_URL}/portal?sender=${sender}&inputToken=${network + '%3A' + inputToken}&inputAmount=${inputAmount}&outputToken=${network + '%3A' + outputToken}&slippageTolerancePercentage=${slippage ? slippage : '2.5'}&validate=false`;
 
     return url;
@@ -47,10 +49,12 @@ export class PortalsService {
 
   async approvePortals(
     sender: string,
-    network: string,
+    network: string | undefined,
     inputToken: string,
     inputAmount: string,
   ) {
+    if (!network) throw new BadRequestException('Network not supported');
+
     const data = await fetch(
       `${PORTALS_URL}/approval?sender=${sender}&inputToken=${network + '%3A' + inputToken}&inputAmount=${inputAmount}`,
       {
@@ -98,12 +102,14 @@ export class PortalsService {
   }
 
   async simulateTransaction(
-    network: string,
+    network: string | undefined,
     inputToken: string,
     inputAmount: string,
     outputToken: string,
     slippage?: number,
   ) {
+    if (!network) throw new BadRequestException('Network not supported');
+
     const data = await fetch(
       `${PORTALS_URL}/portal/estimate?&inputToken=${network + '%3A' + inputToken}&inputAmount=${inputAmount}&outputToken=${network + '%3A' + outputToken}&slippage=${slippage ? slippage : '2.5'}`,
       {
@@ -126,12 +132,14 @@ export class PortalsService {
 
   async prepareTransaction(
     sender: string,
-    network: string,
+    network: string | undefined,
     inputToken: string,
     inputAmount: string,
     outputToken: string,
     slippage?: number,
   ): Promise<PortalsTransaction> {
+    if (!network) throw new BadRequestException('Network not supported');
+
     const data = await fetch(
       `${PORTALS_URL}/portal?sender=${sender}&inputToken=${network + '%3A' + inputToken}&inputAmount=${inputAmount}&outputToken=${network + '%3A' + outputToken}&slippageTolerancePercentage=${slippage ? slippage : '2.5'}&validate=false`,
       {
@@ -149,12 +157,14 @@ export class PortalsService {
   //* Creates the executable transaction of portals of type ExecutableTransaction
   async createExecutableTransaction(
     sender: string,
-    network: string,
+    network: string | undefined,
     inputToken: string,
     inputAmount: string,
     outputToken: string,
     slippage?: number,
   ): Promise<ExecutableTransaction> {
+    if (!network) throw new BadRequestException('Network not supported');
+
     const data = await this.prepareTransaction(
       sender,
       network,

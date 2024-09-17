@@ -5,6 +5,8 @@ export const RPC_URLS = {
   '10': process.env.OP_RPC,
   '8453': process.env.BASE_RPC,
   '59144': process.env.LINEA_RPC,
+  '56': process.env.BSC_RPC,
+  '137': process.env.POLYGON_RPC,
 };
 
 export const DEFI_LLAMA_URI = 'https://yields.llama.fi';
@@ -53,6 +55,8 @@ export const CHAINS = {
   OP: 10,
   BASE: 8453,
   LINEA: 59144,
+  BSC: 56,
+  POLYGON: 137,
 };
 
 export const chainToChainId = {
@@ -60,16 +64,22 @@ export const chainToChainId = {
   Optimism: '10',
   Base: '8453',
   Linea: '59144',
+  BSC: '56',
+  POLYGON: '137',
 };
 
 export const chainIdToChainPortals = {
   '42161': 'arbitrum',
   '10': 'optimism',
   '8453': 'base',
+  '56': 'bsc',
+  '137': 'polygon',
 };
 
 export const chainToChainIdPortals = {
   arbitrum: '42161',
   optimism: '10',
   base: '8453',
+  bsc: '56',
+  polygon: '137',
 };
