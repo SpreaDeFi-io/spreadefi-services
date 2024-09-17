@@ -43,8 +43,9 @@ export class AssetController {
     AssetBySymbolResponseDto,
   )
   @HttpCode(HttpStatus.OK)
-  @Get('symbol/:symbol')
-  async getAssetBySymbol(@Param('symbol') symbol: string) {
+  @Get('symbol')
+  async getAssetBySymbol(@Query('symbol') symbol: string) {
+    console.log('symbol is', symbol);
     const data = await this.assetService.getAssetBySymbol(symbol);
 
     return {
