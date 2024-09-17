@@ -30,12 +30,18 @@ export const chainIdToChainPortals = {
   '42161': 'arbitrum',
   '10': 'optimism',
   '8453': 'base',
+  '59144': 'linea',
+  '56': 'bsc',
+  '137': 'polygon',
 };
 
 export const chainToChainIdPortals = {
   arbitrum: '42161',
   optimism: '10',
   base: '8453',
+  linea: '59144',
+  bsc: '56',
+  polygon: '137',
 };
 
 export const PORTALS_ENSO_SUPPORTED_PROTOCOLS = [
