@@ -6,6 +6,7 @@ export const RPC_URLS = {
   '8453': process.env.BASE_RPC,
   '59144': process.env.LINEA_RPC,
   '56': process.env.BSC_RPC,
+  '137': process.env.POLYGON_RPC,
 };
 
 export const DEFI_LLAMA_URI = 'https://yields.llama.fi';
