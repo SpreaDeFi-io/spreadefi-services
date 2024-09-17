@@ -55,6 +55,7 @@ export const CHAINS = {
   BASE: 8453,
   LINEA: 59144,
   BSC: 56,
+  POLYGON: 137,
 };
 
 export const chainToChainId = {
@@ -63,6 +64,7 @@ export const chainToChainId = {
   Base: '8453',
   Linea: '59144',
   BSC: '56',
+  POLYGON: '137',
 };
 
 export const chainIdToChainPortals = {
@@ -70,6 +72,7 @@ export const chainIdToChainPortals = {
   '10': 'optimism',
   '8453': 'base',
   '56': 'bsc',
+  '137': 'polygon',
 };
 
 export const chainToChainIdPortals = {
@@ -77,4 +80,5 @@ export const chainToChainIdPortals = {
   optimism: '10',
   base: '8453',
   bsc: '56',
+  polygon: '137',
 };
