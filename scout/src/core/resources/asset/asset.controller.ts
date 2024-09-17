@@ -45,7 +45,6 @@ export class AssetController {
   @HttpCode(HttpStatus.OK)
   @Get('symbol')
   async getAssetBySymbol(@Query('symbol') symbol: string) {
-    console.log('symbol is', symbol);
     const data = await this.assetService.getAssetBySymbol(symbol);
 
     return {
@@ -114,18 +113,18 @@ export class AssetController {
     };
   }
 
-  // @HttpCode(HttpStatus.CREATED)
-  // @Post('portals')
-  // async createPortalsAsset(
-  //   @Query('network') network: string,
-  //   @Query('platform') platform: string,
-  // ) {
-  //   const data = await this.assetService.createPortalsAsset(network, platform);
+  @HttpCode(HttpStatus.CREATED)
+  @Post('portals')
+  async createPortalsAsset(
+    @Query('network') network: string,
+    @Query('platform') platform: string,
+  ) {
+    const data = await this.assetService.createPortalsAsset(network, platform);
 
-  //   return {
-  //     statusCode: HttpStatus.CREATED,
-  //     message: 'Created portals assets successfully',
-  //     data,
-  //   };
-  // }
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Created portals assets successfully',
+      data,
+    };
+  }
 }

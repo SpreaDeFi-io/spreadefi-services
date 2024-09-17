@@ -48,6 +48,7 @@ export const PORTALS_ENSO_SUPPORTED_PROTOCOLS = [
   StrategyName.YEARN_V3,
   StrategyName.PENDLE,
   StrategyName.BEEFY,
+  StrategyName.HARVEST_FINANCE,
 ];
 
 export const PORTALS_ENSO_MIGRATION_PROTOCOLS = [
@@ -57,4 +58,10 @@ export const PORTALS_ENSO_MIGRATION_PROTOCOLS = [
   StrategyName.BEEFY_PENDLE,
   StrategyName.YEARN_V3_BEEFY,
   StrategyName.BEEFY_YEARN_V3,
+  StrategyName.HARVEST_FINANCE_BEEFY,
+  StrategyName.HARVEST_FINANCE_PENDLE,
+  StrategyName.HARVEST_FINANCE_YEARN_V3,
+  StrategyName.BEEFY_HARVEST_FINANCE,
+  StrategyName.PENDLE_HARVEST_FINANCE,
+  StrategyName.YEARN_V3_HARVEST_FINANCE,
 ];

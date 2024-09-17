@@ -103,18 +103,24 @@ export class BalanceService {
       (token) => PORTALS_PLATFORMS.includes(token.platform) && token,
     );
 
-    const formattedTokenDetails = supportedTokens.map((token) => {
-      return {
-        asset: assets.find(
-          (asset) =>
-            getAddress(asset.assetAddress) === getAddress(token.address) &&
-            asset.chainId === chainToChainIdPortals[token.network],
-        ),
-        protocol: token.platform,
-        chainId: chainToChainIdPortals[token.network],
-        balance: token.balance,
-        balanceUSD: token.balanceUSD,
-      };
+    const formattedTokenDetails = [];
+
+    supportedTokens.forEach((token) => {
+      const asset = assets.find(
+        (asset) =>
+          getAddress(asset.assetAddress) === getAddress(token.address) &&
+          asset.chainId === chainToChainIdPortals[token.network],
+      );
+
+      if (asset) {
+        formattedTokenDetails.push({
+          asset: asset,
+          protocol: token.platform,
+          chainId: chainToChainIdPortals[token.network],
+          balance: token.balance,
+          balanceUSD: token.balanceUSD,
+        });
+      }
     });
 
     const filteredBalances = balanceResults

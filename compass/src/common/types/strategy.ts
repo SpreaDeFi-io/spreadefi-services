@@ -25,6 +25,13 @@ export enum StrategyName {
   PENDLE_BEEFY = 'pendle-beefy',
   BEEFY_YEARN_V3 = 'beefy-yearn-v3',
   BEEFY_PENDLE = 'beefy-pendle',
+  HARVEST_FINANCE = 'harvest-finance',
+  HARVEST_FINANCE_YEARN_V3 = 'harvest-finance-yearn-v3',
+  HARVEST_FINANCE_PENDLE = 'harvest-finance-pendle',
+  HARVEST_FINANCE_BEEFY = 'harvest-finance-beefy',
+  YEARN_V3_HARVEST_FINANCE = 'yearn-v3-harvest-finance',
+  PENDLE_HARVEST_FINANCE = 'pendle-harvest-finance',
+  BEEFY_HARVEST_FINANCE = 'beefy-harvest-finance',
 }
 
 export enum Action {
