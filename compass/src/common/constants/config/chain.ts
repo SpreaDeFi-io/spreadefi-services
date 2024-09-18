@@ -44,4 +44,14 @@ export const chains = {
     rpc: process.env.POLYGON_RPC,
     wethAddress: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
   },
+  '250': {
+    name: 'FANTOM',
+    rpc: process.env.FANTOM_RPC,
+    wethAddress: '0x1B6382DBDEa11d97f24495C9A90b7c88469134a4', //!axelar usdc address
+  },
+  '43114': {
+    name: 'AVALANCHE',
+    rpc: process.env.AVALANCHE_RPC,
+    wethAddress: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7', //!usdt address
+  },
 };

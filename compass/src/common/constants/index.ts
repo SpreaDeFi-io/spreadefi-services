@@ -33,6 +33,8 @@ export const chainIdToChainPortals = {
   '59144': 'linea',
   '56': 'bsc',
   '137': 'polygon',
+  '250': 'fantom',
+  '43114': 'avalanche',
 };
 
 export const chainToChainIdPortals = {
@@ -42,6 +44,8 @@ export const chainToChainIdPortals = {
   linea: '59144',
   bsc: '56',
   polygon: '137',
+  fantom: '250',
+  avalanche: '43114',
 };
 
 export const PORTALS_ENSO_SUPPORTED_PROTOCOLS = [
@@ -49,6 +53,9 @@ export const PORTALS_ENSO_SUPPORTED_PROTOCOLS = [
   StrategyName.PENDLE,
   StrategyName.BEEFY,
   StrategyName.HARVEST_FINANCE,
+  StrategyName.YEARN,
+  StrategyName.STARGATE,
+  StrategyName.BENQI,
 ];
 
 export const PORTALS_ENSO_MIGRATION_PROTOCOLS = [
@@ -64,4 +71,30 @@ export const PORTALS_ENSO_MIGRATION_PROTOCOLS = [
   StrategyName.BEEFY_HARVEST_FINANCE,
   StrategyName.PENDLE_HARVEST_FINANCE,
   StrategyName.YEARN_V3_HARVEST_FINANCE,
+  StrategyName.YEARN_PENDLE,
+  StrategyName.YEARN_BEEFY,
+  StrategyName.YEARN_HARVEST_FINANCE,
+  StrategyName.PENDLE_YEARN,
+  StrategyName.BEEFY_YEARN,
+  StrategyName.HARVEST_FINANCE_YEARN,
+  StrategyName.STARGATE_YEARN,
+  StrategyName.YEARN_STARGATE,
+  StrategyName.STARGATE_PENDLE,
+  StrategyName.PENDLE_STARGATE,
+  StrategyName.STARGATE_YEARN_V3,
+  StrategyName.YEARN_V3_STARGATE,
+  StrategyName.HARVEST_FINANCE_STARGATE,
+  StrategyName.STARGATE_HARVEST_FINANCE,
+  StrategyName.STARGATE_BEEFY,
+  StrategyName.BEEFY_STARGATE,
+  StrategyName.BENQI_STARGATE,
+  StrategyName.STARGATE_BENQI,
+  StrategyName.BENQI_YEARN,
+  StrategyName.YEARN_BENQI,
+  StrategyName.BENQI_YEARN_V3,
+  StrategyName.YEARN_V3_BENQI,
+  StrategyName.BENQI_HARVEST_FINANCE,
+  StrategyName.HARVEST_FINANCE_BENQI,
+  StrategyName.BENQI_PENDLE,
+  StrategyName.PENDLE_BENQI,
 ];

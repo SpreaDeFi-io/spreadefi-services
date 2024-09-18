@@ -7,6 +7,8 @@ export const RPC_URLS = {
   '59144': process.env.LINEA_RPC,
   '56': process.env.BSC_RPC,
   '137': process.env.POLYGON_RPC,
+  '250': process.env.FANTOM_RPC,
+  '43114': process.env.AVALANCHE_RPC,
 };
 
 export const DEFI_LLAMA_URI = 'https://yields.llama.fi';
@@ -18,6 +20,9 @@ export const PORTALS_PLATFORMS = [
   'pendle',
   'beefy',
   'harvest-finance',
+  'yearn',
+  'stargate',
+  'benqi',
 ];
 
 export const PORTALS_BALANCE = [
@@ -25,6 +30,9 @@ export const PORTALS_BALANCE = [
   'beefy',
   'pendle',
   'harves-finance',
+  'yearn',
+  'stargate',
+  'benqi',
 ];
 
 export const DEFI_LLAMA_POOLS = [
@@ -67,6 +75,8 @@ export const CHAINS = {
   LINEA: 59144,
   BSC: 56,
   POLYGON: 137,
+  FANTOM: 250,
+  AVALANCHE: 43114,
 };
 
 export const chainToChainId = {
@@ -76,6 +86,8 @@ export const chainToChainId = {
   Linea: '59144',
   BSC: '56',
   POLYGON: '137',
+  FANTOM: '250',
+  AVALANCHE: '43114',
 };
 
 export const chainIdToChainPortals = {
@@ -84,6 +96,8 @@ export const chainIdToChainPortals = {
   '8453': 'base',
   '56': 'bsc',
   '137': 'polygon',
+  '250': 'fantom',
+  '43114': 'avalanche',
 };
 
 export const chainToChainIdPortals = {
@@ -92,4 +106,6 @@ export const chainToChainIdPortals = {
   base: '8453',
   bsc: '56',
   polygon: '137',
+  fantom: '250',
+  avalanche: '43114',
 };
