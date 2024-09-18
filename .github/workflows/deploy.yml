@@ -42,6 +42,8 @@ jobs:
           echo LINEA_RPC=${{ secrets.LINEA_RPC }} >> .env
           echo BSC_RPC=${{secrets.BSC_RPC}} >> .env
           echo POLYGON_RPC=${{secrets.POLYGON_RPC}} >> .env
+          echo FANTOM_RPC=${{secrets.FANTOM_RPC}} >> .env
+          echo AVALANCHE_RPC=${{secrets.AVALANCHE_RPC}} >> .env
       - name: Install dependencies for compass
         run: |
           cd compass
@@ -89,6 +91,8 @@ jobs:
           echo LINEA_RPC=${{ secrets.LINEA_RPC }} >> .env
           echo BSC_RPC=${{secrets.BSC_RPC}} >> .env
           echo POLYGON_RPC=${{secrets.POLYGON_RPC}} >> .env
+          echo FANTOM_RPC=${{secrets.FANTOM_RPC}} >> .env
+          echo AVALANCHE_RPC=${{secrets.AVALANCHE_RPC}} >> .env
       - name: Install dependencies for scout
         run: |
           cd scout
