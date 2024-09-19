@@ -23,6 +23,7 @@
   "dependencies": {
     "@0xsquid/sdk": "^2.8.24",
     "@0xsquid/squid-types": "^0.1.101",
+    "@lifi/sdk": "^3.2.3",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.2",
     "@nestjs/core": "^10.0.0",
@@ -35,7 +36,9 @@
     "ethers": "^6.13.0",
     "mongoose": "^8.4.1",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "viem": "^2.21.9",
+    "wagmi": "^2.12.12"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
