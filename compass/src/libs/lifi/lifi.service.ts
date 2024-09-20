@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   ChainId,
+  ChainType,
   ContractCallsQuoteRequest,
   ContractCallsQuoteRequestFromAmount,
   createConfig,
   getContractCallsQuote,
   getQuote,
   getRoutes,
+  getTokens,
   QuoteRequest,
   RoutesRequest,
 } from '@lifi/sdk';
@@ -33,46 +35,71 @@ export class LifiService {
     });
   }
 
-  async getLifiRoute(lifiRouteArgs: Partial<RoutesRequest>) {
-    const result = await getRoutes({
-      fromAddress: lifiRouteArgs.fromAddress,
-      fromChainId: lifiRouteArgs.fromChainId,
-      toChainId: lifiRouteArgs.toChainId,
-      fromTokenAddress: lifiRouteArgs.fromTokenAddress,
-      toTokenAddress: lifiRouteArgs.toTokenAddress,
-      fromAmount: lifiRouteArgs.fromAmount,
-    });
+  async getTokenList() {
+    try {
+      const tokens = await getTokens({
+        chainTypes: [ChainType.EVM],
+      });
 
-    return result.routes[0];
+      return tokens;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async getLifiRoute(lifiRouteArgs: Partial<RoutesRequest>) {
+    try {
+      const result = await getRoutes({
+        fromAddress: lifiRouteArgs.fromAddress,
+        fromChainId: lifiRouteArgs.fromChainId,
+        toChainId: lifiRouteArgs.toChainId,
+        fromTokenAddress: lifiRouteArgs.fromTokenAddress,
+        toTokenAddress: lifiRouteArgs.toTokenAddress,
+        fromAmount: lifiRouteArgs.fromAmount,
+      });
+
+      return result.routes[0];
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async getLifiQuote(lifiQuoteArgs: Partial<QuoteRequest>) {
-    const result = await getQuote({
-      fromAddress: lifiQuoteArgs.fromAddress,
-      fromChain: lifiQuoteArgs.fromChain,
-      toChain: lifiQuoteArgs.toChain,
-      fromToken: lifiQuoteArgs.fromToken,
-      toToken: lifiQuoteArgs.toToken,
-      fromAmount: lifiQuoteArgs.fromAmount,
-    });
+    try {
+      const result = await getQuote({
+        fromAddress: lifiQuoteArgs.fromAddress,
+        fromChain: lifiQuoteArgs.fromChain,
+        toChain: lifiQuoteArgs.toChain,
+        fromToken: lifiQuoteArgs.fromToken,
+        toToken: lifiQuoteArgs.toToken,
+        fromAmount: lifiQuoteArgs.fromAmount,
+      });
 
-    return result;
+      return result;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
-  async getContractQuote(
+  async getLifiContractQuote(
     lifiContractQuoteArgs: Partial<ContractCallsQuoteRequest>,
   ) {
-    const result = await getContractCallsQuote({
-      fromAddress: lifiContractQuoteArgs.fromAddress,
-      fromChain: lifiContractQuoteArgs.fromChain,
-      toChain: lifiContractQuoteArgs.toChain,
-      fromToken: lifiContractQuoteArgs.fromToken,
-      toToken: lifiContractQuoteArgs.toToken,
-      fromAmount: (lifiContractQuoteArgs as ContractCallsQuoteRequestFromAmount)
-        .fromAmount,
-      contractCalls: lifiContractQuoteArgs.contractCalls,
-    });
+    try {
+      const result = await getContractCallsQuote({
+        fromAddress: lifiContractQuoteArgs.fromAddress,
+        fromChain: lifiContractQuoteArgs.fromChain,
+        toChain: lifiContractQuoteArgs.toChain,
+        fromToken: lifiContractQuoteArgs.fromToken,
+        toToken: lifiContractQuoteArgs.toToken,
+        fromAmount: (
+          lifiContractQuoteArgs as ContractCallsQuoteRequestFromAmount
+        ).fromAmount,
+        contractCalls: lifiContractQuoteArgs.contractCalls,
+      });
 
-    return result;
+      return result;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

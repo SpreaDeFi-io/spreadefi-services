@@ -202,6 +202,21 @@ export class PathFinderService {
           transactions.push(...singleChainTransactions);
         }
 
+        const squidChains = await this.squidService.getSquidChains();
+
+        //If toChain or fromChain is not supported by squid then switch the method to lifi
+        if (
+          !squidChains.find(
+            (squidChain) =>
+              squidChain.chainId === txDetails.toChain ||
+              !squidChains.find(
+                (squidChain) => squidChain.chainId === txDetails.fromChain,
+              ),
+          )
+        )
+          //!instead of throwing bad request should we call another func?
+          throw new BadRequestException('Chain not supported by squid');
+
         //if toToken can directly be achieved using squid then don't use postHook
         const squidTokens = await this.squidService.getSquidTokens();
         const formattedToToken = ethers.getAddress(txDetails.toToken);

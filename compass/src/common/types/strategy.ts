@@ -85,4 +85,5 @@ export enum Action {
   DEPOSIT = 'Deposit',
   PORTALS = 'Portals',
   ENSO = 'Enso',
+  LIFI = 'Lifi',
 }

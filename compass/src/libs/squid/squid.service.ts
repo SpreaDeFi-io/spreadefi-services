@@ -30,6 +30,18 @@ export class SquidService {
     }
   }
 
+  async getSquidChains() {
+    try {
+      await this.squid.init();
+
+      const chains = this.squid.chains;
+
+      return chains;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async createQuote(squidQuoteArgs: Partial<RouteRequest>) {
     try {
       await this.squid.init();
