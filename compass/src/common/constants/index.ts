@@ -8,6 +8,8 @@ export const PORTALS_URL = 'https://api.portals.fi/v2';
 
 export const ENSO_URL = 'https://api.enso.finance/api/v1';
 
+export const LIFI_URL = 'https://li.quest/v1';
+
 export const SQUID_MULTICALL_CONTRACT =
   '0xEa749Fd6bA492dbc14c24FE8A3d08769229b896c';
 
