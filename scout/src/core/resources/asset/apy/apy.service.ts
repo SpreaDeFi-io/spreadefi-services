@@ -114,7 +114,10 @@ export class ApyService {
     const assets = await this.assetModel.find({}).lean();
 
     const portalAssets = assets.filter(
-      (asset) => PORTALS_PLATFORMS.includes(asset.protocolName) && asset,
+      (asset) =>
+        PORTALS_PLATFORMS.includes(asset.protocolName) &&
+        asset &&
+        Object.keys(chainIdToChainPortals).includes(asset.chainId),
     );
 
     const portalAssetsIds = portalAssets.map(

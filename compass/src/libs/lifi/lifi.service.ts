@@ -31,6 +31,7 @@ export class LifiService {
         [ChainId.POL]: [this.configService.get<string>('POLYGON_RPC')],
         [ChainId.LNA]: [this.configService.get<string>('LINEA_RPC')],
         [ChainId.BSC]: [this.configService.get<string>('BSC_RPC')],
+        [ChainId.ERA]: [this.configService.get<string>('ZKSYNC_ERA_RPC')],
       },
     });
   }
@@ -56,10 +57,16 @@ export class LifiService {
         fromTokenAddress: lifiRouteArgs.fromTokenAddress,
         toTokenAddress: lifiRouteArgs.toTokenAddress,
         fromAmount: lifiRouteArgs.fromAmount,
+        options: {
+          bridges: {
+            allow: ['symbiosis'],
+          },
+        },
       });
 
       return result.routes[0];
     } catch (error) {
+      console.log('eror is', error);
       throw new BadRequestException(error);
     }
   }
@@ -95,6 +102,7 @@ export class LifiService {
           lifiContractQuoteArgs as ContractCallsQuoteRequestFromAmount
         ).fromAmount,
         contractCalls: lifiContractQuoteArgs.contractCalls,
+        preferBridges: ['symbiosis'],
       });
 
       return result;

@@ -54,4 +54,9 @@ export const chains = {
     rpc: process.env.AVALANCHE_RPC,
     wethAddress: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7', //!usdt address
   },
+  '324': {
+    name: 'ZkSync Era',
+    rpc: process.env.ZKSYNC_ERA_RPC,
+    wethAddress: '0xf00DAD97284D0c6F06dc4Db3c32454D4292c6813',
+  },
 };

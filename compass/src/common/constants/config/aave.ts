@@ -11,4 +11,8 @@ export const aaveConfig = {
     poolAddress: '0x794a61358D6845594F94dc1DB02A252b5b4814aD',
     wethDebtToken: '0x0c84331e39d6658Cd6e6b9ba04736cC4c4734351',
   },
+  '324': {
+    poolAddress: '0x78e30497a3c7527d953c6B1E3541b021A98Ac43c',
+    wethDebtToken: '0x98dC737eA0E9bCb254c3F98510a71c5E11F74238',
+  },
 };

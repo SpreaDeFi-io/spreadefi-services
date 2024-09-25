@@ -44,6 +44,7 @@ jobs:
           echo POLYGON_RPC=${{secrets.POLYGON_RPC}} >> .env
           echo FANTOM_RPC=${{secrets.FANTOM_RPC}} >> .env
           echo AVALANCHE_RPC=${{secrets.AVALANCHE_RPC}} >> .env
+          echo ZKSYNC_ERA_RPC=${{secrets.ZKSYNC_ERA_RPC}} >> .env
       - name: Install dependencies for compass
         run: |
           cd compass
@@ -93,6 +94,7 @@ jobs:
           echo POLYGON_RPC=${{secrets.POLYGON_RPC}} >> .env
           echo FANTOM_RPC=${{secrets.FANTOM_RPC}} >> .env
           echo AVALANCHE_RPC=${{secrets.AVALANCHE_RPC}} >> .env
+          echo ZKSYNC_ERA_RPC=${{secrets.ZKSYNC_ERA_RPC}} >> .env
       - name: Install dependencies for scout
         run: |
           cd scout

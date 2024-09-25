@@ -5,7 +5,7 @@ import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-tran
 import { aaveConfig } from 'src/common/constants/config/aave';
 import { SquidCallType } from '@0xsquid/squid-types';
 import { HookBuilderArgs } from 'src/common/types';
-import { ETHEREUM_ADDRESS } from 'src/common/constants';
+import { ETHEREUM_ADDRESS_SQUID } from 'src/common/constants';
 
 /**
  * * This hooks includes interacting with aave protocol and performing functions
@@ -26,7 +26,7 @@ export const aaveSupplyHandler = (txDetails: TransactionDetailsDto) => {
   const calls: HookBuilderArgs['calls'] = [];
 
   //* approval not needed if token is ethereum
-  if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+  if (txDetails.toToken !== ETHEREUM_ADDRESS_SQUID) {
     const erc20EncodedData = encodeFunctionData(
       ERC20_ABI,
       'approve',
@@ -80,7 +80,7 @@ export const aaveSupplyHandler = (txDetails: TransactionDetailsDto) => {
 export const aaveRepayHandler = (txDetails: TransactionDetailsDto) => {
   const calls: HookBuilderArgs['calls'] = [];
 
-  if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+  if (txDetails.toToken !== ETHEREUM_ADDRESS_SQUID) {
     const erc20EncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
       aaveConfig[txDetails.toChain].poolAddress,
       1,
@@ -105,9 +105,9 @@ export const aaveRepayHandler = (txDetails: TransactionDetailsDto) => {
   ]); //* the amount at index 1 gets overwritten by payload
 
   calls.push({
-    target: txDetails.toToken,
+    target: aaveConfig[txDetails.toChain].poolAddress,
     callType:
-      txDetails.toToken === ETHEREUM_ADDRESS
+      txDetails.toToken === ETHEREUM_ADDRESS_SQUID
         ? SquidCallType.FULL_NATIVE_BALANCE
         : SquidCallType.FULL_TOKEN_BALANCE,
     callData: aaveRepayEncodedData,
