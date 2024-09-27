@@ -4,7 +4,7 @@ import { ERC20_ABI, SEAMLESS_POOL_ABI } from 'src/common/constants/abi';
 import { seamlessConfig } from 'src/common/constants/config/seamless';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { SquidCallType } from '@0xsquid/squid-types';
-import { ETHEREUM_ADDRESS } from 'src/common/constants';
+import { ETHEREUM_ADDRESS_SQUID } from 'src/common/constants';
 import { HookBuilderArgs } from 'src/common/types';
 
 /**
@@ -26,7 +26,7 @@ export const seamlessSupplyHandler = (txDetails: TransactionDetailsDto) => {
   const calls: HookBuilderArgs['calls'] = [];
 
   //* approval not needed if token is ethereum
-  if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+  if (txDetails.toToken !== ETHEREUM_ADDRESS_SQUID) {
     const erc20EncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
       seamlessConfig[txDetails.toChain].poolAddress as string,
       1, //* this amount gets overwritten by payload
@@ -53,7 +53,7 @@ export const seamlessSupplyHandler = (txDetails: TransactionDetailsDto) => {
   calls.push({
     target: seamlessConfig[txDetails.toChain].poolAddress,
     callType:
-      txDetails.toToken === ETHEREUM_ADDRESS
+      txDetails.toToken === ETHEREUM_ADDRESS_SQUID
         ? SquidCallType.FULL_NATIVE_BALANCE
         : SquidCallType.FULL_TOKEN_BALANCE,
     callData: seamlessSupplyEncodedData,
@@ -83,7 +83,7 @@ export const seamlessSupplyHandler = (txDetails: TransactionDetailsDto) => {
 export const seamlessRepayHandler = (txDetails: TransactionDetailsDto) => {
   const calls: HookBuilderArgs['calls'] = [];
 
-  if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+  if (txDetails.toToken !== ETHEREUM_ADDRESS_SQUID) {
     const erc20EncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
       seamlessConfig[txDetails.toChain].poolAddress,
       1, //* the amount at index 1 gets overwritten by payload
@@ -110,7 +110,7 @@ export const seamlessRepayHandler = (txDetails: TransactionDetailsDto) => {
   calls.push({
     target: seamlessConfig[txDetails.toChain].poolAddress,
     callType:
-      txDetails.toToken === ETHEREUM_ADDRESS
+      txDetails.toToken === ETHEREUM_ADDRESS_SQUID
         ? SquidCallType.FULL_NATIVE_BALANCE
         : SquidCallType.FULL_TOKEN_BALANCE,
     callData: seamlessRepayEncodedData,

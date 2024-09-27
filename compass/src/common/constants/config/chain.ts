@@ -54,4 +54,9 @@ export const chains = {
     rpc: process.env.AVALANCHE_RPC,
     wethAddress: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7', //!usdt address
   },
+  '534352': {
+    name: 'SCROLL',
+    rpc: process.env.SCROLL_RPC,
+    wethAddress: '0x5300000000000000000000000000000000000004',
+  },
 };

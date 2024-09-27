@@ -5,7 +5,7 @@ import { encodeFunctionData } from 'src/common/ethers';
 import { TransactionDetailsDto } from 'src/core/resources/quote/dto/prepare-transaction.dto';
 import { hookBuilder } from '../hook-builder';
 import { HookBuilderArgs } from 'src/common/types';
-import { ETHEREUM_ADDRESS } from 'src/common/constants';
+import { ETHEREUM_ADDRESS_SQUID } from 'src/common/constants';
 
 /**
  * * This hook includes interacting with zerolend protocol and performing functions
@@ -26,7 +26,7 @@ export const zerolendSupplyHandler = (txDetails: TransactionDetailsDto) => {
   const calls: HookBuilderArgs['calls'] = [];
 
   //* approval not needed if token is ethereum
-  if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+  if (txDetails.toToken !== ETHEREUM_ADDRESS_SQUID) {
     const erc20EncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
       zerolendConfig[txDetails.toChain].poolAddress as string,
       1, //* this amount gets overwritten by payload
@@ -53,7 +53,7 @@ export const zerolendSupplyHandler = (txDetails: TransactionDetailsDto) => {
   calls.push({
     target: zerolendConfig[txDetails.toChain].poolAddress,
     callType:
-      txDetails.toToken === ETHEREUM_ADDRESS
+      txDetails.toToken === ETHEREUM_ADDRESS_SQUID
         ? SquidCallType.FULL_NATIVE_BALANCE
         : SquidCallType.FULL_TOKEN_BALANCE,
     callData: zerolendSupplyEncodedData,
@@ -83,7 +83,7 @@ export const zerolendSupplyHandler = (txDetails: TransactionDetailsDto) => {
 export const zerolendRepayHandler = (txDetails: TransactionDetailsDto) => {
   const calls: HookBuilderArgs['calls'] = [];
 
-  if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+  if (txDetails.toToken !== ETHEREUM_ADDRESS_SQUID) {
     const erc20EncodedData = encodeFunctionData(ERC20_ABI, 'approve', [
       zerolendConfig[txDetails.toChain].poolAddress,
       1, //* the amount at index 1 gets overwritten by payload
@@ -110,7 +110,7 @@ export const zerolendRepayHandler = (txDetails: TransactionDetailsDto) => {
   calls.push({
     target: zerolendConfig[txDetails.toChain].poolAddress,
     callType:
-      txDetails.toToken === ETHEREUM_ADDRESS
+      txDetails.toToken === ETHEREUM_ADDRESS_SQUID
         ? SquidCallType.FULL_NATIVE_BALANCE
         : SquidCallType.FULL_TOKEN_BALANCE,
     callData: zerolendRepayEncodedData,

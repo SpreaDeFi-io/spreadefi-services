@@ -6,15 +6,24 @@ import { AAVE_POOL_ABI, ERC20_ABI } from 'src/common/constants/abi';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { aaveRepayHandler, aaveSupplyHandler } from 'src/common/hooks/aave';
 import {
+  aaveLifiRepayHandler,
+  aaveLifiSupplyHandler,
+} from 'src/common/lifi/contract-calls/aave';
+import {
   PrepareTransactionDto,
   TransactionDetailsDto,
 } from 'src/core/resources/quote/dto/prepare-transaction.dto';
-import { ETHEREUM_ADDRESS } from 'src/common/constants';
+import { ETHEREUM_ADDRESS_SQUID, LIFI_CHAINS } from 'src/common/constants';
+import { LifiService } from 'src/libs/lifi/lifi.service';
+import { convertQuoteToRoute } from '@lifi/sdk';
 // import { isProtocolAvailable } from 'src/libs/protocol/protocol-checker';
 
 @Injectable()
 export class AaveService {
-  constructor(private readonly squidService: SquidService) {}
+  constructor(
+    private readonly squidService: SquidService,
+    private readonly lifiService: LifiService,
+  ) {}
 
   async prepareAaveTransaction({
     action,
@@ -60,7 +69,7 @@ export class AaveService {
     ) {
       //** Approve the tokens first
       //** If token is ethereum we don't need approval
-      if (txDetails.fromToken !== ETHEREUM_ADDRESS) {
+      if (txDetails.fromToken !== ETHEREUM_ADDRESS_SQUID) {
         const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
           aaveConfig[txDetails.fromChain].poolAddress,
           txDetails.fromAmount,
@@ -93,21 +102,62 @@ export class AaveService {
     } else {
       //* get the quote from squid
       //* prepare the post hook
-      const hook = aaveSupplyHandler(txDetails);
 
-      //* prepare squid Transaction data
-      const tx1 = await this.squidService.createQuote({
-        ...txDetails,
-        postHook: hook,
-      });
+      //*If this statement is true then use lifi for the transaction otherwise use squid
+      if (
+        LIFI_CHAINS.filter(
+          (chain) =>
+            chain.chainId === txDetails.toChain ||
+            chain.chainId === txDetails.fromChain,
+        ).length > 0
+      ) {
+        const route = await this.lifiService.getLifiRoute({
+          fromAddress: txDetails.fromAddress,
+          fromChainId: +txDetails.fromChain,
+          toChainId: +txDetails.toChain,
+          fromTokenAddress: txDetails.fromToken,
+          toTokenAddress: txDetails.toToken,
+          fromAmount: txDetails.fromAmount,
+        });
 
-      transactions.push({
-        chain: txDetails.fromChain,
-        to: '',
-        type: Action.SQUID,
-        tx: tx1,
-      });
+        const toAmount = route.toAmount;
 
+        const contractCalls = aaveLifiSupplyHandler(txDetails, toAmount);
+
+        const lifiContractQuote = await this.lifiService.getLifiContractQuote({
+          fromAddress: txDetails.fromAddress,
+          fromChain: txDetails.fromChain,
+          toChain: txDetails.toChain,
+          fromToken: txDetails.fromToken,
+          toToken: txDetails.toToken,
+          fromAmount: txDetails.fromAmount,
+          contractCalls: contractCalls,
+        });
+
+        const contractRoute = convertQuoteToRoute(lifiContractQuote);
+
+        transactions.push({
+          chain: txDetails.fromChain,
+          to: '',
+          type: Action.LIFI,
+          tx: contractRoute,
+        });
+      } else {
+        const hook = aaveSupplyHandler(txDetails);
+
+        //* prepare squid Transaction data
+        const tx1 = await this.squidService.createQuote({
+          ...txDetails,
+          postHook: hook,
+        });
+
+        transactions.push({
+          chain: txDetails.fromChain,
+          to: '',
+          type: Action.SQUID,
+          tx: tx1,
+        });
+      }
       return transactions;
     }
   }
@@ -137,14 +187,39 @@ export class AaveService {
       txDetails.fromChain !== txDetails.toChain ||
       txDetails.fromToken !== txDetails.toToken
     ) {
-      const tx2 = await this.squidService.createQuote(txDetails);
+      //*If this statement is true then use lifi for the transaction otherwise use squid
+      if (
+        LIFI_CHAINS.filter(
+          (chain) =>
+            chain.chainId === txDetails.toChain ||
+            chain.chainId === txDetails.fromChain,
+        ).length > 0
+      ) {
+        const route = await this.lifiService.getLifiRoute({
+          fromAddress: txDetails.fromAddress,
+          fromChainId: +txDetails.fromChain,
+          toChainId: +txDetails.toChain,
+          fromTokenAddress: txDetails.fromToken,
+          toTokenAddress: txDetails.toToken,
+          fromAmount: txDetails.fromAmount,
+        });
 
-      transactions.push({
-        chain: txDetails.fromChain,
-        to: '',
-        type: Action.SQUID,
-        tx: tx2,
-      });
+        transactions.push({
+          chain: txDetails.fromChain,
+          to: '',
+          type: Action.LIFI,
+          tx: route,
+        });
+      } else {
+        const tx2 = await this.squidService.createQuote(txDetails);
+
+        transactions.push({
+          chain: txDetails.fromChain,
+          to: '',
+          type: Action.SQUID,
+          tx: tx2,
+        });
+      }
     }
 
     return transactions;
@@ -159,23 +234,64 @@ export class AaveService {
       txDetails.fromChain !== txDetails.toChain ||
       txDetails.fromToken !== txDetails.toToken
     ) {
-      const hook = aaveRepayHandler(txDetails);
+      if (
+        LIFI_CHAINS.filter(
+          (chain) =>
+            chain.chainId === txDetails.toChain ||
+            chain.chainId === txDetails.fromChain,
+        ).length > 0
+      ) {
+        const lifiRoute = await this.lifiService.getLifiRoute({
+          fromAddress: txDetails.fromAddress,
+          fromChainId: +txDetails.fromChain,
+          toChainId: +txDetails.toChain,
+          fromTokenAddress: txDetails.fromToken,
+          toTokenAddress: txDetails.toToken,
+          fromAmount: txDetails.fromAmount,
+        });
 
-      const tx1 = await this.squidService.createQuote({
-        ...txDetails,
-        postHook: hook,
-      });
+        const toAmount = lifiRoute.toAmount;
 
-      transactions.push({
-        chain: txDetails.fromChain,
-        to: '',
-        type: Action.SQUID,
-        tx: tx1,
-      });
+        const contractCalls = aaveLifiRepayHandler(txDetails, toAmount);
+
+        const lifiContractQuote = await this.lifiService.getLifiContractQuote({
+          fromAddress: txDetails.fromAddress,
+          fromChain: txDetails.fromChain,
+          toChain: txDetails.toChain,
+          fromToken: txDetails.fromToken,
+          toToken: txDetails.toToken,
+          fromAmount: txDetails.fromAmount,
+          contractCalls: contractCalls,
+          contractOutputsToken: txDetails.toToken, //! what if the amount of token sent is greater than what is to be repayed, in that case return the remainin amount to the user
+        });
+
+        const contractRoute = convertQuoteToRoute(lifiContractQuote);
+
+        transactions.push({
+          chain: txDetails.fromChain,
+          to: '',
+          type: Action.LIFI,
+          tx: contractRoute,
+        });
+      } else {
+        const hook = aaveRepayHandler(txDetails);
+
+        const tx1 = await this.squidService.createQuote({
+          ...txDetails,
+          postHook: hook,
+        });
+
+        transactions.push({
+          chain: txDetails.fromChain,
+          to: '',
+          type: Action.SQUID,
+          tx: tx1,
+        });
+      }
 
       return transactions;
     } else {
-      if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+      if (txDetails.toToken !== ETHEREUM_ADDRESS_SQUID) {
         const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
           aaveConfig[txDetails.fromChain].poolAddress,
           txDetails.fromAmount,
@@ -243,14 +359,38 @@ export class AaveService {
       txDetails.fromChain !== txDetails.toChain ||
       txDetails.fromToken !== txDetails.toToken
     ) {
-      const tx3 = await this.squidService.createQuote(txDetails);
+      if (
+        LIFI_CHAINS.filter(
+          (chain) =>
+            chain.chainId === txDetails.toChain ||
+            chain.chainId === txDetails.fromChain,
+        ).length > 0
+      ) {
+        const tx3 = await this.lifiService.getLifiRoute({
+          fromAddress: txDetails.fromAddress,
+          fromChainId: +txDetails.fromChain,
+          toChainId: +txDetails.toChain,
+          fromTokenAddress: txDetails.fromToken,
+          toTokenAddress: txDetails.toToken,
+          fromAmount: txDetails.fromAmount,
+        });
 
-      transactions.push({
-        chain: txDetails.fromChain,
-        to: '',
-        type: Action.SQUID,
-        tx: tx3,
-      });
+        transactions.push({
+          chain: txDetails.fromChain,
+          to: '',
+          type: Action.LIFI,
+          tx: tx3,
+        });
+      } else {
+        const tx3 = await this.squidService.createQuote(txDetails);
+
+        transactions.push({
+          chain: txDetails.fromChain,
+          to: '',
+          type: Action.SQUID,
+          tx: tx3,
+        });
+      }
     }
 
     return transactions;

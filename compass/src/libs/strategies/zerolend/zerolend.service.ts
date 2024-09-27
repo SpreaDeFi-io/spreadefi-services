@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ETHEREUM_ADDRESS } from 'src/common/constants';
+import { ETHEREUM_ADDRESS_SQUID } from 'src/common/constants';
 import { ERC20_ABI, ZEROLEND_POOL_ABI } from 'src/common/constants/abi';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
 import { encodeFunctionData } from 'src/common/ethers';
@@ -69,7 +69,7 @@ export class ZerolendService {
       //** Approve the tokens first
       //** If token is ethereum we don't need approval
 
-      if (txDetails.fromToken !== ETHEREUM_ADDRESS) {
+      if (txDetails.fromToken !== ETHEREUM_ADDRESS_SQUID) {
         const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
           zerolendConfig[txDetails.fromChain].poolAddress,
           txDetails.fromAmount,
@@ -184,7 +184,7 @@ export class ZerolendService {
 
       return transactions;
     } else {
-      if (txDetails.toToken !== ETHEREUM_ADDRESS) {
+      if (txDetails.toToken !== ETHEREUM_ADDRESS_SQUID) {
         const tx1 = encodeFunctionData(ERC20_ABI, 'approve', [
           zerolendConfig[txDetails.fromChain].poolAddress,
           txDetails.fromAmount,

@@ -2,7 +2,11 @@ import { StrategyName } from '../types';
 
 export const SQUID_BASE_URL = 'https://apiplus.squidrouter.com';
 
-export const ETHEREUM_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const ETHEREUM_ADDRESS_SQUID =
+  '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+
+export const ETHEREUM_ADDRESS_LIFI =
+  '0x0000000000000000000000000000000000000000';
 
 export const PORTALS_URL = 'https://api.portals.fi/v2';
 
@@ -15,7 +19,7 @@ export const SQUID_MULTICALL_CONTRACT =
 
 export const protocolOnChains = {
   Aave: {
-    chains: ['10', '8453', '42161'],
+    chains: ['10', '8453', '42161', '534352'],
   },
   Seamless: {
     chains: ['8453'],
@@ -32,7 +36,6 @@ export const chainIdToChainPortals = {
   '42161': 'arbitrum',
   '10': 'optimism',
   '8453': 'base',
-  '59144': 'linea',
   '56': 'bsc',
   '137': 'polygon',
   '250': 'fantom',
@@ -43,7 +46,6 @@ export const chainToChainIdPortals = {
   arbitrum: '42161',
   optimism: '10',
   base: '8453',
-  linea: '59144',
   bsc: '56',
   polygon: '137',
   fantom: '250',
@@ -99,4 +101,11 @@ export const PORTALS_ENSO_MIGRATION_PROTOCOLS = [
   StrategyName.HARVEST_FINANCE_BENQI,
   StrategyName.BENQI_PENDLE,
   StrategyName.PENDLE_BENQI,
+];
+
+export const LIFI_CHAINS = [
+  // {
+  //   name: 'Scroll',
+  //   chainId: '534352',
+  // },
 ];
