@@ -9,7 +9,7 @@ export const RPC_URLS = {
   '137': process.env.POLYGON_RPC,
   '250': process.env.FANTOM_RPC,
   '43114': process.env.AVALANCHE_RPC,
-  '324': process.env.ZKSYNC_ERA_RPC,
+  '534352': process.env.SCROLL_RPC,
 };
 
 export const DEFI_LLAMA_URI = 'https://yields.llama.fi';
@@ -78,7 +78,7 @@ export const CHAINS = {
   POLYGON: 137,
   FANTOM: 250,
   AVALANCHE: 43114,
-  ZKSYNC: 324,
+  SCROLL: 534352,
 };
 
 export const chainToChainId = {
@@ -90,7 +90,7 @@ export const chainToChainId = {
   POLYGON: '137',
   FANTOM: '250',
   AVALANCHE: '43114',
-  ZKSYNC: '324',
+  SCROLL: '534352',
 };
 
 export const chainIdToChainPortals = {

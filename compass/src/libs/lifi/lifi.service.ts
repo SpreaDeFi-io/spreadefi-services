@@ -31,7 +31,7 @@ export class LifiService {
         [ChainId.POL]: [this.configService.get<string>('POLYGON_RPC')],
         [ChainId.LNA]: [this.configService.get<string>('LINEA_RPC')],
         [ChainId.BSC]: [this.configService.get<string>('BSC_RPC')],
-        [ChainId.ERA]: [this.configService.get<string>('ZKSYNC_ERA_RPC')],
+        [ChainId.SCL]: [this.configService.get<string>('SCROLL_RPC')],
       },
     });
   }
@@ -51,7 +51,7 @@ export class LifiService {
   async getLifiRoute(lifiRouteArgs: Partial<RoutesRequest>) {
     try {
       const result = await getRoutes({
-        fromAddress: lifiRouteArgs.fromAddress,
+        fromAddress: lifiRouteArgs.fromAddress.toLowerCase(),
         fromChainId: lifiRouteArgs.fromChainId,
         toChainId: lifiRouteArgs.toChainId,
         fromTokenAddress: lifiRouteArgs.fromTokenAddress,
@@ -59,10 +59,12 @@ export class LifiService {
         fromAmount: lifiRouteArgs.fromAmount,
         options: {
           bridges: {
-            allow: ['symbiosis'],
+            allow: ['stargate', 'stargateV2'],
           },
         },
       });
+
+      console.log('result is', result.routes[0]);
 
       return result.routes[0];
     } catch (error) {
@@ -74,7 +76,7 @@ export class LifiService {
   async getLifiQuote(lifiQuoteArgs: Partial<QuoteRequest>) {
     try {
       const result = await getQuote({
-        fromAddress: lifiQuoteArgs.fromAddress,
+        fromAddress: lifiQuoteArgs.fromAddress.toLowerCase(),
         fromChain: lifiQuoteArgs.fromChain,
         toChain: lifiQuoteArgs.toChain,
         fromToken: lifiQuoteArgs.fromToken,
@@ -93,7 +95,8 @@ export class LifiService {
   ) {
     try {
       const result = await getContractCallsQuote({
-        fromAddress: lifiContractQuoteArgs.fromAddress,
+        fromAddress: lifiContractQuoteArgs.fromAddress.toLowerCase(),
+        toFallbackAddress: lifiContractQuoteArgs.fromAddress.toLowerCase(),
         fromChain: lifiContractQuoteArgs.fromChain,
         toChain: lifiContractQuoteArgs.toChain,
         fromToken: lifiContractQuoteArgs.fromToken,
@@ -102,7 +105,7 @@ export class LifiService {
           lifiContractQuoteArgs as ContractCallsQuoteRequestFromAmount
         ).fromAmount,
         contractCalls: lifiContractQuoteArgs.contractCalls,
-        preferBridges: ['symbiosis'],
+        preferBridges: ['stargate', 'stargateV2'],
       });
 
       return result;
