@@ -25,7 +25,7 @@ export const protocolOnChains = {
     chains: ['8453'],
   },
   Zerolend: {
-    chains: ['59144'],
+    chains: ['59144', '81457'],
   },
   Hop: {
     chains: ['10', '42161'],
