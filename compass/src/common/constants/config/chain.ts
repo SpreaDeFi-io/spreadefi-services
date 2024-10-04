@@ -64,4 +64,9 @@ export const chains = {
     rpc: process.env.BLAST_RPC,
     wethAddress: '0x4300000000000000000000000000000000000004',
   },
+  '1088': {
+    name: 'METIS',
+    rpc: process.env.METIS_RPC,
+    wethAddress: '0x420000000000000000000000000000000000000a',
+  },
 };

@@ -19,7 +19,7 @@ export const SQUID_MULTICALL_CONTRACT =
 
 export const protocolOnChains = {
   Aave: {
-    chains: ['10', '8453', '42161', '534352'],
+    chains: ['10', '8453', '42161', '534352', '1088'],
   },
   Seamless: {
     chains: ['8453'],
@@ -104,6 +104,10 @@ export const PORTALS_ENSO_MIGRATION_PROTOCOLS = [
 ];
 
 export const LIFI_CHAINS = [
+  {
+    name: 'Metis',
+    chainId: '1088',
+  },
   // {
   //   name: 'Scroll',
   //   chainId: '534352',
