@@ -111,6 +111,7 @@ export class AaveService {
             chain.chainId === txDetails.fromChain,
         ).length > 0
       ) {
+        //* in case of Li.Fi the fromAmount will be toAmount
         const route = await this.lifiService.getLifiRoute({
           fromAddress: txDetails.fromAddress,
           fromChainId: +txDetails.fromChain,
@@ -130,7 +131,7 @@ export class AaveService {
           toChain: txDetails.toChain,
           fromToken: txDetails.fromToken,
           toToken: txDetails.toToken,
-          fromAmount: txDetails.fromAmount,
+          toAmount: toAmount,
           contractCalls: contractCalls,
         });
 
@@ -260,9 +261,9 @@ export class AaveService {
           toChain: txDetails.toChain,
           fromToken: txDetails.fromToken,
           toToken: txDetails.toToken,
-          fromAmount: txDetails.fromAmount,
+          toAmount: toAmount,
           contractCalls: contractCalls,
-          contractOutputsToken: txDetails.toToken, //! what if the amount of token sent is greater than what is to be repayed, in that case return the remainin amount to the user
+          contractOutputsToken: txDetails.toToken,
         });
 
         const contractRoute = convertQuoteToRoute(lifiContractQuote);

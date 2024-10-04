@@ -3,7 +3,7 @@ import {
   ChainId,
   ChainType,
   ContractCallsQuoteRequest,
-  ContractCallsQuoteRequestFromAmount,
+  ContractCallsQuoteRequestToAmount,
   createConfig,
   getContractCallsQuote,
   getQuote,
@@ -33,6 +33,7 @@ export class LifiService {
         [ChainId.BSC]: [this.configService.get<string>('BSC_RPC')],
         [ChainId.SCL]: [this.configService.get<string>('SCROLL_RPC')],
         [ChainId.BLS]: [this.configService.get<string>('BLAST_RPC')],
+        [ChainId.MAM]: [this.configService.get<string>('METIS_RPC')],
       },
     });
   }
@@ -65,11 +66,9 @@ export class LifiService {
         },
       });
 
-      console.log('result is', result.routes[0]);
-
       return result.routes[0];
     } catch (error) {
-      console.log('eror is', error);
+      console.log('error is', error);
       throw new BadRequestException(error);
     }
   }
@@ -102,9 +101,8 @@ export class LifiService {
         toChain: lifiContractQuoteArgs.toChain,
         fromToken: lifiContractQuoteArgs.fromToken,
         toToken: lifiContractQuoteArgs.toToken,
-        fromAmount: (
-          lifiContractQuoteArgs as ContractCallsQuoteRequestFromAmount
-        ).fromAmount,
+        toAmount: (lifiContractQuoteArgs as ContractCallsQuoteRequestToAmount)
+          .toAmount,
         contractCalls: lifiContractQuoteArgs.contractCalls,
         preferBridges: ['stargate', 'stargateV2'],
       });

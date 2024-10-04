@@ -11,6 +11,7 @@ export const RPC_URLS = {
   '43114': process.env.AVALANCHE_RPC,
   '534352': process.env.SCROLL_RPC,
   '81457': process.env.BLAST_RPC,
+  '1088': process.env.METIS_RPC,
 };
 
 export const DEFI_LLAMA_URI = 'https://yields.llama.fi';
@@ -81,6 +82,7 @@ export const CHAINS = {
   AVALANCHE: 43114,
   SCROLL: 534352,
   BLAST: 81457,
+  METIS: 1088,
 };
 
 export const chainToChainId = {
@@ -94,6 +96,7 @@ export const chainToChainId = {
   AVALANCHE: '43114',
   SCROLL: '534352',
   BLAST: '81457',
+  METIS: '1088',
 };
 
 export const chainIdToChainPortals = {

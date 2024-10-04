@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChainID, CovalentClient } from '@covalenthq/client-sdk';
 
@@ -19,14 +19,21 @@ export class CovalentService {
    * @returns the user wallet balance
    */
   async getWalletBalanceForChain(userAddress: string, chainId: ChainID) {
+    console.log('Fetching wallet balance for chain', chainId);
     const response =
       await this.covalentClient.BalanceService.getTokenBalancesForWalletAddress(
         chainId,
         userAddress,
       );
 
-    if (response.error)
-      throw new InternalServerErrorException('Fetching token balance failed');
+    //!this is a temporary fix for the issue of covalent returning null for some chains
+    if (response.error) {
+      console.log('Error fetching wallet balance', response.error);
+      return [];
+    }
+
+    // if (response.error)
+    //   throw new InternalServerErrorException('Fetching token balance failed');
 
     return response.data.items;
   }
