@@ -45,6 +45,7 @@ jobs:
           echo FANTOM_RPC=${{secrets.FANTOM_RPC}} >> .env
           echo AVALANCHE_RPC=${{secrets.AVALANCHE_RPC}} >> .env
           echo SCROLL_RPC=${{secrets.SCROLL_RPC}} >> .env
+          echo BLAST_RPC=${{ secrets.BLAST_RPC }} >> .env
       - name: Install dependencies for compass
         run: |
           cd compass
@@ -95,6 +96,7 @@ jobs:
           echo FANTOM_RPC=${{secrets.FANTOM_RPC}} >> .env
           echo AVALANCHE_RPC=${{secrets.AVALANCHE_RPC}} >> .env
           echo SCROLL_RPC=${{secrets.SCROLL_RPC}} >> .env
+          echo BLAST_RPC={{ secrets.BLAST_RPC }} >> .env
       - name: Install dependencies for scout
         run: |
           cd scout

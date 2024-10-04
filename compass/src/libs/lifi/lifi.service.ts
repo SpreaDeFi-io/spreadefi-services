@@ -32,6 +32,7 @@ export class LifiService {
         [ChainId.LNA]: [this.configService.get<string>('LINEA_RPC')],
         [ChainId.BSC]: [this.configService.get<string>('BSC_RPC')],
         [ChainId.SCL]: [this.configService.get<string>('SCROLL_RPC')],
+        [ChainId.BLS]: [this.configService.get<string>('BLAST_RPC')],
       },
     });
   }

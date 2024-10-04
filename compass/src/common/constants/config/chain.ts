@@ -59,4 +59,9 @@ export const chains = {
     rpc: process.env.SCROLL_RPC,
     wethAddress: '0x5300000000000000000000000000000000000004',
   },
+  '81457': {
+    name: 'BLAST',
+    rpc: process.env.BLAST_RPC,
+    wethAddress: '0x4300000000000000000000000000000000000004',
+  },
 };
