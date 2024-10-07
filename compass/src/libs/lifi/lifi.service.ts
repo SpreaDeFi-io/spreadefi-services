@@ -34,6 +34,7 @@ export class LifiService {
         [ChainId.SCL]: [this.configService.get<string>('SCROLL_RPC')],
         [ChainId.BLS]: [this.configService.get<string>('BLAST_RPC')],
         [ChainId.MAM]: [this.configService.get<string>('METIS_RPC')],
+        [ChainId.MNT]: [this.configService.get<string>('MANTLE_RPC')],
       },
     });
   }

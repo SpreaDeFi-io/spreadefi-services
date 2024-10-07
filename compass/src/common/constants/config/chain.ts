@@ -69,4 +69,9 @@ export const chains = {
     rpc: process.env.METIS_RPC,
     wethAddress: '0x420000000000000000000000000000000000000a',
   },
+  '5000': {
+    name: 'MANTLE',
+    rpc: process.env.MANTLE_RPC,
+    wethAddress: '0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111',
+  },
 };
