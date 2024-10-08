@@ -19,8 +19,8 @@ import { zerolendConfig } from 'src/common/constants/config/zerolend';
 import { seamlessConfig } from 'src/common/constants/config/seamless';
 import { CovalentService } from 'src/libs/covalent/covalent.service';
 import { PortalsService } from 'src/libs/portals/portals.service';
-import { lendleConfig } from 'src/common/constants/config/lendle';
-import { LENDLE_DATA_PROVIDER_ABI } from 'src/common/constants/abi/lendle';
+// import { lendleConfig } from 'src/common/constants/config/lendle';
+// import { LENDLE_DATA_PROVIDER_ABI } from 'src/common/constants/abi/lendle';
 
 @Injectable()
 export class BalanceService {
@@ -70,15 +70,15 @@ export class BalanceService {
               SEAMLESS_DATA_PROVIDER_ABI,
             );
             break;
-          case 'Lendle':
-            balanceData = await this.fetchAssetBalance(
-              asset.assetAddress,
-              asset.chainId,
-              userAddress,
-              lendleConfig,
-              LENDLE_DATA_PROVIDER_ABI,
-            );
-            break;
+          // case 'Lendle':
+          //   balanceData = await this.fetchAssetBalance(
+          //     asset.assetAddress,
+          //     asset.chainId,
+          //     userAddress,
+          //     lendleConfig,
+          //     LENDLE_DATA_PROVIDER_ABI,
+          //   );
+          //   break;
         }
         return balanceData
           ? {

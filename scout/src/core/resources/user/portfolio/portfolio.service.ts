@@ -37,13 +37,13 @@ export class PortfolioService {
         aaveBalances,
         zerolendBalances,
         seamlessBalances,
-        lendleBalances,
+        // lendleBalances,
         yieldBalances,
       ] = await Promise.all([
         this.getAaveTotalValue(walletAddress),
         this.getZerolendTotalValue(walletAddress),
         this.getSeamlessTotalValue(walletAddress),
-        this.getLendleTotalValue(walletAddress),
+        // this.getLendleTotalValue(walletAddress),
         this.getYieldProtocolsTotalValue(walletAddress),
       ]);
 
@@ -51,7 +51,7 @@ export class PortfolioService {
         aaveBalances,
         zerolendBalances,
         seamlessBalances,
-        lendleBalances,
+        // lendleBalances,
       ];
       //add more params here based on frontend requirement
       const totalCollateralBase = this.calculateTotal(mergedBalance, 0);
@@ -99,7 +99,10 @@ export class PortfolioService {
         aaveBalances: this.convertBalanceToStrings(aaveBalances),
         seamlessBalances: this.convertBalanceToStrings(seamlessBalances),
         zerolendBalances: this.convertBalanceToStrings(zerolendBalances),
-        lendleBalances: this.convertBalanceToStrings(lendleBalances),
+        // lendleBalances: ethers.formatUnits(
+        //   this.convertBalanceToStrings(lendleBalances),
+        //   8,
+        // ),
       };
     } catch (error: any) {
       console.log('error: ', error);
