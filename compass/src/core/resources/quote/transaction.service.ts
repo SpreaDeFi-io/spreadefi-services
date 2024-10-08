@@ -23,6 +23,7 @@ import {
   PORTALS_ENSO_SUPPORTED_PROTOCOLS,
 } from 'src/common/constants';
 import { PathFinderService } from 'src/libs/pathfinder/pathfinder.service';
+import { LendleService } from 'src/libs/strategies/lendle/lendle.service';
 
 @Injectable()
 export class TransactionService {
@@ -44,6 +45,7 @@ export class TransactionService {
     private readonly aaveHopBeefyService: AaveHopBeefyService,
     private readonly squidPortalsService: SquidPortalsService,
     private readonly pathFinderService: PathFinderService,
+    private readonly lendleService: LendleService,
   ) {}
 
   async createQuote(createQuoteDto: CreateSquidQuoteDto) {
@@ -80,6 +82,13 @@ export class TransactionService {
       //* If strategy name is zerolend, then prepare transactions for zerolend
       case StrategyName.ZEROLEND:
         transactions = await this.zerolendService.prepareZerolendTransaction({
+          action,
+          txDetails,
+        });
+        return transactions;
+
+      case StrategyName.LENDLE:
+        transactions = await this.lendleService.prepareLendleTransaction({
           action,
           txDetails,
         });

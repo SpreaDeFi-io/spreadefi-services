@@ -18,6 +18,7 @@ import { SeamlessLoopingStrategyModule } from 'src/libs/strategies/seamless-loop
 import { ZerolendLoopingStrategyModule } from 'src/libs/strategies/zerolend-looping-strategy/zerolend-looping-strategy.module';
 import { SquidPortalsModule } from 'src/libs/strategies/squid-portals/squid-portals.module';
 import { PathfinderModule } from 'src/libs/pathfinder/pathfinder.module';
+import { LendleModule } from 'src/libs/strategies/lendle/lendle.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PathfinderModule } from 'src/libs/pathfinder/pathfinder.module';
     AaveHopBeefyModule.register(),
     SquidPortalsModule.register(),
     PathfinderModule.register(),
+    LendleModule.register(),
   ],
   controllers: [TransactionController],
   providers: [TransactionService],

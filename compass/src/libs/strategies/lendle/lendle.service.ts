@@ -76,7 +76,7 @@ export class LendleService {
       }
 
       //** call the supply method
-      const tx2 = encodeFunctionData(LENDLE_POOL_ABI, 'supply', [
+      const tx2 = encodeFunctionData(LENDLE_POOL_ABI, 'deposit', [
         txDetails.fromToken, //! fromToken will be different if eth is supplied
         txDetails.fromAmount,
         txDetails.fromAddress,

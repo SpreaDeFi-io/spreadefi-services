@@ -35,7 +35,7 @@ export const lendleLifiSupplyHandler = (
 
   const lendleSupplyEncodedData = encodeFunctionData(
     LENDLE_POOL_ABI,
-    'supply',
+    'deposit',
     [txDetails.toToken, toAmount, txDetails.fromAddress, 0],
   );
 
