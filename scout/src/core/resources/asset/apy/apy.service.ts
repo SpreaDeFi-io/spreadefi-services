@@ -24,6 +24,8 @@ import {
 import { seamlessConfig } from 'src/common/constants/config/seamless';
 import { zerolendConfig } from 'src/common/constants/config/zerolend';
 import { ConfigService } from '@nestjs/config';
+import { lendleConfig } from 'src/common/constants/config/lendle';
+import { LENDLE_POOL_ABI } from 'src/common/constants/abi/lendle';
 
 @Injectable()
 export class ApyService {
@@ -42,6 +44,8 @@ export class ApyService {
         return this.getZerolendApy(asset.assetAddress, asset.chainId);
       } else if (asset.protocolName == 'Seamless') {
         return this.getSeamlessApy(asset.assetAddress, asset.chainId);
+      } else if (asset.protocolName == 'Lendle') {
+        return this.getLendleApy(asset.assetAddress, asset.chainId);
       }
     });
 
@@ -256,6 +260,31 @@ export class ApyService {
     } catch (error) {
       this.apyLogger.error(
         `Error getting Zerolend apy on chainId ${chainId} of asset ${assetAddress} : ${error}`,
+      );
+      return null;
+    }
+  }
+
+  async getLendleApy(assetAddress: string, chainId: string) {
+    try {
+      const provider = new ethers.JsonRpcProvider(RPC_URLS[chainId]);
+      const contractAddress = lendleConfig[chainId].poolAddress;
+      const contract = new ethers.Contract(
+        contractAddress,
+        LENDLE_POOL_ABI,
+        provider,
+      );
+      const reserveData = await contract.getReserveData(assetAddress);
+      const liquidityRateRay: bigint = reserveData[2];
+      const borrowRateRay: bigint = reserveData[4];
+
+      const supplyApy = Number(liquidityRateRay) / 1e25;
+      const borrowApy = Number(borrowRateRay) / 1e25;
+
+      return { supplyApy, borrowApy };
+    } catch (error) {
+      this.apyLogger.error(
+        `Error getting Lendle apy on chainId ${chainId} of asset ${assetAddress} : ${error}`,
       );
       return null;
     }

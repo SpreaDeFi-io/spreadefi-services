@@ -47,6 +47,7 @@ jobs:
           echo SCROLL_RPC=${{secrets.SCROLL_RPC}} >> .env
           echo BLAST_RPC=${{ secrets.BLAST_RPC }} >> .env
           echo METIS_RPC=${{ secrets.METIS_RPC }} >> .env
+          echo MANTLE_RPC=${{ secrets.MANTLE_RPC }} >> .env
       - name: Install dependencies for compass
         run: |
           cd compass
@@ -99,6 +100,7 @@ jobs:
           echo SCROLL_RPC=${{secrets.SCROLL_RPC}} >> .env
           echo BLAST_RPC={{ secrets.BLAST_RPC }} >> .env
           echo METIS_RPC=${{ secrets.METIS_RPC }} >> .env
+          echo MANTLE_RPC=${{ secrets.MANTLE_RPC }} >> .env
       - name: Install dependencies for scout
         run: |
           cd scout

@@ -19,7 +19,6 @@ export class CovalentService {
    * @returns the user wallet balance
    */
   async getWalletBalanceForChain(userAddress: string, chainId: ChainID) {
-    console.log('Fetching wallet balance for chain', chainId);
     const response =
       await this.covalentClient.BalanceService.getTokenBalancesForWalletAddress(
         chainId,

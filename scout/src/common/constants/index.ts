@@ -12,6 +12,7 @@ export const RPC_URLS = {
   '534352': process.env.SCROLL_RPC,
   '81457': process.env.BLAST_RPC,
   '1088': process.env.METIS_RPC,
+  '5000': process.env.MANTLE_RPC,
 };
 
 export const DEFI_LLAMA_URI = 'https://yields.llama.fi';
@@ -83,6 +84,7 @@ export const CHAINS = {
   SCROLL: 534352,
   BLAST: 81457,
   METIS: 1088,
+  MANTLE: 5000,
 };
 
 export const chainToChainId = {
@@ -97,6 +99,7 @@ export const chainToChainId = {
   SCROLL: '534352',
   BLAST: '81457',
   METIS: '1088',
+  MANTLE: '5000',
 };
 
 export const chainIdToChainPortals = {

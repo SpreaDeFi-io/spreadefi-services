@@ -14,6 +14,8 @@ import { CovalentService } from 'src/libs/covalent/covalent.service';
 import { AssetRepository } from '../../asset/asset.repository';
 import { ProtocolType } from '../../asset/asset.schema';
 import { PortalsService } from 'src/libs/portals/portals.service';
+import { lendleConfig } from 'src/common/constants/config/lendle';
+import { LENDLE_POOL_ABI } from 'src/common/constants/abi/lendle';
 
 @Injectable()
 export class PortfolioService {
@@ -31,15 +33,26 @@ export class PortfolioService {
    */
   async getTotalBalance(walletAddress: string) {
     try {
-      const [aaveBalances, zerolendBalances, seamlessBalances, yieldBalances] =
-        await Promise.all([
-          this.getAaveTotalValue(walletAddress),
-          this.getZerolendTotalValue(walletAddress),
-          this.getSeamlessTotalValue(walletAddress),
-          this.getYieldProtocolsTotalValue(walletAddress),
-        ]);
+      const [
+        aaveBalances,
+        zerolendBalances,
+        seamlessBalances,
+        // lendleBalances,
+        yieldBalances,
+      ] = await Promise.all([
+        this.getAaveTotalValue(walletAddress),
+        this.getZerolendTotalValue(walletAddress),
+        this.getSeamlessTotalValue(walletAddress),
+        // this.getLendleTotalValue(walletAddress),
+        this.getYieldProtocolsTotalValue(walletAddress),
+      ]);
 
-      const mergedBalance = [aaveBalances, zerolendBalances, seamlessBalances];
+      const mergedBalance = [
+        aaveBalances,
+        zerolendBalances,
+        seamlessBalances,
+        // lendleBalances,
+      ];
       //add more params here based on frontend requirement
       const totalCollateralBase = this.calculateTotal(mergedBalance, 0);
       const totalDebtBase = this.calculateTotal(mergedBalance, 1);
@@ -86,6 +99,10 @@ export class PortfolioService {
         aaveBalances: this.convertBalanceToStrings(aaveBalances),
         seamlessBalances: this.convertBalanceToStrings(seamlessBalances),
         zerolendBalances: this.convertBalanceToStrings(zerolendBalances),
+        // lendleBalances: ethers.formatUnits(
+        //   this.convertBalanceToStrings(lendleBalances),
+        //   8,
+        // ),
       };
     } catch (error: any) {
       console.log('error: ', error);
@@ -157,6 +174,34 @@ export class PortfolioService {
       this.portfolioLogger.error(
         `while getting zerolend total values ${error}`,
       );
+      return null;
+    }
+  }
+
+  async getLendleTotalValue(walletAddress: string) {
+    try {
+      const balanceDataPromises = Object.keys(lendleConfig).map(
+        async (networkId) => {
+          const provider = new ethers.JsonRpcProvider(RPC_URLS[networkId]);
+          const contractAddress = lendleConfig[networkId].poolAddress;
+          const contract = new ethers.Contract(
+            contractAddress,
+            LENDLE_POOL_ABI,
+            provider,
+          );
+          const accountData = await contract.getUserAccountData(walletAddress);
+          return { [networkId]: accountData };
+        },
+      );
+
+      const balanceData = await Promise.all(balanceDataPromises);
+      const balanceDataObject = balanceData.reduce((acc, data) => {
+        return { ...acc, ...data };
+      }, {});
+
+      return balanceDataObject;
+    } catch (error) {
+      this.portfolioLogger.error(`while getting Lendle total values ${error}`);
       return null;
     }
   }

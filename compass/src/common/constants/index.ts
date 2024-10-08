@@ -30,6 +30,9 @@ export const protocolOnChains = {
   Hop: {
     chains: ['10', '42161'],
   },
+  Lendle: {
+    chains: ['5000'],
+  },
 };
 
 export const chainIdToChainPortals = {
@@ -108,8 +111,8 @@ export const LIFI_CHAINS = [
     name: 'Metis',
     chainId: '1088',
   },
-  // {
-  //   name: 'Scroll',
-  //   chainId: '534352',
-  // },
+  {
+    name: 'Mantle',
+    chainId: '5000',
+  },
 ];

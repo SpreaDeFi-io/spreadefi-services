@@ -1,5 +1,6 @@
 export enum StrategyName {
   AAVE = 'Aave',
+  LENDLE = 'Lendle',
   SEAMLESS = 'Seamless',
   ZEROLEND = 'Zerolend',
   AAVE_SEAMLESS = 'Aave-Seamless',
