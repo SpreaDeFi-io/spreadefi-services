@@ -275,7 +275,7 @@ export class ApyService {
         provider,
       );
       const reserveData = await contract.getReserveData(assetAddress);
-      const liquidityRateRay: bigint = reserveData[2];
+      const liquidityRateRay: bigint = reserveData[3];
       const borrowRateRay: bigint = reserveData[4];
 
       const supplyApy = Number(liquidityRateRay) / 1e25;
