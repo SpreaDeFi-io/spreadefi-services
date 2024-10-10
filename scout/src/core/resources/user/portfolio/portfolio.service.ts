@@ -37,13 +37,13 @@ export class PortfolioService {
         aaveBalances,
         zerolendBalances,
         seamlessBalances,
-        // lendleBalances,
+        lendleBalances,
         yieldBalances,
       ] = await Promise.all([
         this.getAaveTotalValue(walletAddress),
         this.getZerolendTotalValue(walletAddress),
         this.getSeamlessTotalValue(walletAddress),
-        // this.getLendleTotalValue(walletAddress),
+        this.getLendleTotalValue(walletAddress),
         this.getYieldProtocolsTotalValue(walletAddress),
       ]);
 
@@ -51,7 +51,7 @@ export class PortfolioService {
         aaveBalances,
         zerolendBalances,
         seamlessBalances,
-        // lendleBalances,
+        lendleBalances,
       ];
       //add more params here based on frontend requirement
       const totalCollateralBase = this.calculateTotal(mergedBalance, 0);
@@ -99,10 +99,7 @@ export class PortfolioService {
         aaveBalances: this.convertBalanceToStrings(aaveBalances),
         seamlessBalances: this.convertBalanceToStrings(seamlessBalances),
         zerolendBalances: this.convertBalanceToStrings(zerolendBalances),
-        // lendleBalances: ethers.formatUnits(
-        //   this.convertBalanceToStrings(lendleBalances),
-        //   8,
-        // ),
+        lendleBalances: this.convertBalanceToStrings(lendleBalances),
       };
     } catch (error: any) {
       console.log('error: ', error);
@@ -199,7 +196,23 @@ export class PortfolioService {
         return { ...acc, ...data };
       }, {});
 
-      return balanceDataObject;
+      const balanceObjectFormatted = {};
+
+      Object.keys(balanceDataObject).forEach((key) => {
+        // Access the array for each key
+        const arr = balanceDataObject[key];
+
+        balanceObjectFormatted[key] = [
+          arr[0].toString().length > 10
+            ? BigInt(arr[0].toString().slice(0, -10))
+            : arr[0],
+          arr[1].toString().length > 10
+            ? BigInt(arr[1].toString()?.substring(0, -10))
+            : arr[1],
+        ].concat(arr.slice(2));
+      });
+
+      return balanceObjectFormatted;
     } catch (error) {
       this.portfolioLogger.error(`while getting Lendle total values ${error}`);
       return null;
